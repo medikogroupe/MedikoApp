@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <rect x="0" y="0" width="120" height="120" rx="28" fill="#0A4B8A"/>
+  <!-- M stylisé -->
+  <path d="M 25 93 L 25 43 Q 25 28 39 28 Q 47 28 52 37 L 68 67 L 83 31 Q 85 26 92 26 Q 102 26 102 38 L 102 93"
+        fill="none" stroke="#7AC74F" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Barre du + -->
+  <path d="M 68 68 L 108 68"
+        fill="none" stroke="#7AC74F" stroke-width="13" stroke-linecap="round"/>
+</svg>

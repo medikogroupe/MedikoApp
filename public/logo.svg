@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 130">
+  <!-- Icône -->
+  <g>
+    <rect x="4" y="5" width="120" height="120" rx="28" fill="#0A4B8A"/>
+    <path d="M 29 98 L 29 48 Q 29 33 43 33 Q 51 33 56 42 L 72 72 L 87 36 Q 89 31 96 31 Q 106 31 106 43 L 106 98"
+          fill="none" stroke="#7AC74F" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M 72 73 L 112 73"
+          fill="none" stroke="#7AC74F" stroke-width="13" stroke-linecap="round"/>
+  </g>
+  <!-- Texte MEDIKO+ -->
+  <text x="142" y="86" font-family="Inter, Arial, Helvetica, sans-serif" font-size="56" font-weight="800" letter-spacing="1">
+    <tspan fill="#0A4B8A">MEDIKO</tspan><tspan fill="#7AC74F">+</tspan>
+  </text>
+</svg>
