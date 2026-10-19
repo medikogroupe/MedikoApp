@@ -1,0 +1,55 @@
+diff --git a/src/app/api/admin/qcm/route.ts b/src/app/api/admin/qcm/route.ts
+index af17de0..4a89d40 100644
+--- a/src/app/api/admin/qcm/route.ts
++++ b/src/app/api/admin/qcm/route.ts
+@@ -9,7 +9,9 @@ import { UUID_RE } from "@/lib/qcm";
+ export async function GET() {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const rows = await db.select().from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(50);
+-  return NextResponse.json({ sessions: rows });
++  return NextResponse.json({
++    sessions: rows.map((r) => ({ ...r, filieres: r.filieres ?? [], questionIds: r.questionIds ?? [] })),
++  });
+ }
+ 
+ /**
+diff --git a/src/app/api/qcm/surveille/route.ts b/src/app/api/qcm/surveille/route.ts
+index 3cb390f..db5c147 100644
+--- a/src/app/api/qcm/surveille/route.ts
++++ b/src/app/api/qcm/surveille/route.ts
+@@ -11,7 +11,9 @@ export async function GET() {
+   const user = await getCurrentUser();
+   if (!user) return NextResponse.json({ sessions: [] });
+   const rows = await db.select().from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(30);
+-  const visibles = rows.filter((s) => s.filieres.length === 0 || s.filieres.includes(user.filiere)).slice(0, 20);
++  const visibles = rows
++    .filter((s) => !s.filieres?.length || s.filieres.includes(user.filiere))
++    .slice(0, 20);
+   const tentatives = visibles.length
+     ? await db
+         .select()
+@@ -28,7 +30,7 @@ export async function GET() {
+         titre: s.titre,
+         module: s.module,
+         dureeMinutes: s.dureeMinutes,
+-        nbQuestions: s.questionIds.length || s.nbQuestions,
++        nbQuestions: s.questionIds?.length || s.nbQuestions,
+         dateLancement: s.dateLancement,
+         statut: s.statut,
+         ouvert: s.statut === "ACTIF" && s.dateLancement.getTime() <= maintenant,
+diff --git a/src/components/admin/QcmSessions.tsx b/src/components/admin/QcmSessions.tsx
+index 4ed8de3..f0f1f13 100644
+--- a/src/components/admin/QcmSessions.tsx
++++ b/src/components/admin/QcmSessions.tsx
+@@ -94,7 +94,10 @@ export default function QcmSessions() {
+ 
+   const charger = useCallback(async () => {
+     const res = await fetch("/api/admin/qcm");
+-    if (res.ok) setSessions((await res.json()).sessions ?? []);
++    if (!res.ok) return;
++    const brutes: Partial<Session>[] = (await res.json()).sessions ?? [];
++    // Tolérant : une ancienne ligne sans filières est traitée comme "toutes les filières".
++    setSessions(brutes.map((s) => ({ ...s, filieres: Array.isArray(s.filieres) ? s.filieres : [], sortiesMax: s.sortiesMax ?? 0 }) as Session));
+   }, []);
+ 
+   useEffect(() => {

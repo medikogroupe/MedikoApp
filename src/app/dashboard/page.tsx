@@ -15,7 +15,8 @@ import {
 } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { db } from "@/db";
-import { edtPerso, qcmAdmin, resultatsQcm } from "@/db/schema";
+import { edtPerso, qcmAdmin, qcmTentatives, resultatsQcm } from "@/db/schema";
+import { colonnesSession } from "@/lib/qcm-server";
 import { getCurrentUser } from "@/lib/auth";
 import { ensureSeed } from "@/lib/seed";
 
@@ -44,7 +45,7 @@ export default async function DashboardPage() {
       .from(edtPerso)
       .where(sql`${edtPerso.userId} = ${user.id} and ${edtPerso.date} = ${today}`)
       .orderBy(edtPerso.heureDebut),
-    db.select().from(qcmAdmin).where(eq(qcmAdmin.statut, "ACTIF")).orderBy(desc(qcmAdmin.dateLancement)).limit(2),
+    db.select(colonnesSession).from(qcmAdmin).where(sql`${qcmAdmin.statut} = 'ACTIF' and ${qcmAdmin.dateLancement} <= now()`).orderBy(desc(qcmAdmin.dateLancement)).limit(20),
     db
       .select()
       .from(resultatsQcm)
@@ -68,7 +69,16 @@ export default async function DashboardPage() {
     (r) => r.createdAt.toISOString().slice(0, 10) === today,
   ).length;
   const progression = Math.min(100, Math.round((faitsAujourdhui / objectifJour) * 100));
-  const session = sessions[0];
+  const faites = sessions.length
+    ? await db
+        .select({ qcmAdminId: qcmTentatives.qcmAdminId })
+        .from(qcmTentatives)
+        .where(sql`${qcmTentatives.userId} = ${user.id} and ${qcmTentatives.statut} = 'TERMINE'`)
+    : [];
+  const dejaFaites = new Set(faites.map((f) => f.qcmAdminId));
+  const session = sessions.find(
+    (s) => (s.filieres.length === 0 || s.filieres.includes(user.filiere)) && !dejaFaites.has(s.id),
+  );
 
   return (
     <PageShell title={`Bonjour, ${user.nomWhatsapp.split(" ")[0]}`} subtitle={`Filière ${user.filiere} · ${user.ville}`} back={false}>

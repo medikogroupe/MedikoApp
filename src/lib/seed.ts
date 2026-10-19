@@ -128,18 +128,22 @@ export async function ensureSeed(): Promise<void> {
     if ((packs[0]?.c ?? 0) === 0) {
       await db.insert(packsConfig).values([
         {
-          nomPack: "MENSUEL",
+          nomPack: "Mensuel 500F",
           prixFcfa: 500,
           dureeJours: 30,
-          lienPaiement: "https://pay.wave.com/m/medikoplus/c/ci/",
+          lienPaiement: "",
           description: "Accès complet pendant 30 jours : QCM, jeux, scanner, bibliothèque.",
+          noteAdmin: "Après paiement Wave, activez manuellement le compte dans Gestion Comptes",
+          ordre: 1,
         },
         {
-          nomPack: "A_VIE",
+          nomPack: "A vie 4900F",
           prixFcfa: 4900,
           dureeJours: 9999,
-          lienPaiement: "https://pay.wave.com/m/medikoplus/c/ci/",
+          lienPaiement: "",
           description: "Accès à vie à toutes les fonctionnalités MEDIKO+.",
+          noteAdmin: "Après paiement Wave, activez manuellement le compte dans Gestion Comptes",
+          ordre: 2,
         },
       ]);
     }
@@ -172,7 +176,7 @@ export async function ensureSeed(): Promise<void> {
     }
 
     const admin = await db.select({ c: sql<number>`count(*)::int` }).from(qcmAdmin);
-    if ((admin[0]?.c ?? 0) === 0) {
+    if (process.env.NODE_ENV !== "production" && (admin[0]?.c ?? 0) === 0) {
       await db.insert(qcmAdmin).values([
         {
           titre: "Examen blanc Cardiologie",

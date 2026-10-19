@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { paiements, pharmacies, qcmAdmin, uploadsCommunaute, users } from "@/db/schema";
 import { isAdmin } from "@/lib/auth";
@@ -24,7 +24,12 @@ export async function GET() {
   const [revenusMois] = await db
     .select({ s: sql<number>`coalesce(sum(montant),0)::int` })
     .from(paiements)
-    .where(sql`date_trunc('month', created_at) = date_trunc('month', now())`);
+    .where(
+      and(
+        eq(paiements.statut, "VALIDE"),
+        sql`date_trunc('month', created_at) = date_trunc('month', now())`,
+      ),
+    );
 
   const revenusSemaine = await db
     .select({
@@ -32,6 +37,7 @@ export async function GET() {
       montant: sql<number>`coalesce(sum(montant),0)::int`,
     })
     .from(paiements)
+    .where(eq(paiements.statut, "VALIDE"))
     .groupBy(sql`date_trunc('week', created_at)`)
     .orderBy(sql`date_trunc('week', created_at)`)
     .limit(8);
@@ -39,6 +45,7 @@ export async function GET() {
   const parPack = await db
     .select({ pack: paiements.pack, total: sql<number>`count(*)::int` })
     .from(paiements)
+    .where(eq(paiements.statut, "VALIDE"))
     .groupBy(paiements.pack);
 
   return NextResponse.json({

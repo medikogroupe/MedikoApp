@@ -3,6 +3,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
 import Footer from "@/components/Footer";
 import { LogoIcon } from "@/components/Logo";
 import { isAdmin } from "@/lib/auth";
+import { CONTACT } from "@/lib/constants";
 import { ensureSeed } from "@/lib/seed";
 
 export default async function AdminPage() {
@@ -22,6 +23,9 @@ export default async function AdminPage() {
       </header>
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-5">
         {admin ? <AdminDashboard /> : <AdminLogin />}
+        <p className="mt-6 text-center text-xs text-mp-grey">
+          Contact : {CONTACT.tel} | {CONTACT.email}
+        </p>
       </main>
       <Footer />
     </div>

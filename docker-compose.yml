@@ -25,8 +25,8 @@ services:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-medikoplus}
-      SESSION_SECRET: ${SESSION_SECRET:-changez-cette-cle-secrete}
-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-medikoplus2026}
+      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET est obligatoire}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD est obligatoire}
       NODE_ENV: production
     ports:
       - "3000:3000"

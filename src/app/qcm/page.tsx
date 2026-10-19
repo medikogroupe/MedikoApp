@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Bell, Clock, Info, Loader2, Play, ShieldCheck } from "lucide-react";
 import PageShell from "@/components/PageShell";
-import QcmRunner, { type Question } from "@/components/QcmRunner";
+import QcmRunner from "@/components/QcmRunner";
+import type { Charge } from "@/components/qcm/types";
 import { MATIERES } from "@/lib/constants";
 
 type Session = {
@@ -15,6 +16,8 @@ type Session = {
   nbQuestions: number;
   dateLancement: string;
   statut: string;
+  ouvert: boolean;
+  tentative: { id: string; statut: string; noteSur20: number } | null;
 };
 
 type Resultat = {
@@ -29,7 +32,8 @@ export default function QcmPage() {
   const [matiere, setMatiere] = useState("toutes");
   const [nb, setNb] = useState("10");
   const [duree, setDuree] = useState("15");
-  const [questions, setQuestions] = useState<Question[] | null>(null);
+  const [charge, setCharge] = useState<Charge | null>(null);
+  const [erreur, setErreur] = useState("");
   const [sessions, setSessions] = useState<Session[]>([]);
   const [resultats, setResultats] = useState<Resultat[]>([]);
   const [loading, setLoading] = useState(false);
@@ -59,24 +63,22 @@ export default function QcmPage() {
 
   async function demarrer() {
     setLoading(true);
-    const res = await fetch(`/api/qcm?matiere=${matiere}&limit=${nb}`);
-    const data = await res.json();
-    setQuestions(data.questions ?? []);
+    setErreur("");
+    const res = await fetch("/api/qcm/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matiere, nb: Number(nb) || 10, duree: Number(duree) || 15 }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (res.ok) setCharge(data as Charge);
+    else setErreur(data.error ?? "Impossible de démarrer le QCM.");
     setLoading(false);
   }
 
-  if (questions) {
+  if (charge) {
     return (
       <PageShell title="Examen blanc" subtitle={matiere === "toutes" ? "Toutes matières" : matiere}>
-        <QcmRunner
-          questions={questions}
-          dureeMinutes={Number(duree) || 15}
-          titre={matiere === "toutes" ? "Examen blanc" : matiere}
-          onFinish={() => void loadMeta()}
-        />
-        <button type="button" className="mp-btn-ghost mt-4" onClick={() => setQuestions(null)}>
-          Revenir aux QCM
-        </button>
+        <QcmRunner charge={charge} onClose={() => setCharge(null)} onFinish={() => void loadMeta()} />
       </PageShell>
     );
   }
@@ -107,6 +109,7 @@ export default function QcmPage() {
         <button type="button" className="mp-btn-yellow mt-4" onClick={demarrer} disabled={loading}>
           {loading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />} Commencer le QCM
         </button>
+        {erreur ? <p className="mt-2 text-xs font-semibold text-red-700">{erreur}</p> : null}
       </section>
 
       <section className="mp-card mt-4 p-4">
@@ -127,10 +130,16 @@ export default function QcmPage() {
                     {new Date(s.dateLancement).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
                   </p>
                 </div>
-                {s.statut === "ACTIF" ? (
-                  <Link href={`/qcm/surveille/${s.id}`} className="rounded-lg bg-mp-yellow px-3 py-1.5 text-xs font-bold uppercase">
-                    Entrer
+                {s.tentative?.statut === "TERMINE" ? (
+                  <Link href={`/qcm/surveille/${s.id}`} className="flex min-h-[44px] items-center rounded-lg bg-mp-bg px-3 text-xs font-bold text-mp-blue">
+                    Ma note : {String(s.tentative.noteSur20).replace(".", ",")}/20
                   </Link>
+                ) : s.ouvert ? (
+                  <Link href={`/qcm/surveille/${s.id}`} className="flex min-h-[44px] items-center rounded-lg bg-mp-yellow px-3 text-xs font-bold uppercase">
+                    {s.tentative ? "Reprendre" : "Entrer"}
+                  </Link>
+                ) : s.statut === "ACTIF" ? (
+                  <span className="text-xs text-mp-grey">Bientôt</span>
                 ) : (
                   <span className="text-xs text-mp-grey">Clôturé</span>
                 )}

@@ -4,7 +4,15 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 
-const SECRET = process.env.SESSION_SECRET || "mediko-plus-secret-ci-2026";
+function getSecret(): string {
+  const secret = process.env.SESSION_SECRET;
+  if (secret) return secret;
+  if (process.env.NODE_ENV === "production") {
+    throw new Error("SESSION_SECRET est obligatoire en production.");
+  }
+  return "dev-only-secret-ne-pas-utiliser-en-production";
+}
+
 export const SESSION_COOKIE = "mp_session";
 export const ADMIN_COOKIE = "mp_admin";
 
@@ -24,7 +32,7 @@ export function verifyPassword(password: string, stored: string): boolean {
 }
 
 function sign(value: string): string {
-  return createHmac("sha256", SECRET).update(value).digest("hex");
+  return createHmac("sha256", getSecret()).update(value).digest("hex");
 }
 
 export function createToken(userId: string): string {
@@ -39,13 +47,20 @@ export function readToken(token: string | undefined): string | null {
   return userId;
 }
 
-export function adminToken(): string {
-  return sign(`admin:${process.env.ADMIN_PASSWORD || "medikoplus2026"}`);
+/** Jeton du cookie admin, ou null si ADMIN_PASSWORD n'est pas défini (accès admin refusé). */
+export function adminToken(): string | null {
+  const password = process.env.ADMIN_PASSWORD;
+  if (!password) return null;
+  return sign(`admin:${password}`);
 }
 
 export async function isAdmin(): Promise<boolean> {
+  const expected = adminToken();
+  if (!expected) return false;
   const store = await cookies();
-  return store.get(ADMIN_COOKIE)?.value === adminToken();
+  const value = store.get(ADMIN_COOKIE)?.value;
+  if (!value || value.length !== expected.length) return false;
+  return timingSafeEqual(Buffer.from(value), Buffer.from(expected));
 }
 
 export type SessionUser = typeof users.$inferSelect;
@@ -55,7 +70,13 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
   const userId = readToken(store.get(SESSION_COOKIE)?.value);
   if (!userId) return null;
   const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-  return rows[0] ?? null;
+  const user = rows[0];
+  if (!user) return null;
+  // Un abonnement expiré retombe automatiquement sur le pack gratuit.
+  if (user.pack !== "FREE" && user.packExpireAt && user.packExpireAt.getTime() < Date.now()) {
+    return { ...user, pack: "FREE" };
+  }
+  return user;
 }
 
 export function normalizeNumber(input: string): string {

@@ -2,28 +2,33 @@
 
 import { useState } from "react";
 import { CreditCard, Loader2 } from "lucide-react";
+import { CONTACT } from "@/lib/constants";
 
 export default function PayerButton({
-  pack,
+  packId,
   montant,
   lien,
 }: {
-  pack: string;
+  packId: string;
   montant: number;
   lien: string;
 }) {
   const [loading, setLoading] = useState(false);
 
-  async function payer() {
+  function payer() {
     setLoading(true);
-    await fetch("/api/abonnement", {
+    // On enregistre l'intention de paiement sans bloquer la redirection (keepalive).
+    fetch("/api/abonnement", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pack, montant }),
-    }).catch(() => undefined);
-    setLoading(false);
-    if (lien) window.open(lien, "_blank", "noopener");
-    else window.open("https://wa.me/2250170501356", "_blank", "noopener");
+      body: JSON.stringify({ packId }),
+      keepalive: true,
+    })
+      .catch(() => undefined)
+      .finally(() => setLoading(false));
+    // Ouverture immédiate pour ne pas être bloqué par les navigateurs mobiles.
+    const cible = lien.startsWith("https://") ? lien : CONTACT.whatsapp;
+    window.open(cible, "_blank", "noopener");
   }
 
   return (

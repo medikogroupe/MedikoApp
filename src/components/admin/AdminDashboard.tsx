@@ -14,6 +14,7 @@ import {
 import {
   CheckCircle2,
   FileSpreadsheet,
+  Info,
   Loader2,
   LogOut,
   Plus,
@@ -22,7 +23,9 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import { MATIERES, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
+import Questionnaires from "@/components/admin/Questionnaires";
+import QuestionBank from "@/components/admin/QuestionBank";
+import { CONTACT, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
 
 type Kpi = {
   comptesActifs: number;
@@ -41,6 +44,7 @@ type Utilisateur = {
   statut: string;
   filiere: string;
   ville: string;
+  packExpireAt: string | null;
   createdAt: string;
 };
 
@@ -51,6 +55,9 @@ type Pack = {
   dureeJours: number;
   lienPaiement: string;
   description: string | null;
+  noteAdmin: string;
+  estActif: boolean;
+  ordre: number;
 };
 
 type Upload = {
@@ -60,16 +67,6 @@ type Upload = {
   statut: string;
   auteur: string | null;
   createdAt: string;
-};
-
-type Session = {
-  id: string;
-  titre: string;
-  module: string;
-  dureeMinutes: number;
-  nbQuestions: number;
-  dateLancement: string;
-  statut: string;
 };
 
 type Pharmacie = {
@@ -93,6 +90,7 @@ const ONGLETS = [
   { id: "comptes", label: "Comptes" },
   { id: "packs", label: "Packs & paiements" },
   { id: "uploads", label: "Validation uploads" },
+  { id: "banque", label: "Banque de questions" },
   { id: "qcm", label: "QCM surveillés" },
   { id: "pharmacies", label: "Pharmacies" },
 ] as const;
@@ -126,27 +124,19 @@ export default function AdminDashboard() {
   const [filtreStatut, setFiltreStatut] = useState("tous");
   const [packs, setPacks] = useState<Pack[]>([]);
   const [uploads, setUploads] = useState<Upload[]>([]);
-  const [sessions, setSessions] = useState<Session[]>([]);
   const [pharmacies, setPharmacies] = useState<Pharmacie[]>([]);
   const [pharmaForm, setPharmaForm] = useState({ ...PHARMA_VIDE, id: "" });
-  const [qcmForm, setQcmForm] = useState({
-    titre: "",
-    module: MATIERES[0],
-    dureeMinutes: "30",
-    nbQuestions: "10",
-    dateLancement: new Date().toISOString().slice(0, 16),
-  });
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [savingId, setSavingId] = useState("");
   const csvRef = useRef<HTMLInputElement>(null);
 
   const loadAll = useCallback(async () => {
-    const [s, u, p, up, q, ph] = await Promise.all([
+    const [s, u, p, up, ph] = await Promise.all([
       fetch("/api/admin/stats"),
       fetch(`/api/admin/users?q=${encodeURIComponent(recherche)}&pack=${filtrePack}&statut=${filtreStatut}`),
       fetch("/api/admin/packs"),
       fetch("/api/admin/uploads"),
-      fetch("/api/admin/qcm"),
       fetch("/api/admin/pharmacies"),
     ]);
     if (s.ok) {
@@ -158,7 +148,6 @@ export default function AdminDashboard() {
     if (u.ok) setUsers((await u.json()).users ?? []);
     if (p.ok) setPacks((await p.json()).packs ?? []);
     if (up.ok) setUploads((await up.json()).uploads ?? []);
-    if (q.ok) setSessions((await q.json()).sessions ?? []);
     if (ph.ok) setPharmacies((await ph.json()).pharmacies ?? []);
   }, [recherche, filtrePack, filtreStatut]);
 
@@ -166,41 +155,90 @@ export default function AdminDashboard() {
     void loadAll();
   }, [loadAll]);
 
-  function flash(texte: string) {
+  function flash(texte: string, duree = 3000) {
     setMessage(texte);
-    setTimeout(() => setMessage(""), 3000);
+    setTimeout(() => setMessage(""), duree);
   }
 
-  async function majUser(id: string, patch: Record<string, string>) {
-    await fetch("/api/admin/users", {
+  async function majUser(id: string, patch: Record<string, unknown>) {
+    const res = await fetch("/api/admin/users", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id, ...patch }),
     });
-    flash("Compte mis à jour.");
+    const data = await res.json().catch(() => ({}));
+    flash(res.ok ? "Compte mis à jour." : (data.error ?? "Échec de la mise à jour."), 5000);
     void loadAll();
   }
 
+  /** Valeur du select : "FREE", "pay:<packId>" ou "gift:<packId>". */
+  function changerPack(u: Utilisateur, valeur: string) {
+    if (valeur === "FREE") {
+      if (window.confirm(`Repasser ${u.nomWhatsapp} en pack gratuit ?`)) {
+        void majUser(u.id, { pack: "FREE" });
+      }
+      return;
+    }
+    const [mode, packId] = valeur.split(":");
+    const pack = packs.find((x) => x.id === packId);
+    if (!pack) return;
+    const question =
+      mode === "gift"
+        ? `Offrir "${pack.nomPack}" à ${u.nomWhatsapp} sans enregistrer de paiement ?`
+        : `Activer "${pack.nomPack}" pour ${u.nomWhatsapp} ? Un paiement de ${pack.prixFcfa} FCFA sera enregistré.`;
+    if (window.confirm(question)) {
+      void majUser(u.id, { pack: "PREMIUM", packId, sansPaiement: mode === "gift" });
+    }
+  }
+
+  function majPackLocal(id: string, patch: Partial<Pack>) {
+    setPacks((liste) => liste.map((x) => (x.id === id ? { ...x, ...patch } : x)));
+  }
+
+  function lienInvalide(lien: string) {
+    const v = lien.trim();
+    return v !== "" && !v.startsWith("https://");
+  }
+
   async function savePack(pack: Pack) {
-    await fetch("/api/admin/packs", {
+    if (lienInvalide(pack.lienPaiement)) {
+      flash("Le lien de paiement doit commencer par https://", 5000);
+      return;
+    }
+    setSavingId(pack.id);
+    const res = await fetch("/api/admin/packs", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(pack),
     });
-    flash("Pack enregistré. Le lien de paiement est actif immédiatement.");
-    void loadAll();
+    const data = await res.json().catch(() => ({}));
+    setSavingId("");
+    flash(
+      res.ok ? "Pack enregistré. Les étudiants voient la modification immédiatement." : (data.error ?? "Échec de l'enregistrement."),
+      5000,
+    );
+    if (res.ok) void loadAll();
   }
 
-  async function lancerQcm() {
-    setBusy(true);
-    await fetch("/api/admin/qcm", {
+  async function ajouterPack() {
+    const res = await fetch("/api/admin/packs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(qcmForm),
+      body: JSON.stringify({ nomPack: "Nouveau pack", prixFcfa: 0, dureeJours: 30, estActif: false }),
     });
-    setBusy(false);
-    flash("QCM surveillé lancé.");
-    void loadAll();
+    const data = await res.json().catch(() => ({}));
+    flash(
+      res.ok ? "Pack créé (inactif). Renseignez-le puis activez-le." : (data.error ?? "Échec de la création."),
+      5000,
+    );
+    if (res.ok) void loadAll();
+  }
+
+  async function supprimerPack(pack: Pack) {
+    if (!window.confirm(`Supprimer définitivement le pack "${pack.nomPack}" ?`)) return;
+    const res = await fetch(`/api/admin/packs?id=${encodeURIComponent(pack.id)}`, { method: "DELETE" });
+    flash(res.ok ? "Pack supprimé." : "Échec de la suppression.", 4000);
+    if (res.ok) void loadAll();
   }
 
   async function savePharmacie() {
@@ -305,7 +343,7 @@ export default function AdminDashboard() {
               { label: "Comptes actifs", value: kpi?.comptesActifs ?? 0 },
               { label: "Revenus du mois", value: `${kpi?.revenusMois ?? 0} F` },
               { label: "Uploads en attente", value: kpi?.uploadsEnAttente ?? 0 },
-              { label: "QCM actifs", value: kpi?.qcmActifs ?? 0 },
+              { label: "Pharmacies", value: kpi?.pharmacies ?? 0 },
             ].map((c) => (
               <div key={c.label} className="mp-card p-4">
                 <p className="text-xs uppercase tracking-wide text-mp-grey">{c.label}</p>
@@ -349,8 +387,7 @@ export default function AdminDashboard() {
             <select className="mp-input" value={filtrePack} onChange={(e) => setFiltrePack(e.target.value)}>
               <option value="tous">Tous les packs</option>
               <option value="FREE">FREE</option>
-              <option value="MENSUEL">MENSUEL</option>
-              <option value="A_VIE">A_VIE</option>
+              <option value="PREMIUM">PREMIUM</option>
             </select>
             <select className="mp-input" value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
               <option value="tous">Tous les statuts</option>
@@ -367,6 +404,7 @@ export default function AdminDashboard() {
                   <th>Numéro</th>
                   <th>Filière</th>
                   <th>Pack</th>
+                  <th>Expire le</th>
                   <th>Statut</th>
                   <th>Inscription</th>
                   <th>Actions</th>
@@ -380,14 +418,36 @@ export default function AdminDashboard() {
                     <td>{u.filiere}</td>
                     <td>
                       <select
-                        className="rounded border border-[#dfe3e8] px-1 py-0.5"
-                        value={u.pack}
-                        onChange={(e) => majUser(u.id, { pack: e.target.value })}
+                        className="min-h-[44px] rounded border border-[#dfe3e8] px-2"
+                        value={u.pack === "FREE" ? "FREE" : "PREMIUM"}
+                        onChange={(e) => changerPack(u, e.target.value)}
                       >
                         <option value="FREE">FREE</option>
-                        <option value="MENSUEL">MENSUEL</option>
-                        <option value="A_VIE">A_VIE</option>
+                        <option value="PREMIUM" disabled>
+                          PREMIUM (actuel)
+                        </option>
+                        {packs
+                          .filter((x) => x.estActif)
+                          .map((x) => (
+                            <option key={`pay-${x.id}`} value={`pay:${x.id}`}>
+                              Activer : {x.nomPack}
+                            </option>
+                          ))}
+                        {packs
+                          .filter((x) => x.estActif)
+                          .map((x) => (
+                            <option key={`gift-${x.id}`} value={`gift:${x.id}`}>
+                              Offrir : {x.nomPack}
+                            </option>
+                          ))}
                       </select>
+                    </td>
+                    <td>
+                      {u.pack === "FREE"
+                        ? "-"
+                        : u.packExpireAt
+                          ? new Date(u.packExpireAt).toLocaleDateString("fr-FR")
+                          : "Illimité"}
                     </td>
                     <td>
                       <span
@@ -402,7 +462,7 @@ export default function AdminDashboard() {
                     <td>
                       <button
                         type="button"
-                        className="rounded bg-mp-yellow px-2 py-1 text-[10px] font-bold uppercase"
+                        className="min-h-[44px] rounded bg-mp-yellow px-3 text-xs font-bold uppercase"
                         onClick={() => majUser(u.id, { statut: u.statut === "ACTIF" ? "BLOQUE" : "ACTIF" })}
                       >
                         {u.statut === "ACTIF" ? "Bloquer" : "Activer"}
@@ -412,7 +472,7 @@ export default function AdminDashboard() {
                 ))}
                 {users.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="py-3 text-mp-grey">
+                    <td colSpan={8} className="py-3 text-mp-grey">
                       Aucun compte trouvé.
                     </td>
                   </tr>
@@ -424,61 +484,148 @@ export default function AdminDashboard() {
       ) : null}
 
       {onglet === "packs" ? (
-        <div className="mt-4 space-y-3">
-          {packs.map((p) => (
-            <section key={p.id} className="mp-card p-4">
-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                <div>
-                  <label className="mp-label">Nom du pack</label>
-                  <input
-                    className="mp-input"
-                    value={p.nomPack}
-                    onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, nomPack: e.target.value } : x)))}
-                  />
+        <div className="mt-4 space-y-4">
+          <section className="mp-card flex items-start gap-3 p-4">
+            <Info size={20} className="mt-0.5 shrink-0 text-mp-blue" />
+            <p className="text-xs leading-relaxed text-mp-grey">
+              Chaque modification est appliquée immédiatement, sans redéploiement. Quand un étudiant touche
+              Payer, il est redirigé vers le lien du pack. Si le lien est vide, il est envoyé sur WhatsApp
+              au {CONTACT.tel}. Après le paiement, activez son compte dans l&apos;onglet Comptes.
+            </p>
+          </section>
+
+          {packs.map((p) => {
+            const invalide = lienInvalide(p.lienPaiement);
+            return (
+              <section key={p.id} className="mp-card p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5"
+                      checked={p.estActif}
+                      onChange={(e) => majPackLocal(p.id, { estActif: e.target.checked })}
+                    />
+                    {p.estActif ? "Pack visible par les étudiants" : "Pack masqué"}
+                  </label>
+                  <button
+                    type="button"
+                    className="mp-btn-ghost min-h-[44px]"
+                    onClick={() => supprimerPack(p)}
+                  >
+                    <Trash2 size={16} /> Supprimer
+                  </button>
                 </div>
-                <div>
-                  <label className="mp-label">Prix (FCFA)</label>
-                  <input
-                    className="mp-input"
-                    value={p.prixFcfa}
-                    onChange={(e) =>
-                      setPacks(packs.map((x) => (x.id === p.id ? { ...x, prixFcfa: Number(e.target.value) || 0 } : x)))
-                    }
-                  />
+
+                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+                  <div>
+                    <label className="mp-label">Nom du pack</label>
+                    <input
+                      className="mp-input"
+                      value={p.nomPack}
+                      onChange={(e) => majPackLocal(p.id, { nomPack: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="mp-label">Prix (FCFA)</label>
+                    <input
+                      className="mp-input"
+                      type="number"
+                      min={0}
+                      inputMode="numeric"
+                      value={p.prixFcfa}
+                      onChange={(e) => majPackLocal(p.id, { prixFcfa: Number(e.target.value) || 0 })}
+                    />
+                  </div>
+                  <div>
+                    <label className="mp-label">Durée (jours, 9999 = à vie)</label>
+                    <input
+                      className="mp-input"
+                      type="number"
+                      min={1}
+                      inputMode="numeric"
+                      value={p.dureeJours}
+                      onChange={(e) => majPackLocal(p.id, { dureeJours: Number(e.target.value) || 0 })}
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="mp-label">Durée (jours)</label>
-                  <input
-                    className="mp-input"
-                    value={p.dureeJours}
-                    onChange={(e) =>
-                      setPacks(packs.map((x) => (x.id === p.id ? { ...x, dureeJours: Number(e.target.value) || 0 } : x)))
-                    }
-                  />
-                </div>
-                <div>
-                  <label className="mp-label">Lien de paiement</label>
+
+                <div className="mt-3">
+                  <label className="mp-label">Lien de paiement (Wave, MTN MoMo ou Orange Money)</label>
                   <input
                     className="mp-input"
                     value={p.lienPaiement}
-                    onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, lienPaiement: e.target.value } : x)))}
-                    placeholder="https://pay.wave.com/..."
+                    onChange={(e) => majPackLocal(p.id, { lienPaiement: e.target.value })}
+                    placeholder="https://pay.wave.com/m/M_ci_..."
+                    autoCapitalize="none"
+                    spellCheck={false}
+                  />
+                  {invalide ? (
+                    <p className="mt-1 text-xs font-semibold text-red-700">Le lien doit commencer par https://</p>
+                  ) : null}
+                </div>
+
+                <div className="mt-3">
+                  <label className="mp-label">Description (visible par l&apos;étudiant)</label>
+                  <textarea
+                    className="mp-input min-h-[72px]"
+                    value={p.description ?? ""}
+                    onChange={(e) => majPackLocal(p.id, { description: e.target.value })}
                   />
                 </div>
-              </div>
-              <div className="mt-3">
-                <label className="mp-label">Description</label>
-                <input
-                  className="mp-input"
-                  value={p.description ?? ""}
-                  onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, description: e.target.value } : x)))}
-                />
-              </div>
-              <button type="button" className="mp-btn-yellow mt-3 md:w-48" onClick={() => savePack(p)}>
-                <Save size={16} /> Enregistrer
-              </button>
-            </section>
-          ))}
+
+                <div className="mt-3">
+                  <label className="mp-label">Note admin (privée, jamais montrée aux étudiants)</label>
+                  <input
+                    className="mp-input"
+                    value={p.noteAdmin ?? ""}
+                    onChange={(e) => majPackLocal(p.id, { noteAdmin: e.target.value })}
+                    placeholder="Après paiement Wave, activez manuellement le compte dans Gestion Comptes"
+                  />
+                </div>
+
+                <div className="mt-4 rounded-xl border border-dashed border-[#cfd7e0] p-3">
+                  <p className="mp-label">Aperçu côté étudiant</p>
+                  <div className="mp-card mt-2 p-4">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-base font-bold">{p.nomPack || "Sans nom"}</p>
+                        <p className="mt-1 text-xs text-mp-grey">{p.description}</p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-xl font-bold text-mp-blue">{p.prixFcfa} F</p>
+                        <p className="text-xs text-mp-grey">
+                          {p.dureeJours >= 9999 ? "accès illimité" : `${p.dureeJours} jours`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mp-btn-yellow mt-4 opacity-80" aria-hidden="true">
+                      Payer {p.prixFcfa} FCFA
+                    </div>
+                  </div>
+                  <p className="mt-2 text-xs text-mp-grey">
+                    {p.lienPaiement.trim() && !invalide
+                      ? `Redirection vers : ${p.lienPaiement.trim()}`
+                      : `Aucun lien valide : l'étudiant sera envoyé sur WhatsApp (${CONTACT.tel}).`}
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  className="mp-btn-yellow mt-4 min-h-[44px] md:w-56"
+                  onClick={() => savePack(p)}
+                  disabled={savingId === p.id || invalide}
+                >
+                  {savingId === p.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                  Sauvegarder
+                </button>
+              </section>
+            );
+          })}
+
+          <button type="button" className="mp-btn-blue min-h-[44px]" onClick={ajouterPack}>
+            <Plus size={16} /> Ajouter un pack
+          </button>
         </div>
       ) : null}
 
@@ -530,78 +677,9 @@ export default function AdminDashboard() {
         </section>
       ) : null}
 
-      {onglet === "qcm" ? (
-        <div className="mt-4 space-y-4">
-          <section className="mp-card p-4">
-            <h2 className="text-sm font-bold">Lancer un QCM surveillé</h2>
-            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-5">
-              <div>
-                <label className="mp-label">Titre</label>
-                <input className="mp-input" value={qcmForm.titre} onChange={(e) => setQcmForm({ ...qcmForm, titre: e.target.value })} />
-              </div>
-              <div>
-                <label className="mp-label">Module</label>
-                <select className="mp-input" value={qcmForm.module} onChange={(e) => setQcmForm({ ...qcmForm, module: e.target.value })}>
-                  {MATIERES.map((m) => (
-                    <option key={m}>{m}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="mp-label">Durée (min)</label>
-                <input className="mp-input" value={qcmForm.dureeMinutes} onChange={(e) => setQcmForm({ ...qcmForm, dureeMinutes: e.target.value })} />
-              </div>
-              <div>
-                <label className="mp-label">Nb questions</label>
-                <input className="mp-input" value={qcmForm.nbQuestions} onChange={(e) => setQcmForm({ ...qcmForm, nbQuestions: e.target.value })} />
-              </div>
-              <div>
-                <label className="mp-label">Date / heure</label>
-                <input
-                  type="datetime-local"
-                  className="mp-input"
-                  value={qcmForm.dateLancement}
-                  onChange={(e) => setQcmForm({ ...qcmForm, dateLancement: e.target.value })}
-                />
-              </div>
-            </div>
-            <button type="button" className="mp-btn-yellow mt-3 md:w-48" onClick={lancerQcm} disabled={busy}>
-              {busy ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} Lancer
-            </button>
-          </section>
+      {onglet === "banque" ? <QuestionBank /> : null}
 
-          <section className="mp-card p-4">
-            <h2 className="text-sm font-bold">Sessions</h2>
-            <ul className="mt-3 space-y-2 text-sm">
-              {sessions.map((s) => (
-                <li key={s.id} className="flex items-center justify-between border-b border-[#eef1f5] pb-2 last:border-0">
-                  <span>
-                    {s.titre}{" "}
-                    <span className="text-xs text-mp-grey">
-                      {s.module} · {s.nbQuestions} q · {s.dureeMinutes} min ·{" "}
-                      {new Date(s.dateLancement).toLocaleString("fr-FR")}
-                    </span>
-                  </span>
-                  <button
-                    type="button"
-                    className="rounded bg-mp-bg px-2 py-1 text-[11px] font-semibold"
-                    onClick={async () => {
-                      await fetch("/api/admin/qcm", {
-                        method: "PATCH",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ id: s.id, statut: s.statut === "ACTIF" ? "CLOTURE" : "ACTIF" }),
-                      });
-                      void loadAll();
-                    }}
-                  >
-                    {s.statut === "ACTIF" ? "Clôturer" : "Réactiver"}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </section>
-        </div>
-      ) : null}
+      {onglet === "qcm" ? <Questionnaires /> : null}
 
       {onglet === "pharmacies" ? (
         <div className="mt-4 space-y-4">

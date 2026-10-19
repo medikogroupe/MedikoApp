@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import { Check, Info } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import PayerButton from "@/components/PayerButton";
@@ -20,10 +20,21 @@ export default async function AbonnementPage() {
   await ensureSeed();
   const user = await getCurrentUser();
   if (!user) redirect("/connexion");
-  const packs = await db.select().from(packsConfig).orderBy(asc(packsConfig.prixFcfa));
+  const packs = await db
+    .select()
+    .from(packsConfig)
+    .where(eq(packsConfig.estActif, true))
+    .orderBy(asc(packsConfig.ordre), asc(packsConfig.prixFcfa));
+  const expire = user.pack !== "FREE" && user.packExpireAt ? user.packExpireAt : null;
 
   return (
-    <PageShell title="Abonnement" subtitle={`Pack actuel : ${user.pack}`}>
+    <PageShell title="Abonnement" subtitle={
+        user.pack === "FREE"
+          ? "Pack actuel : gratuit"
+          : expire
+            ? `Premium jusqu'au ${expire.toLocaleDateString("fr-FR")}`
+            : "Premium : accès illimité"
+      }>
       <section className="mp-card p-4">
         <h2 className="text-sm font-bold">Ce que comprend l&apos;accès complet</h2>
         <ul className="mt-3 space-y-2">
@@ -41,9 +52,7 @@ export default async function AbonnementPage() {
           <section key={p.id} className="mp-card p-4">
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-base font-bold">
-                  {p.nomPack === "A_VIE" ? "Pack à vie" : "Pack mensuel"}
-                </p>
+                <p className="text-base font-bold">{p.nomPack}</p>
                 <p className="mt-1 text-xs text-mp-grey">{p.description}</p>
               </div>
               <div className="text-right">
@@ -53,7 +62,7 @@ export default async function AbonnementPage() {
                 </p>
               </div>
             </div>
-            <PayerButton pack={p.nomPack} montant={p.prixFcfa} lien={p.lienPaiement} />
+            <PayerButton packId={p.id} montant={p.prixFcfa} lien={p.lienPaiement} />
           </section>
         ))}
       </div>

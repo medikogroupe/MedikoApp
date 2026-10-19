@@ -1,0 +1,11 @@
+﻿diff --git a/src/components/admin/QcmSessions.tsx b/src/components/admin/QcmSessions.tsx
+--- a/src/components/admin/QcmSessions.tsx
++++ b/src/components/admin/QcmSessions.tsx
+@@ -252,7 +252,7 @@
+                   </p>
+                   <p className="mt-1 text-xs text-mp-grey">
+-                    Filières : {s.filieres.length === 0 ? "toutes" : s.filieres.map(libelleFiliere).join(", ")}
++                    Filières : {(s.filieres ?? []).length === 0 ? "toutes" : (s.filieres ?? []).map(libelleFiliere).join(", ")}
+                   </p>
+                 </div>
+                 <div className="flex gap-2">

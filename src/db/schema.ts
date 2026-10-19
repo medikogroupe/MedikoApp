@@ -21,6 +21,7 @@ export const users = pgTable("users", {
   projetCarriere: text("projet_carriere").default(""),
   pack: text("pack").notNull().default("FREE"),
   statut: text("statut").notNull().default("ACTIF"),
+  packExpireAt: timestamp("pack_expire_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -73,7 +74,47 @@ export const qcm = pgTable("qcm", {
   bonneReponse: text("bonne_reponse").notNull(),
   explication: text("explication").notNull().default(""),
   niveau: text("niveau").notNull().default("L1"),
+  /** QCU = 1 bonne réponse, QCD = exactement 2 bonnes réponses, QCM = 1 à n bonnes réponses. */
+  type: text("type").notNull().default("QCU"),
+  /** Indices (0-based) des bonnes propositions. Vide = ancienne question, on lit bonneReponse. */
+  bonnes: jsonb("bonnes").$type<number[]>().notNull().default([]),
+  points: doublePrecision("points").notNull().default(1),
+  penalite: doublePrecision("penalite").notNull().default(0),
+  /** TOUT_OU_RIEN ou PARTIEL (QCD/QCM uniquement). */
+  mode: text("mode").notNull().default("TOUT_OU_RIEN"),
+  imageId: uuid("image_id"),
+  /** Question obligatoire : la copie ne peut pas etre rendue tant qu'elle est vide. */
+  obligatoire: boolean("obligatoire").notNull().default(false),
+  propositionsImages: jsonb("propositions_images").$type<(string | null)[]>().notNull().default([]),
+  actif: boolean("actif").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const qcmImages = pgTable("qcm_images", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  mime: text("mime").notNull(),
+  contenu: text("contenu").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const qcmTentatives = pgTable("qcm_tentatives", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull(),
+  qcmAdminId: uuid("qcm_admin_id"),
+  titre: text("titre").notNull().default(""),
+  matiere: text("matiere").notNull().default(""),
+  questionIds: jsonb("question_ids").$type<string[]>().notNull().default([]),
+  reponses: jsonb("reponses").$type<Record<string, number[]>>().notNull().default({}),
+  statut: text("statut").notNull().default("EN_COURS"),
+  points: doublePrecision("points").notNull().default(0),
+  pointsMax: doublePrecision("points_max").notNull().default(0),
+  noteSur20: doublePrecision("note_sur_20").notNull().default(0),
+  nbJustes: integer("nb_justes").notNull().default(0),
+  sorties: integer("sorties").notNull().default(0),
+  surveille: boolean("surveille").notNull().default(false),
+  debutAt: timestamp("debut_at", { withTimezone: true }).notNull().defaultNow(),
+  limiteAt: timestamp("limite_at", { withTimezone: true }).notNull().defaultNow(),
+  finAt: timestamp("fin_at", { withTimezone: true }),
 });
 
 export const qcmAdmin = pgTable("qcm_admin", {
@@ -84,6 +125,22 @@ export const qcmAdmin = pgTable("qcm_admin", {
   nbQuestions: integer("nb_questions").notNull().default(20),
   dateLancement: timestamp("date_lancement", { withTimezone: true }).notNull().defaultNow(),
   statut: text("statut").notNull().default("PROGRAMME"),
+  /** Filières autorisées. Vide = toutes les filières. */
+  filieres: jsonb("filieres").$type<string[]>().notNull().default([]),
+  /** Questions figées de la session (tirées au lancement). */
+  questionIds: jsonb("question_ids").$type<string[]>().notNull().default([]),
+  /** Nombre de sorties d'écran tolérées avant rendu automatique. 0 = illimité. */
+  sortiesMax: integer("sorties_max").notNull().default(0),
+  melanger: boolean("melanger").notNull().default(true),
+  /** Consignes affichees a l'etudiant avant de commencer. */
+  consignes: text("consignes").notNull().default(""),
+  /** Niveau des questions tirees (L1 a M2). Vide = tous. */
+  niveau: text("niveau").notNull().default(""),
+  /** Sections du questionnaire : titre, description, questions choisies ou tirage. */
+  sections: jsonb("sections").$type<Record<string, unknown>[]>().notNull().default([]),
+  /** Date du gel : au premier demarrage d'un etudiant, les questions sont copiees dans snapshot. */
+  figeAt: timestamp("fige_at", { withTimezone: true }),
+  snapshot: jsonb("snapshot").$type<Record<string, unknown>>().notNull().default({}),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -123,6 +180,9 @@ export const packsConfig = pgTable("packs_config", {
   dureeJours: integer("duree_jours").notNull().default(30),
   lienPaiement: text("lien_paiement").notNull().default(""),
   description: text("description").default(""),
+  estActif: boolean("est_actif").notNull().default(true),
+  noteAdmin: text("note_admin").notNull().default(""),
+  ordre: integer("ordre").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
@@ -141,6 +201,7 @@ export const paiements = pgTable("paiements", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull(),
   pack: text("pack").notNull(),
+  packId: uuid("pack_id"),
   montant: integer("montant").notNull().default(0),
   statut: text("statut").notNull().default("VALIDE"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

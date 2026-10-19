@@ -21,7 +21,8 @@ export default function AdminLogin() {
     });
     setLoading(false);
     if (!res.ok) {
-      setError("Mot de passe administrateur incorrect");
+      const data = await res.json().catch(() => ({}));
+      setError(data.error ?? "Mot de passe administrateur incorrect");
       return;
     }
     router.refresh();

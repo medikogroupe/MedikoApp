@@ -1,0 +1,1211 @@
+diff --git a/.env.example b/.env.example
+index 2a034c0..61d02b0 100644
+--- a/.env.example
++++ b/.env.example
+@@ -2,10 +2,12 @@
+ DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/app_db
+ 
+ # Sécurité des sessions étudiantes (HMAC cookie)
+-SESSION_SECRET=changez-cette-cle-secrete
++# Obligatoire en production. Générez-en un : openssl rand -hex 32
++SESSION_SECRET=
+ 
+ # Accès à la console /admin
+-ADMIN_PASSWORD=medikoplus2026
++# Obligatoire : sans lui, /admin refuse toute connexion. Choisissez un mot de passe long et unique.
++ADMIN_PASSWORD=
+ 
+ # Variantes Supabase (si vous branchez l'app sur Supabase plutôt que Postgres auto-hébergé)
+ NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
+diff --git a/docker-compose.yml b/docker-compose.yml
+index f5affc0..ab7d055 100644
+--- a/docker-compose.yml
++++ b/docker-compose.yml
+@@ -25,8 +25,8 @@ services:
+         condition: service_healthy
+     environment:
+       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-medikoplus}
+-      SESSION_SECRET: ${SESSION_SECRET:-changez-cette-cle-secrete}
+-      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-medikoplus2026}
++      SESSION_SECRET: ${SESSION_SECRET:?SESSION_SECRET est obligatoire}
++      ADMIN_PASSWORD: ${ADMIN_PASSWORD:?ADMIN_PASSWORD est obligatoire}
+       NODE_ENV: production
+     ports:
+       - "3000:3000"
+diff --git a/src/app/abonnement/page.tsx b/src/app/abonnement/page.tsx
+index b1c6c26..779ace3 100644
+--- a/src/app/abonnement/page.tsx
++++ b/src/app/abonnement/page.tsx
+@@ -1,5 +1,5 @@
+ import { redirect } from "next/navigation";
+-import { asc } from "drizzle-orm";
++import { asc, eq } from "drizzle-orm";
+ import { Check, Info } from "lucide-react";
+ import PageShell from "@/components/PageShell";
+ import PayerButton from "@/components/PayerButton";
+@@ -20,10 +20,21 @@ export default async function AbonnementPage() {
+   await ensureSeed();
+   const user = await getCurrentUser();
+   if (!user) redirect("/connexion");
+-  const packs = await db.select().from(packsConfig).orderBy(asc(packsConfig.prixFcfa));
++  const packs = await db
++    .select()
++    .from(packsConfig)
++    .where(eq(packsConfig.estActif, true))
++    .orderBy(asc(packsConfig.ordre), asc(packsConfig.prixFcfa));
++  const expire = user.pack !== "FREE" && user.packExpireAt ? user.packExpireAt : null;
+ 
+   return (
+-    <PageShell title="Abonnement" subtitle={`Pack actuel : ${user.pack}`}>
++    <PageShell title="Abonnement" subtitle={
++        user.pack === "FREE"
++          ? "Pack actuel : gratuit"
++          : expire
++            ? `Premium jusqu'au ${expire.toLocaleDateString("fr-FR")}`
++            : "Premium : accès illimité"
++      }>
+       <section className="mp-card p-4">
+         <h2 className="text-sm font-bold">Ce que comprend l&apos;accès complet</h2>
+         <ul className="mt-3 space-y-2">
+@@ -41,9 +52,7 @@ export default async function AbonnementPage() {
+           <section key={p.id} className="mp-card p-4">
+             <div className="flex items-start justify-between">
+               <div>
+-                <p className="text-base font-bold">
+-                  {p.nomPack === "A_VIE" ? "Pack à vie" : "Pack mensuel"}
+-                </p>
++                <p className="text-base font-bold">{p.nomPack}</p>
+                 <p className="mt-1 text-xs text-mp-grey">{p.description}</p>
+               </div>
+               <div className="text-right">
+@@ -53,7 +62,7 @@ export default async function AbonnementPage() {
+                 </p>
+               </div>
+             </div>
+-            <PayerButton pack={p.nomPack} montant={p.prixFcfa} lien={p.lienPaiement} />
++            <PayerButton packId={p.id} montant={p.prixFcfa} lien={p.lienPaiement} />
+           </section>
+         ))}
+       </div>
+diff --git a/src/app/admin/page.tsx b/src/app/admin/page.tsx
+index 07dc7c0..cd4f323 100644
+--- a/src/app/admin/page.tsx
++++ b/src/app/admin/page.tsx
+@@ -3,6 +3,7 @@ import AdminDashboard from "@/components/admin/AdminDashboard";
+ import Footer from "@/components/Footer";
+ import { LogoIcon } from "@/components/Logo";
+ import { isAdmin } from "@/lib/auth";
++import { CONTACT } from "@/lib/constants";
+ import { ensureSeed } from "@/lib/seed";
+ 
+ export default async function AdminPage() {
+@@ -22,6 +23,9 @@ export default async function AdminPage() {
+       </header>
+       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-5">
+         {admin ? <AdminDashboard /> : <AdminLogin />}
++        <p className="mt-6 text-center text-xs text-mp-grey">
++          Contact : {CONTACT.tel} | {CONTACT.email}
++        </p>
+       </main>
+       <Footer />
+     </div>
+diff --git a/src/app/api/abonnement/route.ts b/src/app/api/abonnement/route.ts
+index a34f6ad..d9c92ef 100644
+--- a/src/app/api/abonnement/route.ts
++++ b/src/app/api/abonnement/route.ts
+@@ -1,18 +1,50 @@
+ import { NextResponse } from "next/server";
++import { and, eq, gt, sql } from "drizzle-orm";
+ import { db } from "@/db";
+-import { paiements } from "@/db/schema";
++import { packsConfig, paiements } from "@/db/schema";
+ import { getCurrentUser } from "@/lib/auth";
+ 
++const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++
++/**
++ * Enregistre l'intention de paiement (EN_ATTENTE). Le montant vient toujours de la base,
++ * jamais du client, et un clic répété ne crée pas de doublon sur 24 h.
++ */
+ export async function POST(request: Request) {
+   const user = await getCurrentUser();
+   if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const b = await request.json().catch(() => ({}));
++  const packId = String(b.packId ?? "");
++  if (!UUID.test(packId)) return NextResponse.json({ error: "Pack invalide" }, { status: 400 });
++
++  const [pack] = await db
++    .select()
++    .from(packsConfig)
++    .where(and(eq(packsConfig.id, packId), eq(packsConfig.estActif, true)))
++    .limit(1);
++  if (!pack) return NextResponse.json({ error: "Pack indisponible" }, { status: 404 });
++
++  const [existant] = await db
++    .select()
++    .from(paiements)
++    .where(
++      and(
++        eq(paiements.userId, user.id),
++        eq(paiements.packId, pack.id),
++        eq(paiements.statut, "EN_ATTENTE"),
++        gt(paiements.createdAt, sql`now() - interval '1 day'`),
++      ),
++    )
++    .limit(1);
++  if (existant) return NextResponse.json({ paiement: existant });
++
+   const rows = await db
+     .insert(paiements)
+     .values({
+       userId: user.id,
+-      pack: String(b.pack ?? "MENSUEL"),
+-      montant: Number(b.montant) || 0,
++      pack: pack.nomPack,
++      packId: pack.id,
++      montant: pack.prixFcfa,
+       statut: "EN_ATTENTE",
+     })
+     .returning();
+diff --git a/src/app/api/admin/login/route.ts b/src/app/api/admin/login/route.ts
+index 98ff238..73de490 100644
+--- a/src/app/api/admin/login/route.ts
++++ b/src/app/api/admin/login/route.ts
+@@ -1,16 +1,57 @@
++import { createHash, timingSafeEqual } from "crypto";
+ import { NextResponse } from "next/server";
+ import { ADMIN_COOKIE, adminToken } from "@/lib/auth";
+ import { ensureSeed } from "@/lib/seed";
+ 
++const MAX_ECHECS = 5;
++const FENETRE_MS = 15 * 60 * 1000;
++const tentatives = new Map<string, { count: number; reset: number }>();
++
++function ipDe(request: Request): string {
++  const forwarded = request.headers.get("x-forwarded-for");
++  return forwarded?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "inconnue";
++}
++
++function empreinte(valeur: string): Buffer {
++  return createHash("sha256").update(valeur).digest();
++}
++
+ export async function POST(request: Request) {
++  const expected = process.env.ADMIN_PASSWORD;
++  if (!expected) {
++    return NextResponse.json(
++      { error: "ADMIN_PASSWORD n'est pas configuré sur le serveur." },
++      { status: 503 },
++    );
++  }
++
++  const ip = ipDe(request);
++  const maintenant = Date.now();
++  const etat = tentatives.get(ip);
++  if (etat && etat.reset > maintenant && etat.count >= MAX_ECHECS) {
++    const minutes = Math.ceil((etat.reset - maintenant) / 60000);
++    return NextResponse.json(
++      { error: `Trop de tentatives. Réessayez dans ${minutes} minute(s).` },
++      { status: 429 },
++    );
++  }
++
+   await ensureSeed();
+   const body = await request.json().catch(() => ({}));
+-  const expected = process.env.ADMIN_PASSWORD || "medikoplus2026";
+-  if (String(body.password ?? "") !== expected) {
++  const saisi = String(body.password ?? "");
++
++  if (!timingSafeEqual(empreinte(saisi), empreinte(expected))) {
++    const courant = etat && etat.reset > maintenant ? etat : { count: 0, reset: maintenant + FENETRE_MS };
++    courant.count += 1;
++    tentatives.set(ip, courant);
+     return NextResponse.json({ error: "Mot de passe administrateur incorrect" }, { status: 401 });
+   }
++
++  tentatives.delete(ip);
++  const token = adminToken();
++  if (!token) return NextResponse.json({ error: "Configuration admin invalide." }, { status: 503 });
+   const response = NextResponse.json({ ok: true });
+-  response.cookies.set(ADMIN_COOKIE, adminToken(), {
++  response.cookies.set(ADMIN_COOKIE, token, {
+     httpOnly: true,
+     sameSite: "lax",
+     path: "/",
+diff --git a/src/app/api/admin/packs/route.ts b/src/app/api/admin/packs/route.ts
+index 328103d..7ec4804 100644
+--- a/src/app/api/admin/packs/route.ts
++++ b/src/app/api/admin/packs/route.ts
+@@ -4,44 +4,109 @@ import { db } from "@/db";
+ import { packsConfig } from "@/db/schema";
+ import { isAdmin } from "@/lib/auth";
+ 
++type Corps = Record<string, unknown>;
++type Champs = Partial<typeof packsConfig.$inferInsert>;
++
++/** Vide = accepté (le pack redirige alors vers WhatsApp). Sinon https:// obligatoire. */
++function validerLien(valeur: unknown): string {
++  const lien = String(valeur ?? "").trim();
++  if (lien === "") return "";
++  if (lien.length > 500) throw new Error("Le lien de paiement est trop long (500 caractères max).");
++  let url: URL;
++  try {
++    url = new URL(lien);
++  } catch {
++    throw new Error("Le lien de paiement n'est pas une adresse valide.");
++  }
++  if (url.protocol !== "https:") {
++    throw new Error("Le lien de paiement doit commencer par https://");
++  }
++  return lien;
++}
++
++/** Ne retient que les champs présents dans le corps et les valide. */
++function lireChamps(b: Corps): Champs {
++  const champs: Champs = {};
++  if (b.nomPack !== undefined) {
++    const nom = String(b.nomPack).trim();
++    if (!nom) throw new Error("Le nom du pack est obligatoire.");
++    champs.nomPack = nom.slice(0, 80);
++  }
++  if (b.prixFcfa !== undefined) {
++    const prix = Number(b.prixFcfa);
++    if (!Number.isFinite(prix) || prix < 0) throw new Error("Le prix doit être un nombre positif.");
++    champs.prixFcfa = Math.round(prix);
++  }
++  if (b.dureeJours !== undefined) {
++    const duree = Number(b.dureeJours);
++    if (!Number.isFinite(duree) || duree < 1) throw new Error("La durée doit être d'au moins 1 jour.");
++    champs.dureeJours = Math.round(duree);
++  }
++  if (b.lienPaiement !== undefined) champs.lienPaiement = validerLien(b.lienPaiement);
++  if (b.description !== undefined) champs.description = String(b.description ?? "").slice(0, 500);
++  if (b.noteAdmin !== undefined) champs.noteAdmin = String(b.noteAdmin ?? "").slice(0, 500);
++  if (b.estActif !== undefined) champs.estActif = Boolean(b.estActif);
++  if (b.ordre !== undefined) champs.ordre = Math.round(Number(b.ordre)) || 0;
++  return champs;
++}
++
++function erreur(e: unknown) {
++  const message = e instanceof Error ? e.message : "Requête invalide.";
++  return NextResponse.json({ error: message }, { status: 400 });
++}
++
+ export async function GET() {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+-  const rows = await db.select().from(packsConfig).orderBy(asc(packsConfig.prixFcfa));
++  const rows = await db
++    .select()
++    .from(packsConfig)
++    .orderBy(asc(packsConfig.ordre), asc(packsConfig.prixFcfa));
+   return NextResponse.json({ packs: rows });
+ }
+ 
+ export async function POST(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+-  const b = await request.json().catch(() => ({}));
+-  const rows = await db
+-    .insert(packsConfig)
+-    .values({
+-      nomPack: String(b.nomPack ?? "NOUVEAU"),
+-      prixFcfa: Number(b.prixFcfa) || 0,
+-      dureeJours: Number(b.dureeJours) || 30,
+-      lienPaiement: String(b.lienPaiement ?? ""),
+-      description: String(b.description ?? ""),
+-    })
+-    .returning();
+-  return NextResponse.json({ pack: rows[0] });
++  const b: Corps = await request.json().catch(() => ({}));
++  try {
++    const champs = lireChamps(b);
++    const rows = await db
++      .insert(packsConfig)
++      .values({
++        nomPack: champs.nomPack ?? "Nouveau pack",
++        prixFcfa: champs.prixFcfa ?? 0,
++        dureeJours: champs.dureeJours ?? 30,
++        lienPaiement: champs.lienPaiement ?? "",
++        description: champs.description ?? "",
++        noteAdmin: champs.noteAdmin ?? "",
++        estActif: champs.estActif ?? false,
++        ordre: champs.ordre ?? 99,
++      })
++      .returning();
++    return NextResponse.json({ pack: rows[0] });
++  } catch (e) {
++    return erreur(e);
++  }
+ }
+ 
+ export async function PATCH(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+-  const b = await request.json().catch(() => ({}));
++  const b: Corps = await request.json().catch(() => ({}));
+   if (!b.id) return NextResponse.json({ error: "id manquant" }, { status: 400 });
+-  const rows = await db
+-    .update(packsConfig)
+-    .set({
+-      nomPack: String(b.nomPack ?? ""),
+-      prixFcfa: Number(b.prixFcfa) || 0,
+-      dureeJours: Number(b.dureeJours) || 30,
+-      lienPaiement: String(b.lienPaiement ?? ""),
+-      description: String(b.description ?? ""),
+-    })
+-    .where(eq(packsConfig.id, String(b.id)))
+-    .returning();
+-  return NextResponse.json({ pack: rows[0] });
++  try {
++    const champs = lireChamps(b);
++    if (Object.keys(champs).length === 0) {
++      return NextResponse.json({ error: "Rien à mettre à jour." }, { status: 400 });
++    }
++    const rows = await db
++      .update(packsConfig)
++      .set(champs)
++      .where(eq(packsConfig.id, String(b.id)))
++      .returning();
++    if (!rows[0]) return NextResponse.json({ error: "Pack introuvable." }, { status: 404 });
++    return NextResponse.json({ pack: rows[0] });
++  } catch (e) {
++    return erreur(e);
++  }
+ }
+ 
+ export async function DELETE(request: Request) {
+diff --git a/src/app/api/admin/stats/route.ts b/src/app/api/admin/stats/route.ts
+index 3579a0a..5fc8625 100644
+--- a/src/app/api/admin/stats/route.ts
++++ b/src/app/api/admin/stats/route.ts
+@@ -1,5 +1,5 @@
+ import { NextResponse } from "next/server";
+-import { eq, sql } from "drizzle-orm";
++import { and, eq, sql } from "drizzle-orm";
+ import { db } from "@/db";
+ import { paiements, pharmacies, qcmAdmin, uploadsCommunaute, users } from "@/db/schema";
+ import { isAdmin } from "@/lib/auth";
+@@ -24,7 +24,12 @@ export async function GET() {
+   const [revenusMois] = await db
+     .select({ s: sql<number>`coalesce(sum(montant),0)::int` })
+     .from(paiements)
+-    .where(sql`date_trunc('month', created_at) = date_trunc('month', now())`);
++    .where(
++      and(
++        eq(paiements.statut, "VALIDE"),
++        sql`date_trunc('month', created_at) = date_trunc('month', now())`,
++      ),
++    );
+ 
+   const revenusSemaine = await db
+     .select({
+@@ -32,6 +37,7 @@ export async function GET() {
+       montant: sql<number>`coalesce(sum(montant),0)::int`,
+     })
+     .from(paiements)
++    .where(eq(paiements.statut, "VALIDE"))
+     .groupBy(sql`date_trunc('week', created_at)`)
+     .orderBy(sql`date_trunc('week', created_at)`)
+     .limit(8);
+@@ -39,6 +45,7 @@ export async function GET() {
+   const parPack = await db
+     .select({ pack: paiements.pack, total: sql<number>`count(*)::int` })
+     .from(paiements)
++    .where(eq(paiements.statut, "VALIDE"))
+     .groupBy(paiements.pack);
+ 
+   return NextResponse.json({
+diff --git a/src/app/api/admin/users/route.ts b/src/app/api/admin/users/route.ts
+index 191181f..78e407d 100644
+--- a/src/app/api/admin/users/route.ts
++++ b/src/app/api/admin/users/route.ts
+@@ -1,9 +1,12 @@
+ import { NextResponse } from "next/server";
+-import { and, desc, eq, ilike, type SQL } from "drizzle-orm";
++import { and, desc, eq, ilike, ne, type SQL } from "drizzle-orm";
+ import { db } from "@/db";
+-import { users } from "@/db/schema";
++import { packsConfig, paiements, users } from "@/db/schema";
+ import { isAdmin } from "@/lib/auth";
+ 
++const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++const JOUR_MS = 24 * 60 * 60 * 1000;
++
+ export async function GET(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const params = new URL(request.url).searchParams;
+@@ -13,7 +16,8 @@ export async function GET(request: Request) {
+ 
+   const filters: SQL[] = [];
+   if (q) filters.push(ilike(users.numeroWhatsapp, `%${q}%`));
+-  if (pack && pack !== "tous") filters.push(eq(users.pack, pack));
++  if (pack === "FREE") filters.push(eq(users.pack, "FREE"));
++  else if (pack === "PREMIUM") filters.push(ne(users.pack, "FREE"));
+   if (statut && statut !== "tous") filters.push(eq(users.statut, statut));
+ 
+   const rows = await db
+@@ -27,16 +31,90 @@ export async function GET(request: Request) {
+   });
+ }
+ 
++/**
++ * Corps : { id, statut? , pack? }.
++ * pack = "FREE"  -> repasse en gratuit et efface l'expiration.
++ * pack = "PREMIUM" + packId (+ sansPaiement?) -> active le pack choisi, calcule l'expiration
++ * à partir de duree_jours (9999 = à vie) et enregistre le paiement VALIDE (sauf sansPaiement).
++ */
+ export async function PATCH(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const body = await request.json().catch(() => ({}));
+-  if (!body.id) return NextResponse.json({ error: "id manquant" }, { status: 400 });
+-  const patch: Record<string, string> = {};
+-  if (body.pack) patch.pack = String(body.pack);
+-  if (body.statut) patch.statut = String(body.statut);
++  const id = String(body.id ?? "");
++  if (!UUID.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
++
++  const [cible] = await db.select().from(users).where(eq(users.id, id)).limit(1);
++  if (!cible) return NextResponse.json({ error: "Compte introuvable" }, { status: 404 });
++
++  const patch: Partial<typeof users.$inferInsert> = {};
++  if (body.statut) {
++    if (body.statut !== "ACTIF" && body.statut !== "BLOQUE") {
++      return NextResponse.json({ error: "Statut invalide" }, { status: 400 });
++    }
++    patch.statut = body.statut;
++  }
++
++  if (body.pack === "FREE") {
++    patch.pack = "FREE";
++    patch.packExpireAt = null;
++  } else if (body.pack === "PREMIUM") {
++    const packId = String(body.packId ?? "");
++    if (!UUID.test(packId)) {
++      return NextResponse.json({ error: "Choisissez le pack à activer." }, { status: 400 });
++    }
++    const [pack] = await db.select().from(packsConfig).where(eq(packsConfig.id, packId)).limit(1);
++    if (!pack) return NextResponse.json({ error: "Pack introuvable" }, { status: 404 });
++
++    patch.pack = "PREMIUM";
++    if (pack.dureeJours >= 9999) {
++      patch.packExpireAt = null;
++    } else {
++      // Renouvellement : on prolonge à partir de l'expiration actuelle si elle est encore à venir.
++      const actuelle = cible.packExpireAt?.getTime() ?? 0;
++      const base = cible.pack !== "FREE" && actuelle > Date.now() ? actuelle : Date.now();
++      patch.packExpireAt = new Date(base + pack.dureeJours * JOUR_MS);
++    }
++
++    const enregistrerPaiement = body.sansPaiement !== true;
++    const rows = await db.transaction(async (tx) => {
++      const maj = await tx.update(users).set(patch).where(eq(users.id, id)).returning();
++      if (enregistrerPaiement) {
++        const [enAttente] = await tx
++          .select()
++          .from(paiements)
++          .where(
++            and(
++              eq(paiements.userId, id),
++              eq(paiements.packId, pack.id),
++              eq(paiements.statut, "EN_ATTENTE"),
++            ),
++          )
++          .limit(1);
++        if (enAttente) {
++          await tx
++            .update(paiements)
++            .set({ statut: "VALIDE", montant: pack.prixFcfa })
++            .where(eq(paiements.id, enAttente.id));
++        } else {
++          await tx.insert(paiements).values({
++            userId: id,
++            pack: pack.nomPack,
++            packId: pack.id,
++            montant: pack.prixFcfa,
++            statut: "VALIDE",
++          });
++        }
++      }
++      return maj;
++    });
++    return NextResponse.json({ user: { ...rows[0], passwordHash: undefined } });
++  } else if (body.pack) {
++    return NextResponse.json({ error: "Pack invalide" }, { status: 400 });
++  }
++
+   if (Object.keys(patch).length === 0) {
+     return NextResponse.json({ error: "Rien à mettre à jour" }, { status: 400 });
+   }
+-  const rows = await db.update(users).set(patch).where(eq(users.id, String(body.id))).returning();
++  const rows = await db.update(users).set(patch).where(eq(users.id, id)).returning();
+   return NextResponse.json({ user: { ...rows[0], passwordHash: undefined } });
+ }
+diff --git a/src/app/api/packs/route.ts b/src/app/api/packs/route.ts
+index f184636..b68e1e2 100644
+--- a/src/app/api/packs/route.ts
++++ b/src/app/api/packs/route.ts
+@@ -1,11 +1,15 @@
+ import { NextResponse } from "next/server";
+-import { asc } from "drizzle-orm";
++import { asc, eq } from "drizzle-orm";
+ import { db } from "@/db";
+ import { packsConfig } from "@/db/schema";
+ import { ensureSeed } from "@/lib/seed";
+ 
+ export async function GET() {
+   await ensureSeed();
+-  const rows = await db.select().from(packsConfig).orderBy(asc(packsConfig.prixFcfa));
++  const rows = await db
++    .select()
++    .from(packsConfig)
++    .where(eq(packsConfig.estActif, true))
++    .orderBy(asc(packsConfig.ordre), asc(packsConfig.prixFcfa));
+   return NextResponse.json({ packs: rows });
+ }
+diff --git a/src/components/PayerButton.tsx b/src/components/PayerButton.tsx
+index 947efdf..6f8f902 100644
+--- a/src/components/PayerButton.tsx
++++ b/src/components/PayerButton.tsx
+@@ -2,28 +2,33 @@
+ 
+ import { useState } from "react";
+ import { CreditCard, Loader2 } from "lucide-react";
++import { CONTACT } from "@/lib/constants";
+ 
+ export default function PayerButton({
+-  pack,
++  packId,
+   montant,
+   lien,
+ }: {
+-  pack: string;
++  packId: string;
+   montant: number;
+   lien: string;
+ }) {
+   const [loading, setLoading] = useState(false);
+ 
+-  async function payer() {
++  function payer() {
+     setLoading(true);
+-    await fetch("/api/abonnement", {
++    // On enregistre l'intention de paiement sans bloquer la redirection (keepalive).
++    fetch("/api/abonnement", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+-      body: JSON.stringify({ pack, montant }),
+-    }).catch(() => undefined);
+-    setLoading(false);
+-    if (lien) window.open(lien, "_blank", "noopener");
+-    else window.open("https://wa.me/2250170501356", "_blank", "noopener");
++      body: JSON.stringify({ packId }),
++      keepalive: true,
++    })
++      .catch(() => undefined)
++      .finally(() => setLoading(false));
++    // Ouverture immédiate pour ne pas être bloqué par les navigateurs mobiles.
++    const cible = lien.startsWith("https://") ? lien : CONTACT.whatsapp;
++    window.open(cible, "_blank", "noopener");
+   }
+ 
+   return (
+diff --git a/src/components/admin/AdminDashboard.tsx b/src/components/admin/AdminDashboard.tsx
+index c9c0b48..9392f5d 100644
+--- a/src/components/admin/AdminDashboard.tsx
++++ b/src/components/admin/AdminDashboard.tsx
+@@ -14,6 +14,7 @@ import {
+ import {
+   CheckCircle2,
+   FileSpreadsheet,
++  Info,
+   Loader2,
+   LogOut,
+   Plus,
+@@ -22,7 +23,7 @@ import {
+   Trash2,
+   XCircle,
+ } from "lucide-react";
+-import { MATIERES, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
++import { CONTACT, MATIERES, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
+ 
+ type Kpi = {
+   comptesActifs: number;
+@@ -41,6 +42,7 @@ type Utilisateur = {
+   statut: string;
+   filiere: string;
+   ville: string;
++  packExpireAt: string | null;
+   createdAt: string;
+ };
+ 
+@@ -51,6 +53,9 @@ type Pack = {
+   dureeJours: number;
+   lienPaiement: string;
+   description: string | null;
++  noteAdmin: string;
++  estActif: boolean;
++  ordre: number;
+ };
+ 
+ type Upload = {
+@@ -138,6 +143,7 @@ export default function AdminDashboard() {
+   });
+   const [message, setMessage] = useState("");
+   const [busy, setBusy] = useState(false);
++  const [savingId, setSavingId] = useState("");
+   const csvRef = useRef<HTMLInputElement>(null);
+ 
+   const loadAll = useCallback(async () => {
+@@ -166,29 +172,90 @@ export default function AdminDashboard() {
+     void loadAll();
+   }, [loadAll]);
+ 
+-  function flash(texte: string) {
++  function flash(texte: string, duree = 3000) {
+     setMessage(texte);
+-    setTimeout(() => setMessage(""), 3000);
++    setTimeout(() => setMessage(""), duree);
+   }
+ 
+-  async function majUser(id: string, patch: Record<string, string>) {
+-    await fetch("/api/admin/users", {
++  async function majUser(id: string, patch: Record<string, unknown>) {
++    const res = await fetch("/api/admin/users", {
+       method: "PATCH",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ id, ...patch }),
+     });
+-    flash("Compte mis à jour.");
++    const data = await res.json().catch(() => ({}));
++    flash(res.ok ? "Compte mis à jour." : (data.error ?? "Échec de la mise à jour."), 5000);
+     void loadAll();
+   }
+ 
++  /** Valeur du select : "FREE", "pay:<packId>" ou "gift:<packId>". */
++  function changerPack(u: Utilisateur, valeur: string) {
++    if (valeur === "FREE") {
++      if (window.confirm(`Repasser ${u.nomWhatsapp} en pack gratuit ?`)) {
++        void majUser(u.id, { pack: "FREE" });
++      }
++      return;
++    }
++    const [mode, packId] = valeur.split(":");
++    const pack = packs.find((x) => x.id === packId);
++    if (!pack) return;
++    const question =
++      mode === "gift"
++        ? `Offrir "${pack.nomPack}" à ${u.nomWhatsapp} sans enregistrer de paiement ?`
++        : `Activer "${pack.nomPack}" pour ${u.nomWhatsapp} ? Un paiement de ${pack.prixFcfa} FCFA sera enregistré.`;
++    if (window.confirm(question)) {
++      void majUser(u.id, { pack: "PREMIUM", packId, sansPaiement: mode === "gift" });
++    }
++  }
++
++  function majPackLocal(id: string, patch: Partial<Pack>) {
++    setPacks((liste) => liste.map((x) => (x.id === id ? { ...x, ...patch } : x)));
++  }
++
++  function lienInvalide(lien: string) {
++    const v = lien.trim();
++    return v !== "" && !v.startsWith("https://");
++  }
++
+   async function savePack(pack: Pack) {
+-    await fetch("/api/admin/packs", {
++    if (lienInvalide(pack.lienPaiement)) {
++      flash("Le lien de paiement doit commencer par https://", 5000);
++      return;
++    }
++    setSavingId(pack.id);
++    const res = await fetch("/api/admin/packs", {
+       method: "PATCH",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify(pack),
+     });
+-    flash("Pack enregistré. Le lien de paiement est actif immédiatement.");
+-    void loadAll();
++    const data = await res.json().catch(() => ({}));
++    setSavingId("");
++    flash(
++      res.ok ? "Pack enregistré. Les étudiants voient la modification immédiatement." : (data.error ?? "Échec de l'enregistrement."),
++      5000,
++    );
++    if (res.ok) void loadAll();
++  }
++
++  async function ajouterPack() {
++    const res = await fetch("/api/admin/packs", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ nomPack: "Nouveau pack", prixFcfa: 0, dureeJours: 30, estActif: false }),
++    });
++    const data = await res.json().catch(() => ({}));
++    flash(
++      res.ok ? "Pack créé (inactif). Renseignez-le puis activez-le." : (data.error ?? "Échec de la création."),
++      5000,
++    );
++    if (res.ok) void loadAll();
++  }
++
++  async function supprimerPack(pack: Pack) {
++    if (!window.confirm(`Supprimer définitivement le pack "${pack.nomPack}" ?`)) return;
++    const res = await fetch(`/api/admin/packs?id=${encodeURIComponent(pack.id)}`, { method: "DELETE" });
++    flash(res.ok ? "Pack supprimé." : "Échec de la suppression.", 4000);
++    if (res.ok) void loadAll();
+   }
+ 
+   async function lancerQcm() {
+@@ -305,7 +372,7 @@ export default function AdminDashboard() {
+               { label: "Comptes actifs", value: kpi?.comptesActifs ?? 0 },
+               { label: "Revenus du mois", value: `${kpi?.revenusMois ?? 0} F` },
+               { label: "Uploads en attente", value: kpi?.uploadsEnAttente ?? 0 },
+-              { label: "QCM actifs", value: kpi?.qcmActifs ?? 0 },
++              { label: "Pharmacies", value: kpi?.pharmacies ?? 0 },
+             ].map((c) => (
+               <div key={c.label} className="mp-card p-4">
+                 <p className="text-xs uppercase tracking-wide text-mp-grey">{c.label}</p>
+@@ -349,8 +416,7 @@ export default function AdminDashboard() {
+             <select className="mp-input" value={filtrePack} onChange={(e) => setFiltrePack(e.target.value)}>
+               <option value="tous">Tous les packs</option>
+               <option value="FREE">FREE</option>
+-              <option value="MENSUEL">MENSUEL</option>
+-              <option value="A_VIE">A_VIE</option>
++              <option value="PREMIUM">PREMIUM</option>
+             </select>
+             <select className="mp-input" value={filtreStatut} onChange={(e) => setFiltreStatut(e.target.value)}>
+               <option value="tous">Tous les statuts</option>
+@@ -367,6 +433,7 @@ export default function AdminDashboard() {
+                   <th>Numéro</th>
+                   <th>Filière</th>
+                   <th>Pack</th>
++                  <th>Expire le</th>
+                   <th>Statut</th>
+                   <th>Inscription</th>
+                   <th>Actions</th>
+@@ -380,15 +447,37 @@ export default function AdminDashboard() {
+                     <td>{u.filiere}</td>
+                     <td>
+                       <select
+-                        className="rounded border border-[#dfe3e8] px-1 py-0.5"
+-                        value={u.pack}
+-                        onChange={(e) => majUser(u.id, { pack: e.target.value })}
++                        className="min-h-[44px] rounded border border-[#dfe3e8] px-2"
++                        value={u.pack === "FREE" ? "FREE" : "PREMIUM"}
++                        onChange={(e) => changerPack(u, e.target.value)}
+                       >
+                         <option value="FREE">FREE</option>
+-                        <option value="MENSUEL">MENSUEL</option>
+-                        <option value="A_VIE">A_VIE</option>
++                        <option value="PREMIUM" disabled>
++                          PREMIUM (actuel)
++                        </option>
++                        {packs
++                          .filter((x) => x.estActif)
++                          .map((x) => (
++                            <option key={`pay-${x.id}`} value={`pay:${x.id}`}>
++                              Activer : {x.nomPack}
++                            </option>
++                          ))}
++                        {packs
++                          .filter((x) => x.estActif)
++                          .map((x) => (
++                            <option key={`gift-${x.id}`} value={`gift:${x.id}`}>
++                              Offrir : {x.nomPack}
++                            </option>
++                          ))}
+                       </select>
+                     </td>
++                    <td>
++                      {u.pack === "FREE"
++                        ? "-"
++                        : u.packExpireAt
++                          ? new Date(u.packExpireAt).toLocaleDateString("fr-FR")
++                          : "Illimité"}
++                    </td>
+                     <td>
+                       <span
+                         className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+@@ -402,7 +491,7 @@ export default function AdminDashboard() {
+                     <td>
+                       <button
+                         type="button"
+-                        className="rounded bg-mp-yellow px-2 py-1 text-[10px] font-bold uppercase"
++                        className="min-h-[44px] rounded bg-mp-yellow px-3 text-xs font-bold uppercase"
+                         onClick={() => majUser(u.id, { statut: u.statut === "ACTIF" ? "BLOQUE" : "ACTIF" })}
+                       >
+                         {u.statut === "ACTIF" ? "Bloquer" : "Activer"}
+@@ -412,7 +501,7 @@ export default function AdminDashboard() {
+                 ))}
+                 {users.length === 0 ? (
+                   <tr>
+-                    <td colSpan={7} className="py-3 text-mp-grey">
++                    <td colSpan={8} className="py-3 text-mp-grey">
+                       Aucun compte trouvé.
+                     </td>
+                   </tr>
+@@ -424,61 +513,148 @@ export default function AdminDashboard() {
+       ) : null}
+ 
+       {onglet === "packs" ? (
+-        <div className="mt-4 space-y-3">
+-          {packs.map((p) => (
+-            <section key={p.id} className="mp-card p-4">
+-              <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
+-                <div>
+-                  <label className="mp-label">Nom du pack</label>
+-                  <input
+-                    className="mp-input"
+-                    value={p.nomPack}
+-                    onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, nomPack: e.target.value } : x)))}
+-                  />
++        <div className="mt-4 space-y-4">
++          <section className="mp-card flex items-start gap-3 p-4">
++            <Info size={20} className="mt-0.5 shrink-0 text-mp-blue" />
++            <p className="text-xs leading-relaxed text-mp-grey">
++              Chaque modification est appliquée immédiatement, sans redéploiement. Quand un étudiant touche
++              Payer, il est redirigé vers le lien du pack. Si le lien est vide, il est envoyé sur WhatsApp
++              au {CONTACT.tel}. Après le paiement, activez son compte dans l&apos;onglet Comptes.
++            </p>
++          </section>
++
++          {packs.map((p) => {
++            const invalide = lienInvalide(p.lienPaiement);
++            return (
++              <section key={p.id} className="mp-card p-4">
++                <div className="flex flex-wrap items-center justify-between gap-3">
++                  <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
++                    <input
++                      type="checkbox"
++                      className="h-5 w-5"
++                      checked={p.estActif}
++                      onChange={(e) => majPackLocal(p.id, { estActif: e.target.checked })}
++                    />
++                    {p.estActif ? "Pack visible par les étudiants" : "Pack masqué"}
++                  </label>
++                  <button
++                    type="button"
++                    className="mp-btn-ghost min-h-[44px]"
++                    onClick={() => supprimerPack(p)}
++                  >
++                    <Trash2 size={16} /> Supprimer
++                  </button>
++                </div>
++
++                <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
++                  <div>
++                    <label className="mp-label">Nom du pack</label>
++                    <input
++                      className="mp-input"
++                      value={p.nomPack}
++                      onChange={(e) => majPackLocal(p.id, { nomPack: e.target.value })}
++                    />
++                  </div>
++                  <div>
++                    <label className="mp-label">Prix (FCFA)</label>
++                    <input
++                      className="mp-input"
++                      type="number"
++                      min={0}
++                      inputMode="numeric"
++                      value={p.prixFcfa}
++                      onChange={(e) => majPackLocal(p.id, { prixFcfa: Number(e.target.value) || 0 })}
++                    />
++                  </div>
++                  <div>
++                    <label className="mp-label">Durée (jours, 9999 = à vie)</label>
++                    <input
++                      className="mp-input"
++                      type="number"
++                      min={1}
++                      inputMode="numeric"
++                      value={p.dureeJours}
++                      onChange={(e) => majPackLocal(p.id, { dureeJours: Number(e.target.value) || 0 })}
++                    />
++                  </div>
+                 </div>
+-                <div>
+-                  <label className="mp-label">Prix (FCFA)</label>
++
++                <div className="mt-3">
++                  <label className="mp-label">Lien de paiement (Wave, MTN MoMo ou Orange Money)</label>
+                   <input
+                     className="mp-input"
+-                    value={p.prixFcfa}
+-                    onChange={(e) =>
+-                      setPacks(packs.map((x) => (x.id === p.id ? { ...x, prixFcfa: Number(e.target.value) || 0 } : x)))
+-                    }
++                    value={p.lienPaiement}
++                    onChange={(e) => majPackLocal(p.id, { lienPaiement: e.target.value })}
++                    placeholder="https://pay.wave.com/m/M_ci_..."
++                    autoCapitalize="none"
++                    spellCheck={false}
+                   />
++                  {invalide ? (
++                    <p className="mt-1 text-xs font-semibold text-red-700">Le lien doit commencer par https://</p>
++                  ) : null}
+                 </div>
+-                <div>
+-                  <label className="mp-label">Durée (jours)</label>
+-                  <input
+-                    className="mp-input"
+-                    value={p.dureeJours}
+-                    onChange={(e) =>
+-                      setPacks(packs.map((x) => (x.id === p.id ? { ...x, dureeJours: Number(e.target.value) || 0 } : x)))
+-                    }
++
++                <div className="mt-3">
++                  <label className="mp-label">Description (visible par l&apos;étudiant)</label>
++                  <textarea
++                    className="mp-input min-h-[72px]"
++                    value={p.description ?? ""}
++                    onChange={(e) => majPackLocal(p.id, { description: e.target.value })}
+                   />
+                 </div>
+-                <div>
+-                  <label className="mp-label">Lien de paiement</label>
++
++                <div className="mt-3">
++                  <label className="mp-label">Note admin (privée, jamais montrée aux étudiants)</label>
+                   <input
+                     className="mp-input"
+-                    value={p.lienPaiement}
+-                    onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, lienPaiement: e.target.value } : x)))}
+-                    placeholder="https://pay.wave.com/..."
++                    value={p.noteAdmin ?? ""}
++                    onChange={(e) => majPackLocal(p.id, { noteAdmin: e.target.value })}
++                    placeholder="Après paiement Wave, activez manuellement le compte dans Gestion Comptes"
+                   />
+                 </div>
+-              </div>
+-              <div className="mt-3">
+-                <label className="mp-label">Description</label>
+-                <input
+-                  className="mp-input"
+-                  value={p.description ?? ""}
+-                  onChange={(e) => setPacks(packs.map((x) => (x.id === p.id ? { ...x, description: e.target.value } : x)))}
+-                />
+-              </div>
+-              <button type="button" className="mp-btn-yellow mt-3 md:w-48" onClick={() => savePack(p)}>
+-                <Save size={16} /> Enregistrer
+-              </button>
+-            </section>
+-          ))}
++
++                <div className="mt-4 rounded-xl border border-dashed border-[#cfd7e0] p-3">
++                  <p className="mp-label">Aperçu côté étudiant</p>
++                  <div className="mp-card mt-2 p-4">
++                    <div className="flex items-start justify-between">
++                      <div>
++                        <p className="text-base font-bold">{p.nomPack || "Sans nom"}</p>
++                        <p className="mt-1 text-xs text-mp-grey">{p.description}</p>
++                      </div>
++                      <div className="text-right">
++                        <p className="text-xl font-bold text-mp-blue">{p.prixFcfa} F</p>
++                        <p className="text-xs text-mp-grey">
++                          {p.dureeJours >= 9999 ? "accès illimité" : `${p.dureeJours} jours`}
++                        </p>
++                      </div>
++                    </div>
++                    <div className="mp-btn-yellow mt-4 opacity-80" aria-hidden="true">
++                      Payer {p.prixFcfa} FCFA
++                    </div>
++                  </div>
++                  <p className="mt-2 text-xs text-mp-grey">
++                    {p.lienPaiement.trim() && !invalide
++                      ? `Redirection vers : ${p.lienPaiement.trim()}`
++                      : `Aucun lien valide : l'étudiant sera envoyé sur WhatsApp (${CONTACT.tel}).`}
++                  </p>
++                </div>
++
++                <button
++                  type="button"
++                  className="mp-btn-yellow mt-4 min-h-[44px] md:w-56"
++                  onClick={() => savePack(p)}
++                  disabled={savingId === p.id || invalide}
++                >
++                  {savingId === p.id ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
++                  Sauvegarder
++                </button>
++              </section>
++            );
++          })}
++
++          <button type="button" className="mp-btn-blue min-h-[44px]" onClick={ajouterPack}>
++            <Plus size={16} /> Ajouter un pack
++          </button>
+         </div>
+       ) : null}
+ 
+diff --git a/src/components/admin/AdminLogin.tsx b/src/components/admin/AdminLogin.tsx
+index eb45c86..3018a11 100644
+--- a/src/components/admin/AdminLogin.tsx
++++ b/src/components/admin/AdminLogin.tsx
+@@ -21,7 +21,8 @@ export default function AdminLogin() {
+     });
+     setLoading(false);
+     if (!res.ok) {
+-      setError("Mot de passe administrateur incorrect");
++      const data = await res.json().catch(() => ({}));
++      setError(data.error ?? "Mot de passe administrateur incorrect");
+       return;
+     }
+     router.refresh();
+diff --git a/src/db/schema.ts b/src/db/schema.ts
+index dea75f9..fa76f02 100644
+--- a/src/db/schema.ts
++++ b/src/db/schema.ts
+@@ -21,6 +21,7 @@ export const users = pgTable("users", {
+   projetCarriere: text("projet_carriere").default(""),
+   pack: text("pack").notNull().default("FREE"),
+   statut: text("statut").notNull().default("ACTIF"),
++  packExpireAt: timestamp("pack_expire_at", { withTimezone: true }),
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
+@@ -123,6 +124,9 @@ export const packsConfig = pgTable("packs_config", {
+   dureeJours: integer("duree_jours").notNull().default(30),
+   lienPaiement: text("lien_paiement").notNull().default(""),
+   description: text("description").default(""),
++  estActif: boolean("est_actif").notNull().default(true),
++  noteAdmin: text("note_admin").notNull().default(""),
++  ordre: integer("ordre").notNull().default(0),
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
+@@ -141,6 +145,7 @@ export const paiements = pgTable("paiements", {
+   id: uuid("id").primaryKey().defaultRandom(),
+   userId: uuid("user_id").notNull(),
+   pack: text("pack").notNull(),
++  packId: uuid("pack_id"),
+   montant: integer("montant").notNull().default(0),
+   statut: text("statut").notNull().default("VALIDE"),
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+diff --git a/src/lib/auth.ts b/src/lib/auth.ts
+index b167406..3716cee 100644
+--- a/src/lib/auth.ts
++++ b/src/lib/auth.ts
+@@ -4,7 +4,15 @@ import { eq } from "drizzle-orm";
+ import { db } from "@/db";
+ import { users } from "@/db/schema";
+ 
+-const SECRET = process.env.SESSION_SECRET || "mediko-plus-secret-ci-2026";
++function getSecret(): string {
++  const secret = process.env.SESSION_SECRET;
++  if (secret) return secret;
++  if (process.env.NODE_ENV === "production") {
++    throw new Error("SESSION_SECRET est obligatoire en production.");
++  }
++  return "dev-only-secret-ne-pas-utiliser-en-production";
++}
++
+ export const SESSION_COOKIE = "mp_session";
+ export const ADMIN_COOKIE = "mp_admin";
+ 
+@@ -24,7 +32,7 @@ export function verifyPassword(password: string, stored: string): boolean {
+ }
+ 
+ function sign(value: string): string {
+-  return createHmac("sha256", SECRET).update(value).digest("hex");
++  return createHmac("sha256", getSecret()).update(value).digest("hex");
+ }
+ 
+ export function createToken(userId: string): string {
+@@ -39,13 +47,20 @@ export function readToken(token: string | undefined): string | null {
+   return userId;
+ }
+ 
+-export function adminToken(): string {
+-  return sign(`admin:${process.env.ADMIN_PASSWORD || "medikoplus2026"}`);
++/** Jeton du cookie admin, ou null si ADMIN_PASSWORD n'est pas défini (accès admin refusé). */
++export function adminToken(): string | null {
++  const password = process.env.ADMIN_PASSWORD;
++  if (!password) return null;
++  return sign(`admin:${password}`);
+ }
+ 
+ export async function isAdmin(): Promise<boolean> {
++  const expected = adminToken();
++  if (!expected) return false;
+   const store = await cookies();
+-  return store.get(ADMIN_COOKIE)?.value === adminToken();
++  const value = store.get(ADMIN_COOKIE)?.value;
++  if (!value || value.length !== expected.length) return false;
++  return timingSafeEqual(Buffer.from(value), Buffer.from(expected));
+ }
+ 
+ export type SessionUser = typeof users.$inferSelect;
+@@ -55,7 +70,13 @@ export async function getCurrentUser(): Promise<SessionUser | null> {
+   const userId = readToken(store.get(SESSION_COOKIE)?.value);
+   if (!userId) return null;
+   const rows = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+-  return rows[0] ?? null;
++  const user = rows[0];
++  if (!user) return null;
++  // Un abonnement expiré retombe automatiquement sur le pack gratuit.
++  if (user.pack !== "FREE" && user.packExpireAt && user.packExpireAt.getTime() < Date.now()) {
++    return { ...user, pack: "FREE" };
++  }
++  return user;
+ }
+ 
+ export function normalizeNumber(input: string): string {
+diff --git a/src/lib/seed.ts b/src/lib/seed.ts
+index ce6d3c3..a8f27dc 100644
+--- a/src/lib/seed.ts
++++ b/src/lib/seed.ts
+@@ -128,18 +128,22 @@ export async function ensureSeed(): Promise<void> {
+     if ((packs[0]?.c ?? 0) === 0) {
+       await db.insert(packsConfig).values([
+         {
+-          nomPack: "MENSUEL",
++          nomPack: "Mensuel 500F",
+           prixFcfa: 500,
+           dureeJours: 30,
+-          lienPaiement: "https://pay.wave.com/m/medikoplus/c/ci/",
++          lienPaiement: "",
+           description: "Accès complet pendant 30 jours : QCM, jeux, scanner, bibliothèque.",
++          noteAdmin: "Après paiement Wave, activez manuellement le compte dans Gestion Comptes",
++          ordre: 1,
+         },
+         {
+-          nomPack: "A_VIE",
++          nomPack: "A vie 4900F",
+           prixFcfa: 4900,
+           dureeJours: 9999,
+-          lienPaiement: "https://pay.wave.com/m/medikoplus/c/ci/",
++          lienPaiement: "",
+           description: "Accès à vie à toutes les fonctionnalités MEDIKO+.",
++          noteAdmin: "Après paiement Wave, activez manuellement le compte dans Gestion Comptes",
++          ordre: 2,
+         },
+       ]);
+     }
+diff --git a/supabase/migrations/0002_packs_paiements.sql b/supabase/migrations/0002_packs_paiements.sql
+new file mode 100644
+index 0000000..3cfc859
+--- /dev/null
++++ b/supabase/migrations/0002_packs_paiements.sql
+@@ -0,0 +1,25 @@
++-- MEDIKO+ : packs configurables, expiration des abonnements, paiements fiables.
++-- Idempotent : peut etre rejoue sans risque. Ne supprime aucune donnee.
++
++alter table public.packs_config add column if not exists est_actif boolean not null default true;
++alter table public.packs_config add column if not exists note_admin text not null default '';
++alter table public.packs_config add column if not exists ordre integer not null default 0;
++
++alter table public.users add column if not exists pack_expire_at timestamptz;
++alter table public.paiements add column if not exists pack_id uuid;
++
++-- Renommage des 2 packs par defaut (seulement s'ils portent encore l'ancien nom)
++update public.packs_config set nom_pack = 'Mensuel 500F', ordre = 1 where nom_pack = 'MENSUEL';
++update public.packs_config set nom_pack = 'A vie 4900F', ordre = 2 where nom_pack = 'A_VIE';
++
++-- Retire le faux lien Wave de demonstration (a remplacer depuis /admin)
++update public.packs_config
++set lien_paiement = ''
++where lien_paiement = 'https://pay.wave.com/m/medikoplus/c/ci/';
++
++-- Note admin par defaut
++update public.packs_config
++set note_admin = 'Après paiement Wave, activez manuellement le compte dans Gestion Comptes'
++where note_admin = '';
++
++create index if not exists paiements_user_statut_idx on public.paiements (user_id, statut);

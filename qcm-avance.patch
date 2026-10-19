@@ -1,0 +1,3237 @@
+diff --git a/src/app/api/admin/qcm-images/route.ts b/src/app/api/admin/qcm-images/route.ts
+new file mode 100644
+index 0000000..e7d6775
+--- /dev/null
++++ b/src/app/api/admin/qcm-images/route.ts
+@@ -0,0 +1,31 @@
++import { NextResponse } from "next/server";
++import { db } from "@/db";
++import { qcmImages } from "@/db/schema";
++import { isAdmin } from "@/lib/auth";
++
++const MAX_OCTETS = 500 * 1024;
++
++function typeReel(octets: Buffer): string | null {
++  if (octets.length > 3 && octets[0] === 0xff && octets[1] === 0xd8) return "image/jpeg";
++  if (octets.length > 8 && octets.subarray(0, 4).toString("hex") === "89504e47") return "image/png";
++  if (octets.length > 12 && octets.subarray(0, 4).toString() === "RIFF" && octets.subarray(8, 12).toString() === "WEBP") {
++    return "image/webp";
++  }
++  return null;
++}
++
++/** Corps : { dataUrl: "data:image/jpeg;base64,..." } (déjà compressée côté navigateur). */
++export async function POST(request: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const b = await request.json().catch(() => ({}));
++  const m = /^data:image\/(?:jpeg|png|webp);base64,([A-Za-z0-9+/=]+)$/.exec(String(b.dataUrl ?? ""));
++  if (!m) return NextResponse.json({ error: "Image invalide (JPEG, PNG ou WebP)." }, { status: 400 });
++  const octets = Buffer.from(m[1], "base64");
++  if (octets.length > MAX_OCTETS) {
++    return NextResponse.json({ error: "Image trop lourde (500 Ko maximum après compression)." }, { status: 413 });
++  }
++  const mime = typeReel(octets);
++  if (!mime) return NextResponse.json({ error: "Le fichier n'est pas une vraie image." }, { status: 400 });
++  const [img] = await db.insert(qcmImages).values({ mime, contenu: m[1] }).returning({ id: qcmImages.id });
++  return NextResponse.json({ id: img.id });
++}
+diff --git a/src/app/api/admin/qcm/resultats/route.ts b/src/app/api/admin/qcm/resultats/route.ts
+new file mode 100644
+index 0000000..3403948
+--- /dev/null
++++ b/src/app/api/admin/qcm/resultats/route.ts
+@@ -0,0 +1,72 @@
++import { NextResponse } from "next/server";
++import { and, desc, eq } from "drizzle-orm";
++import { db } from "@/db";
++import { qcmAdmin, qcmTentatives, users } from "@/db/schema";
++import { isAdmin } from "@/lib/auth";
++import { UUID_RE, arrondir, noterQuestion } from "@/lib/qcm";
++import { chargerQuestions } from "@/lib/qcm-server";
++
++/** Résultats d'une session : liste des copies, moyenne, et taux de réussite par question. */
++export async function GET(request: Request) {
++  if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const id = new URL(request.url).searchParams.get("id") ?? "";
++  if (!UUID_RE.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
++
++  const [session] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1);
++  if (!session) return NextResponse.json({ error: "Session introuvable." }, { status: 404 });
++
++  const copies = await db
++    .select({
++      id: qcmTentatives.id,
++      nom: users.nomWhatsapp,
++      numero: users.numeroWhatsapp,
++      filiere: users.filiere,
++      statut: qcmTentatives.statut,
++      points: qcmTentatives.points,
++      pointsMax: qcmTentatives.pointsMax,
++      noteSur20: qcmTentatives.noteSur20,
++      nbJustes: qcmTentatives.nbJustes,
++      sorties: qcmTentatives.sorties,
++      reponses: qcmTentatives.reponses,
++      questionIds: qcmTentatives.questionIds,
++      finAt: qcmTentatives.finAt,
++    })
++    .from(qcmTentatives)
++    .leftJoin(users, eq(users.id, qcmTentatives.userId))
++    .where(and(eq(qcmTentatives.qcmAdminId, id)))
++    .orderBy(desc(qcmTentatives.noteSur20));
++
++  const terminees = copies.filter((c) => c.statut === "TERMINE");
++  const notes = terminees.map((c) => c.noteSur20);
++  const questions = await chargerQuestions(session.questionIds);
++  const parQuestion = questions.map((q) => {
++    let justes = 0;
++    let sansReponse = 0;
++    for (const c of terminees) {
++      const r = noterQuestion(q, c.reponses[q.id] ?? []);
++      if (r.juste) justes += 1;
++      if (!r.repondu) sansReponse += 1;
++    }
++    return {
++      id: q.id,
++      question: q.question.slice(0, 120),
++      type: q.type,
++      tauxReussite: terminees.length ? Math.round((justes / terminees.length) * 100) : 0,
++      sansReponse,
++    };
++  });
++
++  return NextResponse.json({
++    session: { id: session.id, titre: session.titre, module: session.module, filieres: session.filieres },
++    stats: {
++      copies: terminees.length,
++      enCours: copies.length - terminees.length,
++      moyenne: notes.length ? arrondir(notes.reduce((a, b) => a + b, 0) / notes.length) : 0,
++      meilleure: notes.length ? Math.max(...notes) : 0,
++      plusBasse: notes.length ? Math.min(...notes) : 0,
++      reussite: notes.length ? Math.round((notes.filter((n) => n >= 10).length / notes.length) * 100) : 0,
++    },
++    copies: copies.map((c) => ({ ...c, reponses: undefined, questionIds: undefined })),
++    parQuestion,
++  });
++}
+diff --git a/src/app/api/admin/qcm/route.ts b/src/app/api/admin/qcm/route.ts
+index 979fe40..af17de0 100644
+--- a/src/app/api/admin/qcm/route.ts
++++ b/src/app/api/admin/qcm/route.ts
+@@ -1,8 +1,10 @@
+ import { NextResponse } from "next/server";
+-import { desc, eq } from "drizzle-orm";
++import { and, desc, eq, inArray, sql } from "drizzle-orm";
+ import { db } from "@/db";
+-import { qcmAdmin } from "@/db/schema";
++import { qcm, qcmAdmin } from "@/db/schema";
+ import { isAdmin } from "@/lib/auth";
++import { FILIERES } from "@/lib/constants";
++import { UUID_RE } from "@/lib/qcm";
+ 
+ export async function GET() {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+@@ -10,32 +12,75 @@ export async function GET() {
+   return NextResponse.json({ sessions: rows });
+ }
+ 
++/**
++ * Crée une session. Les questions sont figées au lancement : soit la liste `questionIds`
++ * choisie par l'admin, soit un tirage au sort de `nbQuestions` dans le module.
++ */
+ export async function POST(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const b = await request.json().catch(() => ({}));
+-  if (!b.module) return NextResponse.json({ error: "Module obligatoire" }, { status: 400 });
+-  const rows = await db
++  const moduleNom = String(b.module ?? "").trim();
++  if (!moduleNom) return NextResponse.json({ error: "Module obligatoire" }, { status: 400 });
++
++  const dureeMinutes = Math.min(Math.max(Number(b.dureeMinutes) || 30, 1), 300);
++  const nbDemande = Math.min(Math.max(Number(b.nbQuestions) || 10, 1), 100);
++  const filieres = Array.isArray(b.filieres)
++    ? b.filieres.map(String).filter((f: string) => (FILIERES as readonly string[]).includes(f))
++    : [];
++
++  let ids: string[] = Array.isArray(b.questionIds) ? b.questionIds.map(String).filter((i: string) => UUID_RE.test(i)) : [];
++  if (ids.length > 0) {
++    const existantes = await db.select({ id: qcm.id }).from(qcm).where(and(inArray(qcm.id, ids), eq(qcm.actif, true)));
++    const ok = new Set(existantes.map((r) => r.id));
++    ids = ids.filter((i) => ok.has(i));
++  } else {
++    const tirage = await db
++      .select({ id: qcm.id })
++      .from(qcm)
++      .where(and(eq(qcm.matiere, moduleNom), eq(qcm.actif, true)))
++      .orderBy(sql`random()`)
++      .limit(nbDemande);
++    ids = tirage.map((r) => r.id);
++  }
++  if (ids.length === 0) {
++    return NextResponse.json({ error: `Aucune question active dans le module "${moduleNom}". Ajoutez-en dans la banque.` }, { status: 400 });
++  }
++
++  let dateLancement = new Date();
++  if (b.dateLancement) {
++    const d = new Date(String(b.dateLancement));
++    if (Number.isNaN(d.getTime())) return NextResponse.json({ error: "Date invalide." }, { status: 400 });
++    dateLancement = d;
++  }
++
++  const [row] = await db
+     .insert(qcmAdmin)
+     .values({
+-      titre: String(b.titre || `QCM surveillé ${b.module}`),
+-      module: String(b.module),
+-      dureeMinutes: Number(b.dureeMinutes) || 30,
+-      nbQuestions: Number(b.nbQuestions) || 10,
+-      dateLancement: b.dateLancement ? new Date(String(b.dateLancement)) : new Date(),
++      titre: String(b.titre || `QCM surveillé ${moduleNom}`).slice(0, 120),
++      module: moduleNom,
++      dureeMinutes,
++      nbQuestions: ids.length,
++      dateLancement,
+       statut: "ACTIF",
++      filieres,
++      questionIds: ids,
++      sortiesMax: Math.min(Math.max(Math.round(Number(b.sortiesMax)) || 0, 0), 50),
++      melanger: b.melanger === undefined ? true : Boolean(b.melanger),
+     })
+     .returning();
+-  return NextResponse.json({ session: rows[0] });
++  return NextResponse.json({ session: row, nbQuestions: ids.length });
+ }
+ 
+ export async function PATCH(request: Request) {
+   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+   const b = await request.json().catch(() => ({}));
+-  if (!b.id) return NextResponse.json({ error: "id manquant" }, { status: 400 });
+-  const rows = await db
+-    .update(qcmAdmin)
+-    .set({ statut: String(b.statut ?? "CLOTURE") })
+-    .where(eq(qcmAdmin.id, String(b.id)))
+-    .returning();
+-  return NextResponse.json({ session: rows[0] });
++  if (!UUID_RE.test(String(b.id ?? ""))) return NextResponse.json({ error: "id invalide" }, { status: 400 });
++  const patch: Partial<typeof qcmAdmin.$inferInsert> = {};
++  if (b.statut !== undefined) patch.statut = b.statut === "ACTIF" ? "ACTIF" : "CLOTURE";
++  if (Array.isArray(b.filieres)) {
++    patch.filieres = b.filieres.map(String).filter((f: string) => (FILIERES as readonly string[]).includes(f));
++  }
++  if (Object.keys(patch).length === 0) return NextResponse.json({ error: "Rien à mettre à jour." }, { status: 400 });
++  const [row] = await db.update(qcmAdmin).set(patch).where(eq(qcmAdmin.id, String(b.id))).returning();
++  return NextResponse.json({ session: row });
+ }
+diff --git a/src/app/api/admin/questions/route.ts b/src/app/api/admin/questions/route.ts
+new file mode 100644
+index 0000000..b02c9cd
+--- /dev/null
++++ b/src/app/api/admin/questions/route.ts
+@@ -0,0 +1,80 @@
++import { NextResponse } from "next/server";
++import { and, desc, eq, ilike, type SQL } from "drizzle-orm";
++import { db } from "@/db";
++import { qcm } from "@/db/schema";
++import { isAdmin } from "@/lib/auth";
++import { UUID_RE, validerQuestion } from "@/lib/qcm";
++
++function nonAutorise() {
++  return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++}
++
++function erreur(e: unknown) {
++  return NextResponse.json({ error: e instanceof Error ? e.message : "Requête invalide." }, { status: 400 });
++}
++
++export async function GET(request: Request) {
++  if (!(await isAdmin())) return nonAutorise();
++  const p = new URL(request.url).searchParams;
++  const filtres: SQL[] = [];
++  const matiere = p.get("matiere");
++  const type = p.get("type");
++  const q = p.get("q")?.trim();
++  if (matiere && matiere !== "toutes") filtres.push(eq(qcm.matiere, matiere));
++  if (type && type !== "tous") filtres.push(eq(qcm.type, type));
++  if (q) filtres.push(ilike(qcm.question, `%${q}%`));
++  const rows = await db
++    .select()
++    .from(qcm)
++    .where(filtres.length ? and(...filtres) : undefined)
++    .orderBy(desc(qcm.createdAt))
++    .limit(300);
++  return NextResponse.json({ questions: rows });
++}
++
++/** Corps : une question, ou { questions: [...] } pour un import en masse. */
++export async function POST(request: Request) {
++  if (!(await isAdmin())) return nonAutorise();
++  const b = await request.json().catch(() => ({}));
++  if (Array.isArray(b.questions)) {
++    const valides: ReturnType<typeof validerQuestion>[] = [];
++    const rejets: string[] = [];
++    b.questions.slice(0, 500).forEach((ligne: Record<string, unknown>, i: number) => {
++      try {
++        valides.push(validerQuestion(ligne));
++      } catch (e) {
++        rejets.push(`Ligne ${i + 1} : ${e instanceof Error ? e.message : "invalide"}`);
++      }
++    });
++    if (valides.length > 0) await db.insert(qcm).values(valides);
++    return NextResponse.json({ importees: valides.length, rejets: rejets.slice(0, 20), nbRejets: rejets.length });
++  }
++  try {
++    const [row] = await db.insert(qcm).values(validerQuestion(b)).returning();
++    return NextResponse.json({ question: row });
++  } catch (e) {
++    return erreur(e);
++  }
++}
++
++export async function PATCH(request: Request) {
++  if (!(await isAdmin())) return nonAutorise();
++  const b = await request.json().catch(() => ({}));
++  const id = String(b.id ?? "");
++  if (!UUID_RE.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
++  try {
++    const [row] = await db.update(qcm).set(validerQuestion(b)).where(eq(qcm.id, id)).returning();
++    if (!row) return NextResponse.json({ error: "Question introuvable." }, { status: 404 });
++    return NextResponse.json({ question: row });
++  } catch (e) {
++    return erreur(e);
++  }
++}
++
++export async function DELETE(request: Request) {
++  if (!(await isAdmin())) return nonAutorise();
++  const id = new URL(request.url).searchParams.get("id") ?? "";
++  if (!UUID_RE.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
++  await db.delete(qcm).where(eq(qcm.id, id));
++  return NextResponse.json({ ok: true });
++}
+diff --git a/src/app/api/qcm/images/[id]/route.ts b/src/app/api/qcm/images/[id]/route.ts
+new file mode 100644
+index 0000000..c8f53cd
+--- /dev/null
++++ b/src/app/api/qcm/images/[id]/route.ts
+@@ -0,0 +1,24 @@
++import { NextResponse } from "next/server";
++import { eq } from "drizzle-orm";
++import { db } from "@/db";
++import { qcmImages } from "@/db/schema";
++import { getCurrentUser, isAdmin } from "@/lib/auth";
++import { UUID_RE } from "@/lib/qcm";
++
++/** Les images de QCM ne sont servies qu'aux comptes connectés, jamais mises en cache. */
++export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
++  const [user, admin] = await Promise.all([getCurrentUser(), isAdmin()]);
++  if (!user && !admin) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const { id } = await context.params;
++  if (!UUID_RE.test(id)) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
++  const [img] = await db.select().from(qcmImages).where(eq(qcmImages.id, id)).limit(1);
++  if (!img) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
++  return new NextResponse(new Uint8Array(Buffer.from(img.contenu, "base64")), {
++    headers: {
++      "Content-Type": img.mime,
++      "Cache-Control": "private, no-store",
++      "Content-Disposition": "inline",
++      "X-Content-Type-Options": "nosniff",
++    },
++  });
++}
+diff --git a/src/app/api/qcm/resultats/route.ts b/src/app/api/qcm/resultats/route.ts
+index df43697..a6f3cf8 100644
+--- a/src/app/api/qcm/resultats/route.ts
++++ b/src/app/api/qcm/resultats/route.ts
+@@ -15,21 +15,3 @@ export async function GET() {
+     .limit(50);
+   return NextResponse.json({ resultats: rows });
+ }
+-
+-export async function POST(request: Request) {
+-  const user = await getCurrentUser();
+-  if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+-  const body = await request.json().catch(() => ({}));
+-  const rows = await db
+-    .insert(resultatsQcm)
+-    .values({
+-      userId: user.id,
+-      qcmAdminId: body.qcmAdminId ? String(body.qcmAdminId) : null,
+-      matiere: String(body.matiere ?? ""),
+-      score: Number(body.score) || 0,
+-      total: Number(body.total) || 0,
+-      temps: Number(body.temps) || 0,
+-    })
+-    .returning();
+-  return NextResponse.json({ resultat: rows[0] });
+-}
+diff --git a/src/app/api/qcm/route.ts b/src/app/api/qcm/route.ts
+deleted file mode 100644
+index 411b729..0000000
+--- a/src/app/api/qcm/route.ts
++++ /dev/null
+@@ -1,17 +0,0 @@
+-import { NextResponse } from "next/server";
+-import { eq, sql } from "drizzle-orm";
+-import { db } from "@/db";
+-import { qcm } from "@/db/schema";
+-import { ensureSeed } from "@/lib/seed";
+-
+-export async function GET(request: Request) {
+-  await ensureSeed();
+-  const params = new URL(request.url).searchParams;
+-  const matiere = params.get("matiere");
+-  const limit = Math.min(Number(params.get("limit")) || 10, 50);
+-  const base = db.select().from(qcm);
+-  const rows = matiere && matiere !== "toutes"
+-    ? await base.where(eq(qcm.matiere, matiere)).orderBy(sql`random()`).limit(limit)
+-    : await base.orderBy(sql`random()`).limit(limit);
+-  return NextResponse.json({ questions: rows });
+-}
+diff --git a/src/app/api/qcm/start/route.ts b/src/app/api/qcm/start/route.ts
+new file mode 100644
+index 0000000..261412f
+--- /dev/null
++++ b/src/app/api/qcm/start/route.ts
+@@ -0,0 +1,134 @@
++import { NextResponse } from "next/server";
++import { and, eq, sql } from "drizzle-orm";
++import { db } from "@/db";
++import { qcm, qcmAdmin, qcmTentatives } from "@/db/schema";
++import { getCurrentUser } from "@/lib/auth";
++import { UUID_RE, melangerListe, questionPublique } from "@/lib/qcm";
++import { chargerQuestions, finaliser, type Tentative } from "@/lib/qcm-server";
++import { ensureSeed } from "@/lib/seed";
++
++function charge(t: Tentative, questions: Awaited<ReturnType<typeof chargerQuestions>>, melanger: boolean, sortiesMax: number, nom: string) {
++  return {
++    tentative: {
++      id: t.id,
++      titre: t.titre,
++      surveille: t.surveille,
++      limiteAt: t.limiteAt.toISOString(),
++      serverNow: new Date().toISOString(),
++      sortiesMax,
++      filigrane: nom,
++    },
++    questions: questions.map((q) => questionPublique(q, melanger)),
++    reponses: t.reponses,
++    sorties: t.sorties,
++  };
++}
++
++/**
++ * Démarre (ou reprend) une tentative. Les bonnes réponses ne quittent jamais le serveur
++ * avant la fin : l'étudiant reçoit uniquement les énoncés, les propositions et le barème.
++ */
++export async function POST(request: Request) {
++  await ensureSeed();
++  const user = await getCurrentUser();
++  if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  if (user.statut === "BLOQUE") return NextResponse.json({ error: "Compte bloqué." }, { status: 403 });
++  const body = await request.json().catch(() => ({}));
++  const sessionId = body.sessionId ? String(body.sessionId) : null;
++  if (sessionId && !UUID_RE.test(sessionId)) return NextResponse.json({ error: "Session invalide." }, { status: 400 });
++
++  const filigrane = `${user.nomWhatsapp} ${user.numeroWhatsapp}`;
++
++  // 1. Reprise d'une tentative en cours (rechargement de la page, fermeture accidentelle)
++  const enCours = await db
++    .select()
++    .from(qcmTentatives)
++    .where(and(eq(qcmTentatives.userId, user.id), eq(qcmTentatives.statut, "EN_COURS")));
++  for (const t of enCours) {
++    const memeCible = sessionId ? t.qcmAdminId === sessionId : t.qcmAdminId === null;
++    if (!memeCible) continue;
++    if (Date.now() > t.limiteAt.getTime()) {
++      await finaliser(t, undefined, t.sorties);
++      continue;
++    }
++    const [session] = t.qcmAdminId
++      ? await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, t.qcmAdminId)).limit(1)
++      : [undefined];
++    const questions = await chargerQuestions(t.questionIds);
++    return NextResponse.json(charge(t, questions, session?.melanger ?? true, session?.sortiesMax ?? 0, filigrane));
++  }
++
++  // 2. Nouvelle tentative
++  if (sessionId) {
++    const [session] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, sessionId)).limit(1);
++    if (!session) return NextResponse.json({ error: "Session introuvable." }, { status: 404 });
++    if (session.statut !== "ACTIF") return NextResponse.json({ error: "Cette session est clôturée." }, { status: 403 });
++    if (session.dateLancement.getTime() > Date.now()) {
++      return NextResponse.json(
++        { error: `Cette session ouvre le ${session.dateLancement.toLocaleString("fr-FR")}.` },
++        { status: 403 },
++      );
++    }
++    if (session.filieres.length > 0 && !session.filieres.includes(user.filiere)) {
++      return NextResponse.json({ error: "Cette session n'est pas ouverte à votre filière." }, { status: 403 });
++    }
++    const [dejaPasse] = await db
++      .select()
++      .from(qcmTentatives)
++      .where(and(eq(qcmTentatives.userId, user.id), eq(qcmTentatives.qcmAdminId, session.id), eq(qcmTentatives.statut, "TERMINE")))
++      .limit(1);
++    if (dejaPasse) return NextResponse.json({ deja: true, tentativeId: dejaPasse.id });
++
++    let ids = session.questionIds;
++    if (ids.length === 0) {
++      // Ancienne session sans questions figées : tirage dans le module.
++      const rows = await db
++        .select({ id: qcm.id })
++        .from(qcm)
++        .where(and(eq(qcm.matiere, session.module), eq(qcm.actif, true)))
++        .orderBy(sql`random()`)
++        .limit(session.nbQuestions);
++      ids = rows.map((r) => r.id);
++    }
++    if (ids.length === 0) return NextResponse.json({ error: "Aucune question dans cette session." }, { status: 400 });
++    if (session.melanger) ids = melangerListe(ids);
++
++    const limite = new Date(Date.now() + session.dureeMinutes * 60_000);
++    const [t] = await db
++      .insert(qcmTentatives)
++      .values({
++        userId: user.id,
++        qcmAdminId: session.id,
++        titre: session.titre,
++        matiere: session.module,
++        questionIds: ids,
++        surveille: true,
++        limiteAt: limite,
++      })
++      .returning();
++    const questions = await chargerQuestions(ids);
++    return NextResponse.json(charge(t, questions, session.melanger, session.sortiesMax, filigrane));
++  }
++
++  // Entraînement libre
++  const matiere = String(body.matiere ?? "toutes");
++  const nb = Math.min(Math.max(Number(body.nb) || 10, 1), 50);
++  const duree = Math.min(Math.max(Number(body.duree) || 15, 1), 180);
++  const filtre = matiere !== "toutes" ? and(eq(qcm.actif, true), eq(qcm.matiere, matiere)) : eq(qcm.actif, true);
++  const rows = await db.select({ id: qcm.id }).from(qcm).where(filtre).orderBy(sql`random()`).limit(nb);
++  if (rows.length === 0) return NextResponse.json({ error: "Aucune question disponible pour cette sélection." }, { status: 404 });
++  const ids = rows.map((r) => r.id);
++  const [t] = await db
++    .insert(qcmTentatives)
++    .values({
++      userId: user.id,
++      titre: matiere === "toutes" ? "Examen blanc" : `Examen blanc - ${matiere}`,
++      matiere: matiere === "toutes" ? "" : matiere,
++      questionIds: ids,
++      surveille: false,
++      limiteAt: new Date(Date.now() + duree * 60_000),
++    })
++    .returning();
++  const questions = await chargerQuestions(ids);
++  return NextResponse.json(charge(t, questions, true, 0, filigrane));
++}
+diff --git a/src/app/api/qcm/submit/route.ts b/src/app/api/qcm/submit/route.ts
+new file mode 100644
+index 0000000..7a307f6
+--- /dev/null
++++ b/src/app/api/qcm/submit/route.ts
+@@ -0,0 +1,26 @@
++import { NextResponse } from "next/server";
++import { and, eq } from "drizzle-orm";
++import { db } from "@/db";
++import { qcmTentatives } from "@/db/schema";
++import { getCurrentUser } from "@/lib/auth";
++import { UUID_RE } from "@/lib/qcm";
++import { construireResultat, finaliser } from "@/lib/qcm-server";
++
++/** Rend la copie : la note et la correction sont calculées ici, jamais dans le navigateur. */
++export async function POST(request: Request) {
++  const user = await getCurrentUser();
++  if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const body = await request.json().catch(() => ({}));
++  const id = String(body.tentativeId ?? "");
++  if (!UUID_RE.test(id)) return NextResponse.json({ error: "Tentative invalide." }, { status: 400 });
++
++  const [t] = await db
++    .select()
++    .from(qcmTentatives)
++    .where(and(eq(qcmTentatives.id, id), eq(qcmTentatives.userId, user.id)))
++    .limit(1);
++  if (!t) return NextResponse.json({ error: "Tentative introuvable." }, { status: 404 });
++
++  const finale = await finaliser(t, body.reponses ?? {}, Number(body.sorties) || 0);
++  return NextResponse.json(await construireResultat(finale));
++}
+diff --git a/src/app/api/qcm/surveille/route.ts b/src/app/api/qcm/surveille/route.ts
+index fb2ec27..3cb390f 100644
+--- a/src/app/api/qcm/surveille/route.ts
++++ b/src/app/api/qcm/surveille/route.ts
+@@ -1,11 +1,39 @@
+ import { NextResponse } from "next/server";
+-import { desc } from "drizzle-orm";
++import { desc, eq, inArray } from "drizzle-orm";
+ import { db } from "@/db";
+-import { qcmAdmin } from "@/db/schema";
++import { qcmAdmin, qcmTentatives } from "@/db/schema";
++import { getCurrentUser } from "@/lib/auth";
+ import { ensureSeed } from "@/lib/seed";
+ 
++/** Sessions visibles par l'étudiant : celles ouvertes à sa filière, avec l'état de sa tentative. */
+ export async function GET() {
+   await ensureSeed();
+-  const rows = await db.select().from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(20);
+-  return NextResponse.json({ sessions: rows });
++  const user = await getCurrentUser();
++  if (!user) return NextResponse.json({ sessions: [] });
++  const rows = await db.select().from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(30);
++  const visibles = rows.filter((s) => s.filieres.length === 0 || s.filieres.includes(user.filiere)).slice(0, 20);
++  const tentatives = visibles.length
++    ? await db
++        .select()
++        .from(qcmTentatives)
++        .where(inArray(qcmTentatives.qcmAdminId, visibles.map((s) => s.id)))
++    : [];
++  const miennes = tentatives.filter((t) => t.userId === user.id);
++  const maintenant = Date.now();
++  return NextResponse.json({
++    sessions: visibles.map((s) => {
++      const t = miennes.find((x) => x.qcmAdminId === s.id);
++      return {
++        id: s.id,
++        titre: s.titre,
++        module: s.module,
++        dureeMinutes: s.dureeMinutes,
++        nbQuestions: s.questionIds.length || s.nbQuestions,
++        dateLancement: s.dateLancement,
++        statut: s.statut,
++        ouvert: s.statut === "ACTIF" && s.dateLancement.getTime() <= maintenant,
++        tentative: t ? { id: t.id, statut: t.statut, noteSur20: t.noteSur20 } : null,
++      };
++    }),
++  });
+ }
+diff --git a/src/app/api/qcm/tentatives/[id]/route.ts b/src/app/api/qcm/tentatives/[id]/route.ts
+new file mode 100644
+index 0000000..24893c3
+--- /dev/null
++++ b/src/app/api/qcm/tentatives/[id]/route.ts
+@@ -0,0 +1,52 @@
++import { NextResponse } from "next/server";
++import { and, eq } from "drizzle-orm";
++import { db } from "@/db";
++import { qcmTentatives } from "@/db/schema";
++import { getCurrentUser } from "@/lib/auth";
++import { UUID_RE } from "@/lib/qcm";
++import { GRACE_MS, construireResultat, finaliser, nettoyerReponses } from "@/lib/qcm-server";
++
++async function charger(id: string, userId: string) {
++  if (!UUID_RE.test(id)) return null;
++  const [t] = await db
++    .select()
++    .from(qcmTentatives)
++    .where(and(eq(qcmTentatives.id, id), eq(qcmTentatives.userId, userId)))
++    .limit(1);
++  return t ?? null;
++}
++
++/** Correction d'une tentative terminée. Tant qu'elle est en cours, aucune réponse n'est révélée. */
++export async function GET(_request: Request, context: { params: Promise<{ id: string }> }) {
++  const user = await getCurrentUser();
++  if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const { id } = await context.params;
++  let t = await charger(id, user.id);
++  if (!t) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
++  if (t.statut === "EN_COURS" && Date.now() > t.limiteAt.getTime()) {
++    t = await finaliser(t, undefined, t.sorties);
++  }
++  if (t.statut !== "TERMINE") return NextResponse.json({ enCours: true });
++  return NextResponse.json(await construireResultat(t));
++}
++
++/** Sauvegarde automatique des réponses (reprise après coupure). Refusée après l'heure limite. */
++export async function PUT(request: Request, context: { params: Promise<{ id: string }> }) {
++  const user = await getCurrentUser();
++  if (!user) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
++  const { id } = await context.params;
++  const t = await charger(id, user.id);
++  if (!t) return NextResponse.json({ error: "Introuvable" }, { status: 404 });
++  if (t.statut !== "EN_COURS" || Date.now() > t.limiteAt.getTime() + GRACE_MS / 6) {
++    return NextResponse.json({ ok: false });
++  }
++  const body = await request.json().catch(() => ({}));
++  await db
++    .update(qcmTentatives)
++    .set({
++      reponses: nettoyerReponses(body.reponses, t.questionIds),
++      sorties: Math.max(t.sorties, Math.max(0, Math.round(Number(body.sorties)) || 0)),
++    })
++    .where(and(eq(qcmTentatives.id, t.id), eq(qcmTentatives.statut, "EN_COURS")));
++  return NextResponse.json({ ok: true });
++}
+diff --git a/src/app/qcm/page.tsx b/src/app/qcm/page.tsx
+index b2d7fdc..1bbdca2 100644
+--- a/src/app/qcm/page.tsx
++++ b/src/app/qcm/page.tsx
+@@ -4,7 +4,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
+ import Link from "next/link";
+ import { Bell, Clock, Info, Loader2, Play, ShieldCheck } from "lucide-react";
+ import PageShell from "@/components/PageShell";
+-import QcmRunner, { type Question } from "@/components/QcmRunner";
++import QcmRunner from "@/components/QcmRunner";
++import type { Charge } from "@/components/qcm/types";
+ import { MATIERES } from "@/lib/constants";
+ 
+ type Session = {
+@@ -15,6 +16,8 @@ type Session = {
+   nbQuestions: number;
+   dateLancement: string;
+   statut: string;
++  ouvert: boolean;
++  tentative: { id: string; statut: string; noteSur20: number } | null;
+ };
+ 
+ type Resultat = {
+@@ -29,7 +32,8 @@ export default function QcmPage() {
+   const [matiere, setMatiere] = useState("toutes");
+   const [nb, setNb] = useState("10");
+   const [duree, setDuree] = useState("15");
+-  const [questions, setQuestions] = useState<Question[] | null>(null);
++  const [charge, setCharge] = useState<Charge | null>(null);
++  const [erreur, setErreur] = useState("");
+   const [sessions, setSessions] = useState<Session[]>([]);
+   const [resultats, setResultats] = useState<Resultat[]>([]);
+   const [loading, setLoading] = useState(false);
+@@ -59,24 +63,22 @@ export default function QcmPage() {
+ 
+   async function demarrer() {
+     setLoading(true);
+-    const res = await fetch(`/api/qcm?matiere=${matiere}&limit=${nb}`);
+-    const data = await res.json();
+-    setQuestions(data.questions ?? []);
++    setErreur("");
++    const res = await fetch("/api/qcm/start", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ matiere, nb: Number(nb) || 10, duree: Number(duree) || 15 }),
++    });
++    const data = await res.json().catch(() => ({}));
++    if (res.ok) setCharge(data as Charge);
++    else setErreur(data.error ?? "Impossible de démarrer le QCM.");
+     setLoading(false);
+   }
+ 
+-  if (questions) {
++  if (charge) {
+     return (
+       <PageShell title="Examen blanc" subtitle={matiere === "toutes" ? "Toutes matières" : matiere}>
+-        <QcmRunner
+-          questions={questions}
+-          dureeMinutes={Number(duree) || 15}
+-          titre={matiere === "toutes" ? "Examen blanc" : matiere}
+-          onFinish={() => void loadMeta()}
+-        />
+-        <button type="button" className="mp-btn-ghost mt-4" onClick={() => setQuestions(null)}>
+-          Revenir aux QCM
+-        </button>
++        <QcmRunner charge={charge} onClose={() => setCharge(null)} onFinish={() => void loadMeta()} />
+       </PageShell>
+     );
+   }
+@@ -107,6 +109,7 @@ export default function QcmPage() {
+         <button type="button" className="mp-btn-yellow mt-4" onClick={demarrer} disabled={loading}>
+           {loading ? <Loader2 size={16} className="animate-spin" /> : <Play size={16} />} Commencer le QCM
+         </button>
++        {erreur ? <p className="mt-2 text-xs font-semibold text-red-700">{erreur}</p> : null}
+       </section>
+ 
+       <section className="mp-card mt-4 p-4">
+@@ -127,10 +130,16 @@ export default function QcmPage() {
+                     {new Date(s.dateLancement).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" })}
+                   </p>
+                 </div>
+-                {s.statut === "ACTIF" ? (
+-                  <Link href={`/qcm/surveille/${s.id}`} className="rounded-lg bg-mp-yellow px-3 py-1.5 text-xs font-bold uppercase">
+-                    Entrer
++                {s.tentative?.statut === "TERMINE" ? (
++                  <Link href={`/qcm/surveille/${s.id}`} className="flex min-h-[44px] items-center rounded-lg bg-mp-bg px-3 text-xs font-bold text-mp-blue">
++                    Ma note : {String(s.tentative.noteSur20).replace(".", ",")}/20
++                  </Link>
++                ) : s.ouvert ? (
++                  <Link href={`/qcm/surveille/${s.id}`} className="flex min-h-[44px] items-center rounded-lg bg-mp-yellow px-3 text-xs font-bold uppercase">
++                    {s.tentative ? "Reprendre" : "Entrer"}
+                   </Link>
++                ) : s.statut === "ACTIF" ? (
++                  <span className="text-xs text-mp-grey">Bientôt</span>
+                 ) : (
+                   <span className="text-xs text-mp-grey">Clôturé</span>
+                 )}
+diff --git a/src/app/qcm/surveille/[id]/SurveilleClient.tsx b/src/app/qcm/surveille/[id]/SurveilleClient.tsx
+index f9f804f..c13090c 100644
+--- a/src/app/qcm/surveille/[id]/SurveilleClient.tsx
++++ b/src/app/qcm/surveille/[id]/SurveilleClient.tsx
+@@ -1,80 +1,107 @@
+ "use client";
+ 
+-import { useEffect, useRef, useState } from "react";
+-import { AlertTriangle, Maximize2 } from "lucide-react";
+-import QcmRunner, { type Question } from "@/components/QcmRunner";
++import { useCallback, useEffect, useRef, useState } from "react";
++import { Loader2, Maximize2 } from "lucide-react";
++import QcmRunner from "@/components/QcmRunner";
++import QcmResultat from "@/components/qcm/QcmResultat";
++import type { Charge, ResultatFinal } from "@/components/qcm/types";
++
++type Etat = "NOUVEAU" | "EN_COURS" | "TERMINE";
+ 
+ export default function SurveilleClient({
+-  questions,
+-  dureeMinutes,
+-  titre,
+   sessionId,
++  dureeMinutes,
++  nbQuestions,
++  sortiesMax,
++  etat,
++  tentativeId,
++  filigrane,
+ }: {
+-  questions: Question[];
+-  dureeMinutes: number;
+-  titre: string;
+   sessionId: string;
++  dureeMinutes: number;
++  nbQuestions: number;
++  sortiesMax: number;
++  etat: Etat;
++  tentativeId: string | null;
++  filigrane: string;
+ }) {
+-  const [started, setStarted] = useState(false);
+-  const [alertes, setAlertes] = useState(0);
+-  const containerRef = useRef<HTMLDivElement>(null);
++  const [charge, setCharge] = useState<Charge | null>(null);
++  const [correction, setCorrection] = useState<ResultatFinal | null>(null);
++  const [chargement, setChargement] = useState(etat === "TERMINE");
++  const [erreur, setErreur] = useState("");
++  const conteneur = useRef<HTMLDivElement>(null);
++
++  const chargerCorrection = useCallback(async (id: string) => {
++    setChargement(true);
++    const res = await fetch(`/api/qcm/tentatives/${id}`);
++    const data = await res.json().catch(() => ({}));
++    if (res.ok && data.resultat) setCorrection(data as ResultatFinal);
++    else setErreur(data.error ?? "Correction indisponible.");
++    setChargement(false);
++  }, []);
+ 
+   useEffect(() => {
+-    if (!started) return;
+-    const onBlur = () => setAlertes((a) => a + 1);
+-    const onVisibility = () => {
+-      if (document.visibilityState === "hidden") setAlertes((a) => a + 1);
+-    };
+-    window.addEventListener("blur", onBlur);
+-    document.addEventListener("visibilitychange", onVisibility);
+-    return () => {
+-      window.removeEventListener("blur", onBlur);
+-      document.removeEventListener("visibilitychange", onVisibility);
+-    };
+-  }, [started]);
++    if (etat === "TERMINE" && tentativeId) void chargerCorrection(tentativeId);
++  }, [etat, tentativeId, chargerCorrection]);
+ 
+   async function demarrer() {
+-    setStarted(true);
++    setChargement(true);
++    setErreur("");
+     try {
+-      await containerRef.current?.requestFullscreen?.();
++      await conteneur.current?.requestFullscreen?.();
+     } catch {
+-      // mode plein écran refusé : la session continue
++      // plein écran refusé : la session continue
++    }
++    const res = await fetch("/api/qcm/start", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ sessionId }),
++    });
++    const data = await res.json().catch(() => ({}));
++    if (!res.ok) {
++      setErreur(data.error ?? "Impossible de démarrer la session.");
++    } else if (data.deja && data.tentativeId) {
++      await chargerCorrection(data.tentativeId);
++      return;
++    } else {
++      setCharge(data as Charge);
+     }
++    setChargement(false);
+   }
+ 
+   return (
+-    <div ref={containerRef} className="bg-mp-bg">
+-      {!started ? (
++    <div ref={conteneur} className="bg-mp-bg">
++      {correction ? (
++        <QcmResultat data={correction} filigrane={filigrane} />
++      ) : charge ? (
++        <QcmRunner charge={charge} />
++      ) : etat === "TERMINE" && chargement ? (
++        <p className="mp-card flex items-center gap-2 p-4 text-sm text-mp-grey">
++          <Loader2 size={16} className="animate-spin" /> Chargement de votre correction...
++        </p>
++      ) : (
+         <section className="mp-card p-4">
+           <h2 className="text-sm font-bold">Règles de la session surveillée</h2>
+           <ul className="mt-3 space-y-2 text-xs text-mp-grey">
+-            <li>Une seule tentative est autorisée pour cette session.</li>
+-            <li>La sortie de l&apos;écran (changement d&apos;onglet) est détectée et comptabilisée.</li>
+-            <li>Le chronomètre démarre immédiatement et ne peut pas être mis en pause.</li>
+-            <li>Durée : {dureeMinutes} minutes · {questions.length} questions.</li>
++            <li>Une seule tentative est autorisée. Si vous quittez la page, vous pouvez reprendre tant que le temps n&apos;est pas écoulé.</li>
++            <li>Le chronomètre est géré par le serveur : il démarre immédiatement et ne peut pas être mis en pause.</li>
++            <li>
++              Chaque sortie de l&apos;écran est comptée et le contenu est masqué
++              {sortiesMax > 0 ? `. Au-delà de ${sortiesMax} sortie(s), votre copie est rendue automatiquement` : ""}.
++            </li>
++            <li>Vos réponses sont sauvegardées automatiquement. Une question sans réponse vaut 0 point.</li>
++            <li>Votre note et la correction détaillée s&apos;affichent dès que vous avez rendu votre copie.</li>
++            <li>
++              Durée : {dureeMinutes} minutes · {nbQuestions} questions. Votre nom est affiché en filigrane sur chaque
++              écran.
++            </li>
+           </ul>
+-          <button type="button" className="mp-btn-yellow mt-4" onClick={demarrer}>
+-            <Maximize2 size={16} /> Démarrer en plein écran
++          {erreur ? <p className="mt-3 text-xs font-semibold text-red-700">{erreur}</p> : null}
++          <button type="button" className="mp-btn-yellow mt-4" onClick={demarrer} disabled={chargement}>
++            {chargement ? <Loader2 size={16} className="animate-spin" /> : <Maximize2 size={16} />}
++            {etat === "EN_COURS" ? "Reprendre ma copie" : "Démarrer en plein écran"}
+           </button>
+         </section>
+-      ) : (
+-        <>
+-          {alertes > 0 ? (
+-            <div className="mp-card mb-3 flex items-start gap-2 border-l-4 border-red-500 p-3">
+-              <AlertTriangle size={16} className="mt-0.5 text-red-600" />
+-              <p className="text-xs text-red-700">
+-                Avertissement : {alertes} sortie(s) d&apos;écran détectée(s). Toute nouvelle sortie peut
+-                invalider votre session.
+-              </p>
+-            </div>
+-          ) : null}
+-          <QcmRunner
+-            questions={questions}
+-            dureeMinutes={dureeMinutes}
+-            titre={titre}
+-            qcmAdminId={sessionId}
+-          />
+-        </>
+       )}
+     </div>
+   );
+diff --git a/src/app/qcm/surveille/[id]/page.tsx b/src/app/qcm/surveille/[id]/page.tsx
+index 7f87bb9..b2c60ec 100644
+--- a/src/app/qcm/surveille/[id]/page.tsx
++++ b/src/app/qcm/surveille/[id]/page.tsx
+@@ -1,11 +1,11 @@
+ import { redirect } from "next/navigation";
+-import { and, eq, sql } from "drizzle-orm";
++import { and, eq } from "drizzle-orm";
+ import PageShell from "@/components/PageShell";
+ import SurveilleClient from "./SurveilleClient";
+-import type { Question } from "@/components/QcmRunner";
+ import { db } from "@/db";
+-import { qcm, qcmAdmin, resultatsQcm } from "@/db/schema";
++import { qcmAdmin, qcmTentatives } from "@/db/schema";
+ import { getCurrentUser } from "@/lib/auth";
++import { UUID_RE } from "@/lib/qcm";
+ import { ensureSeed } from "@/lib/seed";
+ 
+ export default async function QcmSurveillePage({ params }: { params: Promise<{ id: string }> }) {
+@@ -14,7 +14,9 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
+   const user = await getCurrentUser();
+   if (!user) redirect("/connexion");
+ 
+-  const [session] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1);
++  const [session] = UUID_RE.test(id)
++    ? await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1)
++    : [undefined];
+   if (!session) {
+     return (
+       <PageShell title="Session introuvable">
+@@ -23,23 +25,24 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
+     );
+   }
+ 
+-  const [tentative] = await db
+-    .select()
+-    .from(resultatsQcm)
+-    .where(and(eq(resultatsQcm.userId, user.id), eq(resultatsQcm.qcmAdminId, session.id)))
+-    .limit(1);
++  if (session.filieres.length > 0 && !session.filieres.includes(user.filiere)) {
++    return (
++      <PageShell title={session.titre} nav={false}>
++        <p className="mp-card p-4 text-sm text-mp-grey">Cette session n&apos;est pas ouverte à votre filière.</p>
++      </PageShell>
++    );
++  }
+ 
+-  const questions = (await db
++  const tentatives = await db
+     .select()
+-    .from(qcm)
+-    .where(eq(qcm.matiere, session.module))
+-    .orderBy(sql`random()`)
+-    .limit(session.nbQuestions)) as Question[];
++    .from(qcmTentatives)
++    .where(and(eq(qcmTentatives.userId, user.id), eq(qcmTentatives.qcmAdminId, session.id)));
++  const terminee = tentatives.find((t) => t.statut === "TERMINE");
++  const enCours = tentatives.find((t) => t.statut === "EN_COURS" && t.limiteAt.getTime() > Date.now());
++  const etat = terminee ? "TERMINE" : enCours ? "EN_COURS" : "NOUVEAU";
+ 
+-  const fallback =
+-    questions.length === 0
+-      ? ((await db.select().from(qcm).orderBy(sql`random()`).limit(session.nbQuestions)) as Question[])
+-      : questions;
++  const ouverture = session.dateLancement.getTime() > Date.now() ? session.dateLancement : null;
++  const clos = session.statut !== "ACTIF" && etat !== "TERMINE";
+ 
+   return (
+     <PageShell
+@@ -47,20 +50,21 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
+       subtitle={`${session.module} · ${session.dureeMinutes} min · 1 tentative`}
+       nav={false}
+     >
+-      {tentative ? (
+-        <section className="mp-card p-4">
+-          <p className="text-sm font-bold">Tentative déjà enregistrée</p>
+-          <p className="mt-2 text-sm text-mp-grey">
+-            Score obtenu : {tentative.score}/{tentative.total} le{" "}
+-            {tentative.createdAt.toLocaleString("fr-FR")}
+-          </p>
+-        </section>
++      {clos ? (
++        <p className="mp-card p-4 text-sm text-mp-grey">Cette session est clôturée.</p>
++      ) : ouverture && etat === "NOUVEAU" ? (
++        <p className="mp-card p-4 text-sm text-mp-grey">
++          Cette session ouvre le {ouverture.toLocaleString("fr-FR", { dateStyle: "long", timeStyle: "short" })}.
++        </p>
+       ) : (
+         <SurveilleClient
+-          questions={fallback}
+-          dureeMinutes={session.dureeMinutes}
+-          titre={session.titre}
+           sessionId={session.id}
++          dureeMinutes={session.dureeMinutes}
++          nbQuestions={session.questionIds.length || session.nbQuestions}
++          sortiesMax={session.sortiesMax}
++          etat={etat}
++          tentativeId={(terminee ?? enCours)?.id ?? null}
++          filigrane={`${user.nomWhatsapp} ${user.numeroWhatsapp}`}
+         />
+       )}
+     </PageShell>
+diff --git a/src/components/QcmRunner.tsx b/src/components/QcmRunner.tsx
+index c804bef..76a8a1a 100644
+--- a/src/components/QcmRunner.tsx
++++ b/src/components/QcmRunner.tsx
+@@ -1,183 +1,320 @@
+ "use client";
+ 
+-import { useEffect, useMemo, useState } from "react";
+-import { CheckCircle2, ChevronLeft, ChevronRight, Timer, XCircle } from "lucide-react";
+-
+-export type Question = {
+-  id: string;
+-  matiere: string;
+-  question: string;
+-  propositions: string[];
+-  bonneReponse: string;
+-  explication: string;
+-  niveau: string;
+-};
++import { useCallback, useEffect, useRef, useState } from "react";
++import { AlertTriangle, ChevronLeft, ChevronRight, Flag, Loader2, Timer } from "lucide-react";
++import ProtectedZone from "@/components/qcm/ProtectedZone";
++import QcmResultat from "@/components/qcm/QcmResultat";
++import type { Charge, QuestionPublique, ResultatFinal } from "@/components/qcm/types";
++
++function consigne(q: QuestionPublique): string {
++  if (q.type === "QCU") return "Une seule réponse";
++  if (q.type === "QCD") return "Choix double : cochez exactement 2 réponses";
++  return "Choix multiple : une ou plusieurs réponses";
++}
++
++function bareme(q: QuestionPublique): string {
++  const fmt = (n: number) => String(n).replace(".", ",");
++  const erreur = q.penalite > 0 ? `erreur : -${fmt(q.penalite)} pt` : "erreur : 0 pt";
++  const partiel = q.mode === "PARTIEL" && q.type !== "QCU" ? " · points partiels" : "";
++  return `${fmt(q.points)} pt · ${erreur} · sans réponse : 0 pt${partiel}`;
++}
+ 
+ export default function QcmRunner({
+-  questions,
+-  dureeMinutes,
+-  titre,
+-  qcmAdminId,
++  charge,
++  onClose,
+   onFinish,
+ }: {
+-  questions: Question[];
+-  dureeMinutes: number;
+-  titre: string;
+-  qcmAdminId?: string;
+-  onFinish?: (score: number) => void;
++  charge: Charge;
++  onClose?: () => void;
++  onFinish?: () => void;
+ }) {
+-  const [index, setIndex] = useState(0);
+-  const [answers, setAnswers] = useState<Record<string, string>>({});
+-  const [termine, setTermine] = useState(false);
+-  const [restant, setRestant] = useState(dureeMinutes * 60);
+-  const [saved, setSaved] = useState(false);
+-
+-  const score = useMemo(
+-    () => questions.filter((q) => answers[q.id] === q.bonneReponse).length,
+-    [answers, questions],
++  const { tentative, questions } = charge;
++  const decalage = useRef(Date.parse(tentative.serverNow) - Date.now());
++  const limite = Date.parse(tentative.limiteAt);
++  const calculerRestant = useCallback(
++    () => Math.max(0, Math.floor((limite - (Date.now() + decalage.current)) / 1000)),
++    [limite],
+   );
+ 
++  const [index, setIndex] = useState(0);
++  const [reponses, setReponses] = useState<Record<string, number[]>>(charge.reponses ?? {});
++  const [marques, setMarques] = useState<string[]>([]);
++  const [restant, setRestant] = useState(calculerRestant);
++  const [sorties, setSorties] = useState(charge.sorties ?? 0);
++  const [masque, setMasque] = useState(false);
++  const [envoi, setEnvoi] = useState(false);
++  const [erreur, setErreur] = useState("");
++  const [final, setFinal] = useState<ResultatFinal | null>(null);
++
++  const dejaEnvoye = useRef(false);
++  const reponsesRef = useRef(reponses);
++  const sortiesRef = useRef(sorties);
++  reponsesRef.current = reponses;
++  sortiesRef.current = sorties;
++
++  const rendre = useCallback(async () => {
++    if (dejaEnvoye.current) return;
++    dejaEnvoye.current = true;
++    setEnvoi(true);
++    setErreur("");
++    try {
++      const res = await fetch("/api/qcm/submit", {
++        method: "POST",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({
++          tentativeId: tentative.id,
++          reponses: reponsesRef.current,
++          sorties: sortiesRef.current,
++        }),
++      });
++      const data = await res.json().catch(() => ({}));
++      if (!res.ok) throw new Error(data.error ?? "Envoi impossible.");
++      setFinal(data as ResultatFinal);
++      onFinish?.();
++    } catch (e) {
++      dejaEnvoye.current = false;
++      setErreur(e instanceof Error ? e.message : "Envoi impossible. Vérifiez votre connexion et réessayez.");
++    } finally {
++      setEnvoi(false);
++    }
++  }, [tentative.id, onFinish]);
++
++  // Chronomètre calé sur l'heure du serveur : un rechargement ne le remet pas à zéro.
+   useEffect(() => {
+-    if (termine) return;
++    if (final) return;
+     const t = setInterval(() => {
+-      setRestant((r) => {
+-        if (r <= 1) {
+-          setTermine(true);
+-          return 0;
+-        }
+-        return r - 1;
+-      });
++      const r = calculerRestant();
++      setRestant(r);
++      if (r <= 0) void rendre();
+     }, 1000);
+     return () => clearInterval(t);
+-  }, [termine]);
++  }, [final, calculerRestant, rendre]);
+ 
++  // Sauvegarde automatique (reprise possible après coupure).
+   useEffect(() => {
+-    if (!termine || saved) return;
+-    setSaved(true);
+-    const temps = dureeMinutes * 60 - restant;
+-    void fetch("/api/qcm/resultats", {
+-      method: "POST",
+-      headers: { "Content-Type": "application/json" },
+-      body: JSON.stringify({
+-        qcmAdminId,
+-        matiere: questions[0]?.matiere ?? "",
+-        score,
+-        total: questions.length,
+-        temps,
+-      }),
+-    }).catch(() => undefined);
+-    onFinish?.(score);
+-  }, [termine, saved, score, questions, dureeMinutes, restant, qcmAdminId, onFinish]);
++    if (final) return;
++    const t = setTimeout(() => {
++      void fetch(`/api/qcm/tentatives/${tentative.id}`, {
++        method: "PUT",
++        headers: { "Content-Type": "application/json" },
++        body: JSON.stringify({ reponses, sorties }),
++      }).catch(() => undefined);
++    }, 800);
++    return () => clearTimeout(t);
++  }, [reponses, sorties, final, tentative.id]);
++
++  // Sorties d'écran (sessions surveillées uniquement) : comptées, contenu masqué.
++  useEffect(() => {
++    if (final || !tentative.surveille) return;
++    let dernier = 0;
++    const quitter = () => {
++      const maintenant = Date.now();
++      if (maintenant - dernier > 1500) {
++        dernier = maintenant;
++        setSorties((s) => s + 1);
++      }
++      setMasque(true);
++    };
++    const revenir = () => setMasque(false);
++    const visibilite = () => (document.visibilityState === "hidden" ? quitter() : revenir());
++    window.addEventListener("blur", quitter);
++    window.addEventListener("focus", revenir);
++    document.addEventListener("visibilitychange", visibilite);
++    return () => {
++      window.removeEventListener("blur", quitter);
++      window.removeEventListener("focus", revenir);
++      document.removeEventListener("visibilitychange", visibilite);
++    };
++  }, [final, tentative.surveille]);
++
++  const depassement = tentative.sortiesMax > 0 && sorties > tentative.sortiesMax;
++  useEffect(() => {
++    if (depassement && !final) void rendre();
++  }, [depassement, final, rendre]);
++
++  if (final) {
++    return (
++      <div>
++        <QcmResultat data={final} filigrane={tentative.filigrane} />
++        {onClose ? (
++          <button type="button" className="mp-btn-ghost mt-4" onClick={onClose}>
++            Revenir aux QCM
++          </button>
++        ) : null}
++      </div>
++    );
++  }
+ 
+   if (questions.length === 0) {
+     return <p className="mp-card p-4 text-sm text-mp-grey">Aucune question disponible pour cette sélection.</p>;
+   }
+ 
+-  const current = questions[index];
++  const q = questions[index];
++  const choisies = reponses[q.id] ?? [];
+   const minutes = String(Math.floor(restant / 60)).padStart(2, "0");
+-  const seconds = String(restant % 60).padStart(2, "0");
++  const secondes = String(restant % 60).padStart(2, "0");
++  const nbRepondues = questions.filter((x) => (reponses[x.id] ?? []).length > 0).length;
+ 
+-  if (termine) {
+-    const pourcentage = Math.round((score / questions.length) * 100);
+-    return (
+-      <div className="space-y-3">
+-        <section className="mp-card p-4 text-center">
+-          <p className="text-xs uppercase tracking-wide text-mp-grey">Résultat — {titre}</p>
+-          <p className="mt-1 text-4xl font-bold text-mp-blue">
+-            {score}/{questions.length}
+-          </p>
+-          <p className="mt-1 text-sm font-semibold">{pourcentage}% de bonnes réponses</p>
+-        </section>
+-        {questions.map((q, i) => {
+-          const juste = answers[q.id] === q.bonneReponse;
+-          return (
+-            <section key={q.id} className="mp-card p-4">
+-              <div className="flex items-start gap-2">
+-                {juste ? (
+-                  <CheckCircle2 size={18} className="mt-0.5 text-green-600" />
+-                ) : (
+-                  <XCircle size={18} className="mt-0.5 text-red-600" />
+-                )}
+-                <div>
+-                  <p className="text-sm font-semibold">
+-                    {i + 1}. {q.question}
+-                  </p>
+-                  <p className="mt-1 text-xs text-mp-grey">
+-                    Votre réponse : {answers[q.id] ?? "aucune"} — Bonne réponse : {q.bonneReponse}
+-                  </p>
+-                  <p className="mt-1 text-xs">{q.explication}</p>
+-                </div>
+-              </div>
+-            </section>
+-          );
+-        })}
+-      </div>
+-    );
++  function cocher(idx: number) {
++    setReponses((courant) => {
++      const actuel = courant[q.id] ?? [];
++      let suivant: number[];
++      if (q.type === "QCU") {
++        suivant = [idx];
++      } else if (actuel.includes(idx)) {
++        suivant = actuel.filter((i) => i !== idx);
++      } else if (q.type === "QCD" && actuel.length >= 2) {
++        suivant = [actuel[1], idx];
++      } else {
++        suivant = [...actuel, idx];
++      }
++      return { ...courant, [q.id]: suivant };
++    });
++  }
++
++  function confirmerRendu() {
++    const sansReponse = questions.length - nbRepondues;
++    const message =
++      sansReponse > 0
++        ? `${sansReponse} question(s) sans réponse (0 point chacune). Rendre quand même votre copie ?`
++        : "Rendre votre copie ? Vous ne pourrez plus la modifier.";
++    if (window.confirm(message)) void rendre();
+   }
+ 
+   return (
+-    <div>
+-      <section className="mp-card p-4">
+-        <div className="flex items-center justify-between text-xs font-semibold text-mp-grey">
+-          <span>
+-            Question {index + 1}/{questions.length}
+-          </span>
+-          <span className="flex items-center gap-1 text-mp-blue">
+-            <Timer size={14} /> {minutes}:{seconds}
+-          </span>
+-        </div>
+-        <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#e9edf3]">
+-          <div
+-            className="h-full rounded-full bg-mp-yellow"
+-            style={{ width: `${((index + 1) / questions.length) * 100}%` }}
+-          />
+-        </div>
+-        <h2 className="mt-4 text-sm font-bold leading-relaxed">{current.question}</h2>
+-        <div className="mt-4 space-y-2">
+-          {current.propositions.map((p, i) => {
+-            const selected = answers[current.id] === p;
+-            return (
+-              <button
+-                key={p}
+-                type="button"
+-                onClick={() => setAnswers({ ...answers, [current.id]: p })}
+-                className={`flex w-full items-center gap-3 rounded-[10px] border px-3 py-3 text-left text-sm ${
+-                  selected ? "border-mp-blue bg-[#eaf1f8]" : "border-[#dfe3e8] bg-white"
+-                }`}
+-              >
+-                <span
+-                  className={`flex h-6 w-6 items-center justify-center rounded-full border text-xs font-bold ${
+-                    selected ? "border-mp-blue bg-mp-blue text-white" : "border-[#c9d2dc] text-mp-grey"
++    <ProtectedZone filigrane={tentative.filigrane} masque={masque}>
++      <div>
++        {sorties > 0 && tentative.surveille ? (
++          <div className="mp-card mb-3 flex items-start gap-2 border-l-4 border-red-500 p-3">
++            <AlertTriangle size={16} className="mt-0.5 shrink-0 text-red-600" />
++            <p className="text-xs text-red-700">
++              {sorties} sortie(s) d&apos;écran détectée(s)
++              {tentative.sortiesMax > 0
++                ? `. Au-delà de ${tentative.sortiesMax}, votre copie est rendue automatiquement.`
++                : ". Elles sont communiquées à l'enseignant."}
++            </p>
++          </div>
++        ) : null}
++
++        <section className="mp-card p-4">
++          <div className="flex items-center justify-between text-xs font-semibold text-mp-grey">
++            <span>
++              Question {index + 1}/{questions.length} · {nbRepondues} répondue(s)
++            </span>
++            <span className={`flex items-center gap-1 ${restant < 60 ? "text-red-600" : "text-mp-blue"}`}>
++              <Timer size={14} /> {minutes}:{secondes}
++            </span>
++          </div>
++          <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-[#e9edf3]">
++            <div className="h-full rounded-full bg-mp-blue" style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
++          </div>
++
++          <p className="mt-4 text-xs font-bold uppercase tracking-wide text-mp-blue">{consigne(q)}</p>
++          <p className="mt-0.5 text-xs text-mp-grey">{bareme(q)}</p>
++          <h2 className="mt-3 text-sm font-bold leading-relaxed">{q.question}</h2>
++          {q.imageId ? (
++            // eslint-disable-next-line @next/next/no-img-element
++            <img
++              src={`/api/qcm/images/${q.imageId}`}
++              alt="Illustration de la question"
++              draggable={false}
++              className="mt-3 max-h-72 w-auto max-w-full rounded-lg border border-[#dfe3e8]"
++            />
++          ) : null}
++
++          <div className="mt-4 space-y-2">
++            {q.propositions.map((p, position) => {
++              const selection = choisies.includes(p.idx);
++              return (
++                <button
++                  key={p.idx}
++                  type="button"
++                  onClick={() => cocher(p.idx)}
++                  aria-pressed={selection}
++                  className={`flex min-h-[44px] w-full items-start gap-3 rounded-[10px] border px-3 py-3 text-left text-sm ${
++                    selection ? "border-mp-blue bg-[#eaf1f8]" : "border-[#dfe3e8] bg-white"
+                   }`}
+                 >
+-                  {String.fromCharCode(65 + i)}
+-                </span>
+-                {p}
+-              </button>
+-            );
+-          })}
+-        </div>
+-      </section>
+-
+-      <div className="mt-4 grid grid-cols-2 gap-3">
+-        <button
+-          type="button"
+-          className="mp-btn-ghost"
+-          onClick={() => setIndex((i) => Math.max(0, i - 1))}
+-          disabled={index === 0}
+-        >
+-          <ChevronLeft size={16} /> Précédent
+-        </button>
+-        {index === questions.length - 1 ? (
+-          <button type="button" className="mp-btn-yellow" onClick={() => setTermine(true)}>
+-            Terminer
++                  <span
++                    className={`flex h-6 w-6 shrink-0 items-center justify-center border text-xs font-bold ${
++                      q.type === "QCU" ? "rounded-full" : "rounded-md"
++                    } ${selection ? "border-mp-blue bg-mp-blue text-white" : "border-[#c9d2dc] text-mp-grey"}`}
++                  >
++                    {String.fromCharCode(65 + position)}
++                  </span>
++                  <span className="flex-1">
++                    {p.texte}
++                    {p.imageId ? (
++                      // eslint-disable-next-line @next/next/no-img-element
++                      <img
++                        src={`/api/qcm/images/${p.imageId}`}
++                        alt={`Proposition ${String.fromCharCode(65 + position)}`}
++                        draggable={false}
++                        className="mt-2 max-h-40 w-auto max-w-full rounded border border-[#dfe3e8]"
++                      />
++                    ) : null}
++                  </span>
++                </button>
++              );
++            })}
++          </div>
++
++          <button
++            type="button"
++            className="mt-3 flex min-h-[44px] items-center gap-2 text-xs font-semibold text-mp-grey"
++            onClick={() =>
++              setMarques((m) => (m.includes(q.id) ? m.filter((x) => x !== q.id) : [...m, q.id]))
++            }
++          >
++            <Flag size={14} className={marques.includes(q.id) ? "text-mp-blue" : ""} />
++            {marques.includes(q.id) ? "Question marquée pour révision" : "Marquer pour révision"}
+           </button>
+-        ) : (
+-          <button type="button" className="mp-btn-yellow" onClick={() => setIndex((i) => i + 1)}>
+-            Suivant <ChevronRight size={16} />
++        </section>
++
++        <div className="mt-4 grid grid-cols-2 gap-3">
++          <button type="button" className="mp-btn-ghost" onClick={() => setIndex((i) => Math.max(0, i - 1))} disabled={index === 0}>
++            <ChevronLeft size={16} /> Précédent
++          </button>
++          {index === questions.length - 1 ? (
++            <button type="button" className="mp-btn-yellow" onClick={confirmerRendu} disabled={envoi}>
++              {envoi ? <Loader2 size={16} className="animate-spin" /> : null} Rendre ma copie
++            </button>
++          ) : (
++            <button type="button" className="mp-btn-yellow" onClick={() => setIndex((i) => i + 1)}>
++              Suivant <ChevronRight size={16} />
++            </button>
++          )}
++        </div>
++
++        <section className="mp-card mt-4 p-4">
++          <p className="text-xs font-bold text-mp-grey">Navigation</p>
++          <div className="mt-2 grid grid-cols-6 gap-2 sm:grid-cols-10">
++            {questions.map((x, i) => {
++              const repondue = (reponses[x.id] ?? []).length > 0;
++              return (
++                <button
++                  key={x.id}
++                  type="button"
++                  onClick={() => setIndex(i)}
++                  className={`min-h-[44px] rounded-lg border text-xs font-bold ${
++                    i === index ? "ring-2 ring-mp-blue" : ""
++                  } ${repondue ? "border-mp-blue bg-mp-blue text-white" : "border-[#dfe3e8] bg-white text-mp-grey"} ${
++                    marques.includes(x.id) ? "border-dashed border-2 border-mp-blue" : ""
++                  }`}
++                  aria-label={`Question ${i + 1}${repondue ? ", répondue" : ""}`}
++                >
++                  {i + 1}
++                </button>
++              );
++            })}
++          </div>
++          <button type="button" className="mp-btn-ghost mt-3" onClick={confirmerRendu} disabled={envoi}>
++            Rendre ma copie maintenant
+           </button>
+-        )}
++        </section>
++
++        {erreur ? <p className="mt-3 text-xs font-semibold text-red-700">{erreur}</p> : null}
+       </div>
+-    </div>
++    </ProtectedZone>
+   );
+ }
+diff --git a/src/components/admin/AdminDashboard.tsx b/src/components/admin/AdminDashboard.tsx
+index 9392f5d..7c12d9d 100644
+--- a/src/components/admin/AdminDashboard.tsx
++++ b/src/components/admin/AdminDashboard.tsx
+@@ -23,7 +23,9 @@ import {
+   Trash2,
+   XCircle,
+ } from "lucide-react";
+-import { CONTACT, MATIERES, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
++import QcmSessions from "@/components/admin/QcmSessions";
++import QuestionBank from "@/components/admin/QuestionBank";
++import { CONTACT, TYPES_ETABLISSEMENT, VILLES } from "@/lib/constants";
+ 
+ type Kpi = {
+   comptesActifs: number;
+@@ -67,16 +69,6 @@ type Upload = {
+   createdAt: string;
+ };
+ 
+-type Session = {
+-  id: string;
+-  titre: string;
+-  module: string;
+-  dureeMinutes: number;
+-  nbQuestions: number;
+-  dateLancement: string;
+-  statut: string;
+-};
+-
+ type Pharmacie = {
+   id: string;
+   nom: string;
+@@ -98,6 +90,7 @@ const ONGLETS = [
+   { id: "comptes", label: "Comptes" },
+   { id: "packs", label: "Packs & paiements" },
+   { id: "uploads", label: "Validation uploads" },
++  { id: "banque", label: "Banque de questions" },
+   { id: "qcm", label: "QCM surveillés" },
+   { id: "pharmacies", label: "Pharmacies" },
+ ] as const;
+@@ -131,28 +124,19 @@ export default function AdminDashboard() {
+   const [filtreStatut, setFiltreStatut] = useState("tous");
+   const [packs, setPacks] = useState<Pack[]>([]);
+   const [uploads, setUploads] = useState<Upload[]>([]);
+-  const [sessions, setSessions] = useState<Session[]>([]);
+   const [pharmacies, setPharmacies] = useState<Pharmacie[]>([]);
+   const [pharmaForm, setPharmaForm] = useState({ ...PHARMA_VIDE, id: "" });
+-  const [qcmForm, setQcmForm] = useState({
+-    titre: "",
+-    module: MATIERES[0],
+-    dureeMinutes: "30",
+-    nbQuestions: "10",
+-    dateLancement: new Date().toISOString().slice(0, 16),
+-  });
+   const [message, setMessage] = useState("");
+   const [busy, setBusy] = useState(false);
+   const [savingId, setSavingId] = useState("");
+   const csvRef = useRef<HTMLInputElement>(null);
+ 
+   const loadAll = useCallback(async () => {
+-    const [s, u, p, up, q, ph] = await Promise.all([
++    const [s, u, p, up, ph] = await Promise.all([
+       fetch("/api/admin/stats"),
+       fetch(`/api/admin/users?q=${encodeURIComponent(recherche)}&pack=${filtrePack}&statut=${filtreStatut}`),
+       fetch("/api/admin/packs"),
+       fetch("/api/admin/uploads"),
+-      fetch("/api/admin/qcm"),
+       fetch("/api/admin/pharmacies"),
+     ]);
+     if (s.ok) {
+@@ -164,7 +148,6 @@ export default function AdminDashboard() {
+     if (u.ok) setUsers((await u.json()).users ?? []);
+     if (p.ok) setPacks((await p.json()).packs ?? []);
+     if (up.ok) setUploads((await up.json()).uploads ?? []);
+-    if (q.ok) setSessions((await q.json()).sessions ?? []);
+     if (ph.ok) setPharmacies((await ph.json()).pharmacies ?? []);
+   }, [recherche, filtrePack, filtreStatut]);
+ 
+@@ -258,18 +241,6 @@ export default function AdminDashboard() {
+     if (res.ok) void loadAll();
+   }
+ 
+-  async function lancerQcm() {
+-    setBusy(true);
+-    await fetch("/api/admin/qcm", {
+-      method: "POST",
+-      headers: { "Content-Type": "application/json" },
+-      body: JSON.stringify(qcmForm),
+-    });
+-    setBusy(false);
+-    flash("QCM surveillé lancé.");
+-    void loadAll();
+-  }
+-
+   async function savePharmacie() {
+     const payload = {
+       ...pharmaForm,
+@@ -706,78 +677,9 @@ export default function AdminDashboard() {
+         </section>
+       ) : null}
+ 
+-      {onglet === "qcm" ? (
+-        <div className="mt-4 space-y-4">
+-          <section className="mp-card p-4">
+-            <h2 className="text-sm font-bold">Lancer un QCM surveillé</h2>
+-            <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-5">
+-              <div>
+-                <label className="mp-label">Titre</label>
+-                <input className="mp-input" value={qcmForm.titre} onChange={(e) => setQcmForm({ ...qcmForm, titre: e.target.value })} />
+-              </div>
+-              <div>
+-                <label className="mp-label">Module</label>
+-                <select className="mp-input" value={qcmForm.module} onChange={(e) => setQcmForm({ ...qcmForm, module: e.target.value })}>
+-                  {MATIERES.map((m) => (
+-                    <option key={m}>{m}</option>
+-                  ))}
+-                </select>
+-              </div>
+-              <div>
+-                <label className="mp-label">Durée (min)</label>
+-                <input className="mp-input" value={qcmForm.dureeMinutes} onChange={(e) => setQcmForm({ ...qcmForm, dureeMinutes: e.target.value })} />
+-              </div>
+-              <div>
+-                <label className="mp-label">Nb questions</label>
+-                <input className="mp-input" value={qcmForm.nbQuestions} onChange={(e) => setQcmForm({ ...qcmForm, nbQuestions: e.target.value })} />
+-              </div>
+-              <div>
+-                <label className="mp-label">Date / heure</label>
+-                <input
+-                  type="datetime-local"
+-                  className="mp-input"
+-                  value={qcmForm.dateLancement}
+-                  onChange={(e) => setQcmForm({ ...qcmForm, dateLancement: e.target.value })}
+-                />
+-              </div>
+-            </div>
+-            <button type="button" className="mp-btn-yellow mt-3 md:w-48" onClick={lancerQcm} disabled={busy}>
+-              {busy ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} Lancer
+-            </button>
+-          </section>
++      {onglet === "banque" ? <QuestionBank /> : null}
+ 
+-          <section className="mp-card p-4">
+-            <h2 className="text-sm font-bold">Sessions</h2>
+-            <ul className="mt-3 space-y-2 text-sm">
+-              {sessions.map((s) => (
+-                <li key={s.id} className="flex items-center justify-between border-b border-[#eef1f5] pb-2 last:border-0">
+-                  <span>
+-                    {s.titre}{" "}
+-                    <span className="text-xs text-mp-grey">
+-                      {s.module} · {s.nbQuestions} q · {s.dureeMinutes} min ·{" "}
+-                      {new Date(s.dateLancement).toLocaleString("fr-FR")}
+-                    </span>
+-                  </span>
+-                  <button
+-                    type="button"
+-                    className="rounded bg-mp-bg px-2 py-1 text-[11px] font-semibold"
+-                    onClick={async () => {
+-                      await fetch("/api/admin/qcm", {
+-                        method: "PATCH",
+-                        headers: { "Content-Type": "application/json" },
+-                        body: JSON.stringify({ id: s.id, statut: s.statut === "ACTIF" ? "CLOTURE" : "ACTIF" }),
+-                      });
+-                      void loadAll();
+-                    }}
+-                  >
+-                    {s.statut === "ACTIF" ? "Clôturer" : "Réactiver"}
+-                  </button>
+-                </li>
+-              ))}
+-            </ul>
+-          </section>
+-        </div>
+-      ) : null}
++      {onglet === "qcm" ? <QcmSessions /> : null}
+ 
+       {onglet === "pharmacies" ? (
+         <div className="mt-4 space-y-4">
+diff --git a/src/components/admin/QcmSessions.tsx b/src/components/admin/QcmSessions.tsx
+new file mode 100644
+index 0000000..4ed8de3
+--- /dev/null
++++ b/src/components/admin/QcmSessions.tsx
+@@ -0,0 +1,357 @@
++"use client";
++
++import { useCallback, useEffect, useState } from "react";
++import { BarChart3, Loader2, Plus } from "lucide-react";
++import { FILIERES, MATIERES } from "@/lib/constants";
++
++type Session = {
++  id: string;
++  titre: string;
++  module: string;
++  dureeMinutes: number;
++  nbQuestions: number;
++  dateLancement: string;
++  statut: string;
++  filieres: string[];
++  sortiesMax: number;
++};
++
++type QuestionCourte = { id: string; question: string; type: string; points: number };
++
++type Resultats = {
++  session: { titre: string };
++  stats: { copies: number; enCours: number; moyenne: number; meilleure: number; plusBasse: number; reussite: number };
++  copies: {
++    id: string;
++    nom: string | null;
++    numero: string | null;
++    filiere: string | null;
++    statut: string;
++    points: number;
++    pointsMax: number;
++    noteSur20: number;
++    sorties: number;
++  }[];
++  parQuestion: { id: string; question: string; type: string; tauxReussite: number; sansReponse: number }[];
++};
++
++function libelleFiliere(f: string) {
++  return f.charAt(0).toUpperCase() + f.slice(1).replace("-", " ");
++}
++
++function heureLocale(): string {
++  return new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16);
++}
++
++function ChoixFilieres({ valeur, onChange }: { valeur: string[]; onChange: (v: string[]) => void }) {
++  return (
++    <div>
++      <div className="flex flex-wrap gap-2">
++        {FILIERES.map((f) => {
++          const actif = valeur.includes(f);
++          return (
++            <button
++              key={f}
++              type="button"
++              aria-pressed={actif}
++              onClick={() => onChange(actif ? valeur.filter((x) => x !== f) : [...valeur, f])}
++              className={`min-h-[44px] rounded-lg border px-3 text-xs font-semibold ${
++                actif ? "border-mp-blue bg-mp-blue text-white" : "border-[#dfe3e8] bg-white text-mp-grey"
++              }`}
++            >
++              {libelleFiliere(f)}
++            </button>
++          );
++        })}
++      </div>
++      <p className="mt-1 text-xs text-mp-grey">
++        {valeur.length === 0 ? "Aucune filière cochée : la session est ouverte à toutes les filières." : `Ouverte uniquement aux filières cochées (${valeur.length}).`}
++      </p>
++    </div>
++  );
++}
++
++export default function QcmSessions() {
++  const [sessions, setSessions] = useState<Session[]>([]);
++  const [form, setForm] = useState({
++    titre: "",
++    module: MATIERES[0] as string,
++    dureeMinutes: "30",
++    nbQuestions: "10",
++    dateLancement: heureLocale(),
++    filieres: [] as string[],
++    sortiesMax: "3",
++    melanger: true,
++    choix: false,
++  });
++  const [disponibles, setDisponibles] = useState<QuestionCourte[]>([]);
++  const [selection, setSelection] = useState<string[]>([]);
++  const [message, setMessage] = useState("");
++  const [erreur, setErreur] = useState("");
++  const [occupe, setOccupe] = useState(false);
++  const [ouvertId, setOuvertId] = useState("");
++  const [resultats, setResultats] = useState<Resultats | null>(null);
++
++  const charger = useCallback(async () => {
++    const res = await fetch("/api/admin/qcm");
++    if (res.ok) setSessions((await res.json()).sessions ?? []);
++  }, []);
++
++  useEffect(() => {
++    void charger();
++  }, [charger]);
++
++  useEffect(() => {
++    if (!form.choix) return;
++    void (async () => {
++      const res = await fetch(`/api/admin/questions?matiere=${encodeURIComponent(form.module)}`);
++      if (res.ok) setDisponibles((await res.json()).questions ?? []);
++      setSelection([]);
++    })();
++  }, [form.choix, form.module]);
++
++  async function lancer() {
++    setErreur("");
++    setMessage("");
++    setOccupe(true);
++    const res = await fetch("/api/admin/qcm", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({
++        titre: form.titre,
++        module: form.module,
++        dureeMinutes: Number(form.dureeMinutes),
++        nbQuestions: Number(form.nbQuestions),
++        dateLancement: form.dateLancement ? new Date(form.dateLancement).toISOString() : undefined,
++        filieres: form.filieres,
++        sortiesMax: Number(form.sortiesMax) || 0,
++        melanger: form.melanger,
++        questionIds: form.choix ? selection : [],
++      }),
++    });
++    const data = await res.json().catch(() => ({}));
++    setOccupe(false);
++    if (!res.ok) {
++      setErreur(data.error ?? "Impossible de lancer la session.");
++      return;
++    }
++    setMessage(`Session lancée avec ${data.nbQuestions} question(s).`);
++    void charger();
++  }
++
++  async function patch(id: string, corps: Record<string, unknown>) {
++    await fetch("/api/admin/qcm", {
++      method: "PATCH",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ id, ...corps }),
++    });
++    void charger();
++  }
++
++  async function voirResultats(id: string) {
++    if (ouvertId === id) {
++      setOuvertId("");
++      setResultats(null);
++      return;
++    }
++    setOuvertId(id);
++    setResultats(null);
++    const res = await fetch(`/api/admin/qcm/resultats?id=${id}`);
++    if (res.ok) setResultats(await res.json());
++  }
++
++  return (
++    <div className="mt-4 space-y-4">
++      <section className="mp-card p-4">
++        <h2 className="text-sm font-bold">Lancer un QCM surveillé</h2>
++        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
++          <div>
++            <label className="mp-label">Titre</label>
++            <input className="mp-input" value={form.titre} onChange={(e) => setForm({ ...form, titre: e.target.value })} />
++          </div>
++          <div>
++            <label className="mp-label">Module</label>
++            <select className="mp-input" value={form.module} onChange={(e) => setForm({ ...form, module: e.target.value })}>
++              {MATIERES.map((m) => (
++                <option key={m}>{m}</option>
++              ))}
++            </select>
++          </div>
++          <div>
++            <label className="mp-label">Date et heure d&apos;ouverture</label>
++            <input type="datetime-local" className="mp-input" value={form.dateLancement} onChange={(e) => setForm({ ...form, dateLancement: e.target.value })} />
++          </div>
++          <div>
++            <label className="mp-label">Durée (minutes)</label>
++            <input className="mp-input" inputMode="numeric" value={form.dureeMinutes} onChange={(e) => setForm({ ...form, dureeMinutes: e.target.value })} />
++          </div>
++          <div>
++            <label className="mp-label">Nombre de questions (tirage au sort)</label>
++            <input className="mp-input" inputMode="numeric" value={form.nbQuestions} disabled={form.choix} onChange={(e) => setForm({ ...form, nbQuestions: e.target.value })} />
++          </div>
++          <div>
++            <label className="mp-label">Sorties d&apos;écran tolérées (0 = illimité)</label>
++            <input className="mp-input" inputMode="numeric" value={form.sortiesMax} onChange={(e) => setForm({ ...form, sortiesMax: e.target.value })} />
++          </div>
++        </div>
++
++        <div className="mt-4">
++          <label className="mp-label">Filières concernées</label>
++          <ChoixFilieres valeur={form.filieres} onChange={(v) => setForm({ ...form, filieres: v })} />
++        </div>
++
++        <div className="mt-3 flex flex-wrap gap-x-6">
++          <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
++            <input type="checkbox" className="h-5 w-5" checked={form.melanger} onChange={(e) => setForm({ ...form, melanger: e.target.checked })} />
++            Mélanger l&apos;ordre des questions et des propositions
++          </label>
++          <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
++            <input type="checkbox" className="h-5 w-5" checked={form.choix} onChange={(e) => setForm({ ...form, choix: e.target.checked })} />
++            Choisir les questions moi-même
++          </label>
++        </div>
++
++        {form.choix ? (
++          <div className="mt-2 max-h-72 overflow-y-auto rounded-[10px] border border-[#dfe3e8] p-2">
++            {disponibles.length === 0 ? <p className="p-2 text-xs text-mp-grey">Aucune question dans ce module.</p> : null}
++            {disponibles.map((q) => (
++              <label key={q.id} className="flex min-h-[44px] items-start gap-2 border-b border-[#eef1f5] py-2 text-xs last:border-0">
++                <input
++                  type="checkbox"
++                  className="mt-0.5 h-5 w-5 shrink-0"
++                  checked={selection.includes(q.id)}
++                  onChange={(e) => setSelection(e.target.checked ? [...selection, q.id] : selection.filter((x) => x !== q.id))}
++                />
++                <span>
++                  <span className="mr-1 font-bold text-mp-blue">{q.type}</span>
++                  {q.question} <span className="text-mp-grey">({q.points} pt)</span>
++                </span>
++              </label>
++            ))}
++            <p className="p-2 text-xs font-semibold text-mp-blue">{selection.length} question(s) sélectionnée(s)</p>
++          </div>
++        ) : null}
++
++        {erreur ? <p className="mt-2 text-xs font-semibold text-red-700">{erreur}</p> : null}
++        {message ? <p className="mt-2 text-xs font-semibold text-green-700">{message}</p> : null}
++        <button type="button" className="mp-btn-yellow mt-3 min-h-[44px] md:w-48" onClick={lancer} disabled={occupe}>
++          {occupe ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} Lancer
++        </button>
++      </section>
++
++      <section className="mp-card p-4">
++        <h2 className="text-sm font-bold">Sessions</h2>
++        <ul className="mt-3 space-y-3">
++          {sessions.map((s) => (
++            <li key={s.id} className="rounded-[10px] border border-[#eef1f5] p-3">
++              <div className="flex flex-wrap items-start justify-between gap-3">
++                <div className="min-w-0">
++                  <p className="text-sm font-semibold">{s.titre}</p>
++                  <p className="text-xs text-mp-grey">
++                    {s.module} · {s.nbQuestions} q · {s.dureeMinutes} min · {new Date(s.dateLancement).toLocaleString("fr-FR")} ·{" "}
++                    {s.statut === "ACTIF" ? "Active" : "Clôturée"}
++                  </p>
++                  <p className="mt-1 text-xs text-mp-grey">
++                    Filières : {s.filieres.length === 0 ? "toutes" : s.filieres.map(libelleFiliere).join(", ")}
++                  </p>
++                </div>
++                <div className="flex gap-2">
++                  <button type="button" className="flex min-h-[44px] items-center gap-1 rounded-lg bg-mp-bg px-3 text-xs font-semibold" onClick={() => voirResultats(s.id)}>
++                    <BarChart3 size={14} /> Résultats
++                  </button>
++                  <button
++                    type="button"
++                    className="min-h-[44px] rounded-lg bg-mp-bg px-3 text-xs font-semibold"
++                    onClick={() => patch(s.id, { statut: s.statut === "ACTIF" ? "CLOTURE" : "ACTIF" })}
++                  >
++                    {s.statut === "ACTIF" ? "Clôturer" : "Réactiver"}
++                  </button>
++                </div>
++              </div>
++
++              <details className="mt-2">
++                <summary className="flex min-h-[44px] cursor-pointer items-center text-xs font-semibold text-mp-blue">Modifier les filières concernées</summary>
++                <div className="mt-2">
++                  <ChoixFilieres valeur={s.filieres} onChange={(v) => void patch(s.id, { filieres: v })} />
++                </div>
++              </details>
++
++              {ouvertId === s.id ? (
++                <div className="mt-3 border-t border-[#eef1f5] pt-3">
++                  {!resultats ? (
++                    <p className="flex items-center gap-2 text-xs text-mp-grey">
++                      <Loader2 size={14} className="animate-spin" /> Chargement...
++                    </p>
++                  ) : (
++                    <>
++                      <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
++                        {[
++                          ["Copies rendues", resultats.stats.copies],
++                          ["Moyenne /20", resultats.stats.moyenne],
++                          ["Meilleure", resultats.stats.meilleure],
++                          ["Plus basse", resultats.stats.plusBasse],
++                          ["Note >= 10", `${resultats.stats.reussite}%`],
++                        ].map(([label, valeur]) => (
++                          <div key={String(label)} className="rounded-lg bg-mp-bg p-2 text-center">
++                            <p className="text-lg font-bold text-mp-blue">{valeur}</p>
++                            <p className="text-xs text-mp-grey">{label}</p>
++                          </div>
++                        ))}
++                      </div>
++                      {resultats.stats.enCours > 0 ? <p className="mt-2 text-xs text-mp-grey">{resultats.stats.enCours} copie(s) en cours.</p> : null}
++
++                      <div className="mt-3 overflow-x-auto">
++                        <table className="w-full min-w-[560px] text-left text-xs">
++                          <thead className="text-mp-grey">
++                            <tr>
++                              <th className="py-1">Étudiant</th>
++                              <th>Numéro</th>
++                              <th>Filière</th>
++                              <th>Points</th>
++                              <th>Note /20</th>
++                              <th>Sorties</th>
++                            </tr>
++                          </thead>
++                          <tbody>
++                            {resultats.copies.map((c) => (
++                              <tr key={c.id} className="border-t border-[#eef1f5]">
++                                <td className="py-2">{c.nom}</td>
++                                <td>{c.numero}</td>
++                                <td>{c.filiere}</td>
++                                <td>{c.statut === "TERMINE" ? `${c.points} / ${c.pointsMax}` : "en cours"}</td>
++                                <td className="font-bold text-mp-blue">{c.statut === "TERMINE" ? c.noteSur20 : "-"}</td>
++                                <td className={c.sorties > 0 ? "font-bold text-red-700" : ""}>{c.sorties}</td>
++                              </tr>
++                            ))}
++                          </tbody>
++                        </table>
++                      </div>
++
++                      <p className="mt-4 text-xs font-bold text-mp-grey">Taux de réussite par question</p>
++                      <ul className="mt-2 space-y-2">
++                        {resultats.parQuestion.map((q, i) => (
++                          <li key={q.id}>
++                            <div className="flex justify-between gap-2 text-xs">
++                              <span className="truncate">
++                                {i + 1}. [{q.type}] {q.question}
++                              </span>
++                              <span className="shrink-0 font-semibold text-mp-blue">{q.tauxReussite}%</span>
++                            </div>
++                            <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-[#e9edf3]">
++                              <div className="h-full rounded-full bg-mp-blue" style={{ width: `${q.tauxReussite}%` }} />
++                            </div>
++                          </li>
++                        ))}
++                      </ul>
++                    </>
++                  )}
++                </div>
++              ) : null}
++            </li>
++          ))}
++          {sessions.length === 0 ? <li className="text-xs text-mp-grey">Aucune session.</li> : null}
++        </ul>
++      </section>
++    </div>
++  );
++}
+diff --git a/src/components/admin/QuestionBank.tsx b/src/components/admin/QuestionBank.tsx
+new file mode 100644
+index 0000000..0b2f1b2
+--- /dev/null
++++ b/src/components/admin/QuestionBank.tsx
+@@ -0,0 +1,516 @@
++"use client";
++
++import { useCallback, useEffect, useRef, useState } from "react";
++import { FileSpreadsheet, ImagePlus, Loader2, Pencil, Plus, Save, Trash2, X } from "lucide-react";
++import { MATIERES } from "@/lib/constants";
++import { TYPES_QUESTION } from "@/lib/qcm";
++
++type Question = {
++  id: string;
++  matiere: string;
++  question: string;
++  propositions: string[];
++  propositionsImages: (string | null)[];
++  bonnes: number[];
++  bonneReponse: string;
++  type: string;
++  points: number;
++  penalite: number;
++  mode: string;
++  explication: string;
++  niveau: string;
++  imageId: string | null;
++  actif: boolean;
++};
++
++type Formulaire = {
++  id: string;
++  matiere: string;
++  niveau: string;
++  type: string;
++  question: string;
++  imageId: string | null;
++  lignes: { texte: string; image: string | null; bonne: boolean }[];
++  points: string;
++  penalite: string;
++  mode: string;
++  explication: string;
++  actif: boolean;
++};
++
++const NIVEAUX = ["L1", "L2", "L3", "M1", "M2"];
++
++function vide(): Formulaire {
++  return {
++    id: "",
++    matiere: MATIERES[0],
++    niveau: "L1",
++    type: "QCU",
++    question: "",
++    imageId: null,
++    lignes: [0, 1, 2, 3].map(() => ({ texte: "", image: null, bonne: false })),
++    points: "1",
++    penalite: "0",
++    mode: "TOUT_OU_RIEN",
++    explication: "",
++    actif: true,
++  };
++}
++
++function depuis(q: Question): Formulaire {
++  const bonnes = q.bonnes.length > 0 ? q.bonnes : [q.propositions.indexOf(q.bonneReponse)];
++  return {
++    id: q.id,
++    matiere: q.matiere,
++    niveau: q.niveau,
++    type: q.type,
++    question: q.question,
++    imageId: q.imageId,
++    lignes: q.propositions.map((texte, i) => ({
++      texte,
++      image: q.propositionsImages?.[i] ?? null,
++      bonne: bonnes.includes(i),
++    })),
++    points: String(q.points),
++    penalite: String(q.penalite),
++    mode: q.mode,
++    explication: q.explication,
++    actif: q.actif,
++  };
++}
++
++/** Réduit l'image (1000 px max, JPEG) pour rester sous la limite de 500 Ko. */
++async function compresser(fichier: File): Promise<string> {
++  const url = URL.createObjectURL(fichier);
++  try {
++    const img = await new Promise<HTMLImageElement>((ok, ko) => {
++      const i = new Image();
++      i.onload = () => ok(i);
++      i.onerror = () => ko(new Error("Image illisible."));
++      i.src = url;
++    });
++    const ratio = Math.min(1, 1000 / Math.max(img.width, img.height));
++    const canvas = document.createElement("canvas");
++    canvas.width = Math.round(img.width * ratio);
++    canvas.height = Math.round(img.height * ratio);
++    const ctx = canvas.getContext("2d");
++    if (!ctx) throw new Error("Compression impossible.");
++    ctx.fillStyle = "#ffffff";
++    ctx.fillRect(0, 0, canvas.width, canvas.height);
++    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
++    for (const qualite of [0.85, 0.72, 0.6, 0.5, 0.4]) {
++      const data = canvas.toDataURL("image/jpeg", qualite);
++      if (data.length * 0.75 < 450 * 1024) return data;
++    }
++    throw new Error("Image trop lourde même après compression.");
++  } finally {
++    URL.revokeObjectURL(url);
++  }
++}
++
++async function televerser(fichier: File): Promise<string> {
++  const dataUrl = await compresser(fichier);
++  const res = await fetch("/api/admin/qcm-images", {
++    method: "POST",
++    headers: { "Content-Type": "application/json" },
++    body: JSON.stringify({ dataUrl }),
++  });
++  const data = await res.json().catch(() => ({}));
++  if (!res.ok) throw new Error(data.error ?? "Envoi de l'image impossible.");
++  return data.id as string;
++}
++
++const MODELE_CSV =
++  "matiere,niveau,type,question,A,B,C,D,E,F,bonnes,points,penalite,mode,explication\n" +
++  'Cardiologie,L2,QCU,"La valve entre l\'oreillette gauche et le ventricule gauche est :",Mitrale,Tricuspide,Aortique,Pulmonaire,,,A,1,0,TOUT_OU_RIEN,La valve mitrale est bicuspide.\n' +
++  'Anatomie,L1,QCD,"Quels sont deux os du carpe ?",Scaphoide,Femur,Pisiforme,Tibia,,,A;C,2,0.5,PARTIEL,Le scaphoide et le pisiforme sont des os du carpe.\n';
++
++export default function QuestionBank() {
++  const [liste, setListe] = useState<Question[]>([]);
++  const [form, setForm] = useState<Formulaire>(vide());
++  const [matiereFiltre, setMatiereFiltre] = useState("toutes");
++  const [typeFiltre, setTypeFiltre] = useState("tous");
++  const [recherche, setRecherche] = useState("");
++  const [message, setMessage] = useState("");
++  const [erreur, setErreur] = useState("");
++  const [occupe, setOccupe] = useState(false);
++  const [rapport, setRapport] = useState("");
++  const csvRef = useRef<HTMLInputElement>(null);
++
++  const charger = useCallback(async () => {
++    const params = new URLSearchParams({ matiere: matiereFiltre, type: typeFiltre, q: recherche });
++    const res = await fetch(`/api/admin/questions?${params}`);
++    if (res.ok) setListe((await res.json()).questions ?? []);
++  }, [matiereFiltre, typeFiltre, recherche]);
++
++  useEffect(() => {
++    const t = setTimeout(() => void charger(), 250);
++    return () => clearTimeout(t);
++  }, [charger]);
++
++  function flash(texte: string) {
++    setMessage(texte);
++    setTimeout(() => setMessage(""), 4000);
++  }
++
++  const nbBonnes = form.lignes.filter((l) => l.bonne).length;
++  const attendu = form.type === "QCU" ? "exactement 1" : form.type === "QCD" ? "exactement 2" : "au moins 1";
++
++  function majLigne(i: number, patch: Partial<Formulaire["lignes"][number]>) {
++    setForm((f) => ({
++      ...f,
++      lignes: f.lignes.map((l, n) => {
++        if (n === i) return { ...l, ...patch };
++        // QCU : cocher une réponse décoche les autres.
++        if (patch.bonne && f.type === "QCU") return { ...l, bonne: false };
++        return l;
++      }),
++    }));
++  }
++
++  async function ajouterImage(cible: "enonce" | number, fichier: File | undefined) {
++    if (!fichier) return;
++    setErreur("");
++    setOccupe(true);
++    try {
++      const id = await televerser(fichier);
++      if (cible === "enonce") setForm((f) => ({ ...f, imageId: id }));
++      else majLigne(cible, { image: id });
++    } catch (e) {
++      setErreur(e instanceof Error ? e.message : "Échec de l'envoi de l'image.");
++    }
++    setOccupe(false);
++  }
++
++  async function enregistrer() {
++    setErreur("");
++    setOccupe(true);
++    const corps = {
++      id: form.id || undefined,
++      matiere: form.matiere,
++      niveau: form.niveau,
++      type: form.type,
++      question: form.question,
++      imageId: form.imageId,
++      propositions: form.lignes.map((l) => l.texte),
++      propositionsImages: form.lignes.map((l) => l.image),
++      bonnes: form.lignes.map((l, i) => (l.bonne ? i : -1)).filter((i) => i >= 0),
++      points: Number(form.points.replace(",", ".")),
++      penalite: Number(form.penalite.replace(",", ".")),
++      mode: form.mode,
++      explication: form.explication,
++      actif: form.actif,
++    };
++    const res = await fetch("/api/admin/questions", {
++      method: form.id ? "PATCH" : "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify(corps),
++    });
++    const data = await res.json().catch(() => ({}));
++    setOccupe(false);
++    if (!res.ok) {
++      setErreur(data.error ?? "Enregistrement impossible.");
++      return;
++    }
++    flash(form.id ? "Question modifiée." : "Question ajoutée à la banque.");
++    setForm(vide());
++    void charger();
++  }
++
++  async function supprimer(q: Question) {
++    if (!window.confirm("Supprimer définitivement cette question ?")) return;
++    await fetch(`/api/admin/questions?id=${q.id}`, { method: "DELETE" });
++    if (form.id === q.id) setForm(vide());
++    void charger();
++  }
++
++  async function importer(fichier: File | undefined) {
++    if (!fichier) return;
++    setRapport("");
++    const Papa = (await import("papaparse")).default;
++    const texte = await fichier.text();
++    const parsed = Papa.parse<Record<string, string>>(texte, { header: true, skipEmptyLines: true });
++    const lettres = ["A", "B", "C", "D", "E", "F"];
++    const questions = parsed.data.map((ligne) => {
++      const propositions = lettres.map((l) => (ligne[l] ?? "").trim());
++      const bonnes = (ligne.bonnes ?? "")
++        .split(/[;,\s]+/)
++        .map((x) => lettres.indexOf(x.trim().toUpperCase()))
++        .filter((i) => i >= 0);
++      return {
++        matiere: ligne.matiere,
++        niveau: ligne.niveau || "L1",
++        type: (ligne.type || "QCU").toUpperCase(),
++        question: ligne.question,
++        propositions,
++        bonnes,
++        points: Number((ligne.points || "1").replace(",", ".")),
++        penalite: Number((ligne.penalite || "0").replace(",", ".")),
++        mode: (ligne.mode || "TOUT_OU_RIEN").toUpperCase(),
++        explication: ligne.explication || "",
++      };
++    });
++    const res = await fetch("/api/admin/questions", {
++      method: "POST",
++      headers: { "Content-Type": "application/json" },
++      body: JSON.stringify({ questions }),
++    });
++    const data = await res.json().catch(() => ({}));
++    if (!res.ok) {
++      setRapport(data.error ?? "Import impossible.");
++    } else {
++      const rejets = (data.rejets as string[]).join("\n");
++      setRapport(`${data.importees} question(s) importée(s), ${data.nbRejets} rejetée(s).${rejets ? `\n${rejets}` : ""}`);
++      void charger();
++    }
++    if (csvRef.current) csvRef.current.value = "";
++  }
++
++  function telechargerModele() {
++    const blob = new Blob([MODELE_CSV], { type: "text/csv;charset=utf-8" });
++    const a = document.createElement("a");
++    a.href = URL.createObjectURL(blob);
++    a.download = "modele-questions-mediko.csv";
++    a.click();
++    URL.revokeObjectURL(a.href);
++  }
++
++  return (
++    <div className="mt-4 space-y-4">
++      <section className="mp-card p-4">
++        <h2 className="text-sm font-bold">{form.id ? "Modifier la question" : "Nouvelle question"}</h2>
++
++        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
++          <div>
++            <label className="mp-label">Matière / module</label>
++            <select className="mp-input" value={form.matiere} onChange={(e) => setForm({ ...form, matiere: e.target.value })}>
++              {MATIERES.map((m) => (
++                <option key={m}>{m}</option>
++              ))}
++            </select>
++          </div>
++          <div>
++            <label className="mp-label">Niveau</label>
++            <select className="mp-input" value={form.niveau} onChange={(e) => setForm({ ...form, niveau: e.target.value })}>
++              {NIVEAUX.map((n) => (
++                <option key={n}>{n}</option>
++              ))}
++            </select>
++          </div>
++          <div>
++            <label className="mp-label">Type</label>
++            <select
++              className="mp-input"
++              value={form.type}
++              onChange={(e) =>
++                setForm({
++                  ...form,
++                  type: e.target.value,
++                  mode: e.target.value === "QCU" ? "TOUT_OU_RIEN" : form.mode,
++                  lignes: e.target.value === "QCU" ? form.lignes.map((l, i) => ({ ...l, bonne: l.bonne && i === form.lignes.findIndex((x) => x.bonne) })) : form.lignes,
++                })
++              }
++            >
++              {TYPES_QUESTION.map((t) => (
++                <option key={t.value} value={t.value}>
++                  {t.label}
++                </option>
++              ))}
++            </select>
++          </div>
++        </div>
++
++        <div className="mt-3">
++          <label className="mp-label">Énoncé</label>
++          <textarea className="mp-input min-h-[88px]" value={form.question} onChange={(e) => setForm({ ...form, question: e.target.value })} />
++          <div className="mt-2 flex flex-wrap items-center gap-3">
++            <label className="mp-btn-ghost min-h-[44px] cursor-pointer md:w-auto md:px-4">
++              <ImagePlus size={16} /> {form.imageId ? "Remplacer l'image" : "Ajouter une image"}
++              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => void ajouterImage("enonce", e.target.files?.[0])} />
++            </label>
++            {form.imageId ? (
++              <>
++                {/* eslint-disable-next-line @next/next/no-img-element */}
++                <img src={`/api/qcm/images/${form.imageId}`} alt="Aperçu" className="h-16 w-auto rounded border border-[#dfe3e8]" />
++                <button type="button" className="min-h-[44px] px-2 text-xs font-semibold text-red-700" onClick={() => setForm({ ...form, imageId: null })}>
++                  Retirer
++                </button>
++              </>
++            ) : null}
++          </div>
++        </div>
++
++        <div className="mt-4">
++          <div className="flex items-center justify-between">
++            <label className="mp-label">Propositions (cochez les bonnes réponses)</label>
++            <span className={`text-xs font-semibold ${nbBonnes === 0 || (form.type === "QCD" && nbBonnes !== 2) || (form.type === "QCU" && nbBonnes !== 1) ? "text-red-700" : "text-mp-grey"}`}>
++              {nbBonnes} cochée(s) · il en faut {attendu}
++            </span>
++          </div>
++          <div className="mt-2 space-y-2">
++            {form.lignes.map((l, i) => (
++              <div key={i} className="flex flex-wrap items-center gap-2 rounded-[10px] border border-[#dfe3e8] p-2">
++                <label className="flex min-h-[44px] items-center gap-2 text-xs font-bold">
++                  <input type="checkbox" className="h-5 w-5" checked={l.bonne} onChange={(e) => majLigne(i, { bonne: e.target.checked })} />
++                  {String.fromCharCode(65 + i)}
++                </label>
++                <input
++                  className="mp-input min-w-[160px] flex-1"
++                  value={l.texte}
++                  onChange={(e) => majLigne(i, { texte: e.target.value })}
++                  placeholder={`Proposition ${String.fromCharCode(65 + i)}`}
++                />
++                <label className="flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-lg border border-[#dfe3e8]" title="Ajouter une image à cette proposition">
++                  <ImagePlus size={16} />
++                  <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => void ajouterImage(i, e.target.files?.[0])} />
++                </label>
++                {l.image ? (
++                  <>
++                    {/* eslint-disable-next-line @next/next/no-img-element */}
++                    <img src={`/api/qcm/images/${l.image}`} alt="" className="h-10 w-auto rounded border border-[#dfe3e8]" />
++                    <button type="button" className="min-h-[44px] px-2 text-xs font-semibold text-red-700" onClick={() => majLigne(i, { image: null })}>
++                      Retirer
++                    </button>
++                  </>
++                ) : null}
++                {form.lignes.length > 2 ? (
++                  <button
++                    type="button"
++                    aria-label="Supprimer la proposition"
++                    className="flex min-h-[44px] min-w-[44px] items-center justify-center text-mp-grey"
++                    onClick={() => setForm({ ...form, lignes: form.lignes.filter((_, n) => n !== i) })}
++                  >
++                    <X size={16} />
++                  </button>
++                ) : null}
++              </div>
++            ))}
++          </div>
++          {form.lignes.length < 8 ? (
++            <button
++              type="button"
++              className="mp-btn-ghost mt-2 min-h-[44px] md:w-auto md:px-4"
++              onClick={() => setForm({ ...form, lignes: [...form.lignes, { texte: "", image: null, bonne: false }] })}
++            >
++              <Plus size={16} /> Ajouter une proposition
++            </button>
++          ) : null}
++        </div>
++
++        <div className="mt-4 rounded-xl border border-dashed border-[#cfd7e0] p-3">
++          <p className="mp-label">Notation de cette question</p>
++          <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">
++            <div>
++              <label className="mp-label">Points si juste</label>
++              <input className="mp-input" inputMode="decimal" value={form.points} onChange={(e) => setForm({ ...form, points: e.target.value })} />
++            </div>
++            <div>
++              <label className="mp-label">Pénalité si faux (points perdus)</label>
++              <input className="mp-input" inputMode="decimal" value={form.penalite} onChange={(e) => setForm({ ...form, penalite: e.target.value })} />
++            </div>
++            <div>
++              <label className="mp-label">Mode</label>
++              <select className="mp-input" value={form.mode} disabled={form.type === "QCU"} onChange={(e) => setForm({ ...form, mode: e.target.value })}>
++                <option value="TOUT_OU_RIEN">Tout ou rien</option>
++                <option value="PARTIEL">Points partiels (QCD / QCM)</option>
++              </select>
++            </div>
++          </div>
++          <p className="mt-2 text-xs text-mp-grey">
++            Sans réponse : toujours 0 point. Tout ou rien : sélection exacte = points, sinon = pénalité. Partiel : points proportionnels aux bonnes
++            cases cochées, moins la pénalité proportionnelle aux mauvaises ; jamais moins que la pénalité ni plus que les points.
++          </p>
++        </div>
++
++        <div className="mt-3">
++          <label className="mp-label">Explication (montrée à l&apos;étudiant après avoir rendu sa copie)</label>
++          <textarea className="mp-input min-h-[72px]" value={form.explication} onChange={(e) => setForm({ ...form, explication: e.target.value })} />
++        </div>
++
++        <label className="mt-3 flex min-h-[44px] items-center gap-2 text-sm font-semibold">
++          <input type="checkbox" className="h-5 w-5" checked={form.actif} onChange={(e) => setForm({ ...form, actif: e.target.checked })} />
++          Question active (utilisable dans les QCM)
++        </label>
++
++        {erreur ? <p className="mt-2 text-xs font-semibold text-red-700">{erreur}</p> : null}
++        {message ? <p className="mt-2 text-xs font-semibold text-green-700">{message}</p> : null}
++
++        <div className="mt-3 flex flex-wrap gap-3">
++          <button type="button" className="mp-btn-yellow min-h-[44px] md:w-56" onClick={enregistrer} disabled={occupe}>
++            {occupe ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />} {form.id ? "Enregistrer" : "Ajouter la question"}
++          </button>
++          {form.id ? (
++            <button type="button" className="mp-btn-ghost min-h-[44px] md:w-auto md:px-4" onClick={() => setForm(vide())}>
++              Annuler la modification
++            </button>
++          ) : null}
++        </div>
++      </section>
++
++      <section className="mp-card p-4">
++        <h2 className="flex items-center gap-2 text-sm font-bold">
++          <FileSpreadsheet size={16} className="text-mp-blue" /> Import CSV
++        </h2>
++        <p className="mt-1 text-xs text-mp-grey">
++          Colonnes : matiere, niveau, type (QCU/QCD/QCM), question, A à F, bonnes (ex. A ou A;C), points, penalite, mode, explication.
++        </p>
++        <div className="mt-3 flex flex-wrap gap-3">
++          <label className="mp-btn-blue min-h-[44px] cursor-pointer md:w-auto md:px-4">
++            Importer un fichier CSV
++            <input ref={csvRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => void importer(e.target.files?.[0])} />
++          </label>
++          <button type="button" className="mp-btn-ghost min-h-[44px] md:w-auto md:px-4" onClick={telechargerModele}>
++            Télécharger le modèle
++          </button>
++        </div>
++        {rapport ? <pre className="mt-3 whitespace-pre-wrap text-xs text-mp-grey">{rapport}</pre> : null}
++      </section>
++
++      <section className="mp-card p-4">
++        <h2 className="text-sm font-bold">Banque de questions ({liste.length})</h2>
++        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
++          <select className="mp-input" value={matiereFiltre} onChange={(e) => setMatiereFiltre(e.target.value)}>
++            <option value="toutes">Toutes les matières</option>
++            {MATIERES.map((m) => (
++              <option key={m}>{m}</option>
++            ))}
++          </select>
++          <select className="mp-input" value={typeFiltre} onChange={(e) => setTypeFiltre(e.target.value)}>
++            <option value="tous">Tous les types</option>
++            <option value="QCU">QCU</option>
++            <option value="QCD">QCD</option>
++            <option value="QCM">QCM</option>
++          </select>
++          <input className="mp-input" placeholder="Rechercher dans l'énoncé" value={recherche} onChange={(e) => setRecherche(e.target.value)} />
++        </div>
++        <ul className="mt-3 space-y-2">
++          {liste.map((q) => (
++            <li key={q.id} className="rounded-[10px] border border-[#eef1f5] p-3">
++              <div className="flex items-start justify-between gap-3">
++                <div className="min-w-0">
++                  <p className="text-xs text-mp-grey">
++                    <span className="mr-1 rounded bg-mp-bg px-1.5 py-0.5 font-bold text-mp-blue">{q.type}</span>
++                    {q.matiere} · {q.niveau} · {q.points} pt · pénalité {q.penalite}
++                    {q.mode === "PARTIEL" ? " · partiel" : ""}
++                    {q.imageId ? " · image" : ""}
++                    {!q.actif ? " · inactive" : ""}
++                  </p>
++                  <p className="mt-1 text-sm font-semibold">{q.question}</p>
++                </div>
++                <div className="flex shrink-0">
++                  <button type="button" aria-label="Modifier" className="flex min-h-[44px] min-w-[44px] items-center justify-center text-mp-blue" onClick={() => { setForm(depuis(q)); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
++                    <Pencil size={16} />
++                  </button>
++                  <button type="button" aria-label="Supprimer" className="flex min-h-[44px] min-w-[44px] items-center justify-center text-red-700" onClick={() => supprimer(q)}>
++                    <Trash2 size={16} />
++                  </button>
++                </div>
++              </div>
++            </li>
++          ))}
++          {liste.length === 0 ? <li className="text-xs text-mp-grey">Aucune question.</li> : null}
++        </ul>
++      </section>
++    </div>
++  );
++}
+diff --git a/src/components/qcm/ProtectedZone.tsx b/src/components/qcm/ProtectedZone.tsx
+new file mode 100644
+index 0000000..4fdd8d9
+--- /dev/null
++++ b/src/components/qcm/ProtectedZone.tsx
+@@ -0,0 +1,53 @@
++"use client";
++
++import { useMemo } from "react";
++
++/**
++ * Dissuasion contre les fuites : filigrane au nom de l'étudiant sur tout l'écran, copier/coller,
++ * clic droit, glisser et impression bloqués. Un navigateur ne peut PAS empêcher une capture d'écran :
++ * le filigrane permet de retrouver l'auteur d'une capture diffusée.
++ */
++export default function ProtectedZone({
++  filigrane,
++  masque = false,
++  children,
++}: {
++  filigrane: string;
++  masque?: boolean;
++  children: React.ReactNode;
++}) {
++  const motif = useMemo(() => {
++    const texte = filigrane.replace(/[<>&"']/g, "");
++    const svg =
++      `<svg xmlns='http://www.w3.org/2000/svg' width='320' height='200'>` +
++      `<text x='10' y='110' fill='rgba(10,75,138,0.16)' font-size='15' font-family='sans-serif' ` +
++      `transform='rotate(-24 160 100)'>${texte}</text></svg>`;
++    return `url("data:image/svg+xml;utf8,${encodeURIComponent(svg)}")`;
++  }, [filigrane]);
++
++  const bloquer = (e: React.SyntheticEvent) => e.preventDefault();
++
++  return (
++    <div
++      className="mp-protege relative select-none"
++      style={{ WebkitTouchCallout: "none" }}
++      onContextMenu={bloquer}
++      onCopy={bloquer}
++      onCut={bloquer}
++      onDragStart={bloquer}
++    >
++      <style>{`@media print { .mp-protege { display: none !important; } }`}</style>
++      <div className={masque ? "invisible" : undefined}>{children}</div>
++      {masque ? (
++        <div className="mp-card absolute inset-0 flex items-center justify-center p-6 text-center text-sm font-semibold text-mp-blue">
++          Contenu masqué. Revenez sur cette page pour continuer l&apos;examen.
++        </div>
++      ) : null}
++      <div
++        aria-hidden="true"
++        className="pointer-events-none fixed inset-0 z-40"
++        style={{ backgroundImage: motif, backgroundRepeat: "repeat" }}
++      />
++    </div>
++  );
++}
+diff --git a/src/components/qcm/QcmResultat.tsx b/src/components/qcm/QcmResultat.tsx
+new file mode 100644
+index 0000000..2846b8c
+--- /dev/null
++++ b/src/components/qcm/QcmResultat.tsx
+@@ -0,0 +1,119 @@
++"use client";
++
++import { AlertTriangle, CheckCircle2, XCircle } from "lucide-react";
++import ProtectedZone from "@/components/qcm/ProtectedZone";
++import type { ResultatFinal } from "@/components/qcm/types";
++
++function formatPoints(n: number) {
++  return `${n > 0 ? "+" : ""}${String(n).replace(".", ",")}`;
++}
++
++function formatDuree(s: number) {
++  const m = Math.floor(s / 60);
++  return `${m} min ${String(s % 60).padStart(2, "0")} s`;
++}
++
++export default function QcmResultat({ data, filigrane }: { data: ResultatFinal; filigrane: string }) {
++  const { resultat: r, details } = data;
++  const pourcentage = r.pointsMax > 0 ? Math.round((Math.max(0, r.points) / r.pointsMax) * 100) : 0;
++
++  return (
++    <ProtectedZone filigrane={filigrane}>
++      <div className="space-y-3">
++        <section className="mp-card p-4 text-center">
++          <p className="text-xs font-semibold uppercase tracking-wide text-mp-grey">Résultat : {r.titre}</p>
++          <p className="mt-2 text-5xl font-bold text-mp-blue">
++            {String(r.noteSur20).replace(".", ",")}
++            <span className="text-xl text-mp-grey">/20</span>
++          </p>
++          <p className="mt-1 text-sm font-semibold">
++            {String(r.points).replace(".", ",")} / {String(r.pointsMax).replace(".", ",")} points ({pourcentage}%)
++          </p>
++          <p className="mt-1 text-xs text-mp-grey">
++            {r.nbJustes} question(s) entièrement juste(s) sur {r.nbQuestions} · {formatDuree(r.dureeSecondes)}
++            {r.surveille ? ` · ${r.sorties} sortie(s) d'écran` : ""}
++          </p>
++        </section>
++
++        {details.map((d, i) => (
++          <section key={d.id} className="mp-card p-4">
++            <div className="flex items-start gap-2">
++              {d.juste ? (
++                <CheckCircle2 size={18} className="mt-0.5 shrink-0 text-green-600" />
++              ) : d.repondu ? (
++                <XCircle size={18} className="mt-0.5 shrink-0 text-red-600" />
++              ) : (
++                <AlertTriangle size={18} className="mt-0.5 shrink-0 text-mp-grey" />
++              )}
++              <div className="min-w-0 flex-1">
++                <div className="flex items-start justify-between gap-2">
++                  <p className="text-sm font-semibold">
++                    {i + 1}. {d.question}
++                  </p>
++                  <span
++                    className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-bold ${
++                      d.points > 0 ? "bg-green-50 text-green-700" : d.points < 0 ? "bg-red-50 text-red-700" : "bg-mp-bg text-mp-grey"
++                    }`}
++                  >
++                    {formatPoints(d.points)} / {String(d.pointsMax).replace(".", ",")}
++                  </span>
++                </div>
++                {d.imageId ? (
++                  // eslint-disable-next-line @next/next/no-img-element
++                  <img
++                    src={`/api/qcm/images/${d.imageId}`}
++                    alt="Illustration de la question"
++                    draggable={false}
++                    className="mt-2 max-h-64 w-auto rounded-lg border border-[#dfe3e8]"
++                  />
++                ) : null}
++                {!d.repondu ? <p className="mt-1 text-xs font-semibold text-mp-grey">Non répondu : 0 point.</p> : null}
++
++                <ul className="mt-3 space-y-2">
++                  {d.propositions.map((p) => {
++                    const bonne = d.bonnes.includes(p.idx);
++                    const cochee = d.choisies.includes(p.idx);
++                    const etat = bonne && cochee ? "ok" : bonne ? "manquee" : cochee ? "faute" : "neutre";
++                    const style = {
++                      ok: "border-green-600 bg-green-50",
++                      manquee: "border-green-600 border-dashed bg-white",
++                      faute: "border-red-600 bg-red-50",
++                      neutre: "border-[#dfe3e8] bg-white",
++                    }[etat];
++                    const libelle = { ok: "Bonne réponse cochée", manquee: "Bonne réponse à cocher", faute: "Erreur", neutre: "" }[etat];
++                    return (
++                      <li key={p.idx} className={`rounded-[10px] border px-3 py-2 text-sm ${style}`}>
++                        <div className="flex items-start gap-2">
++                          <span className="font-bold">{String.fromCharCode(65 + p.idx)}.</span>
++                          <div className="flex-1">
++                            {p.texte ? <span>{p.texte}</span> : null}
++                            {p.imageId ? (
++                              // eslint-disable-next-line @next/next/no-img-element
++                              <img
++                                src={`/api/qcm/images/${p.imageId}`}
++                                alt={`Proposition ${String.fromCharCode(65 + p.idx)}`}
++                                draggable={false}
++                                className="mt-1 max-h-40 w-auto rounded border border-[#dfe3e8]"
++                              />
++                            ) : null}
++                          </div>
++                          {libelle ? <span className="shrink-0 text-xs font-semibold">{libelle}</span> : null}
++                        </div>
++                      </li>
++                    );
++                  })}
++                </ul>
++                {d.explication ? (
++                  <p className="mt-3 rounded-lg bg-mp-bg p-3 text-xs leading-relaxed">
++                    <span className="font-bold">Explication : </span>
++                    {d.explication}
++                  </p>
++                ) : null}
++              </div>
++            </div>
++          </section>
++        ))}
++      </div>
++    </ProtectedZone>
++  );
++}
+diff --git a/src/components/qcm/types.ts b/src/components/qcm/types.ts
+new file mode 100644
+index 0000000..be9dc20
+--- /dev/null
++++ b/src/components/qcm/types.ts
+@@ -0,0 +1,61 @@
++export type PropositionPublique = { idx: number; texte: string; imageId: string | null };
++
++export type QuestionPublique = {
++  id: string;
++  matiere: string;
++  type: "QCU" | "QCD" | "QCM" | string;
++  question: string;
++  imageId: string | null;
++  propositions: PropositionPublique[];
++  nbAttendues: number;
++  points: number;
++  penalite: number;
++  mode: string;
++};
++
++export type Charge = {
++  tentative: {
++    id: string;
++    titre: string;
++    surveille: boolean;
++    limiteAt: string;
++    serverNow: string;
++    sortiesMax: number;
++    filigrane: string;
++  };
++  questions: QuestionPublique[];
++  reponses: Record<string, number[]>;
++  sorties: number;
++};
++
++export type DetailCorrection = {
++  id: string;
++  question: string;
++  imageId: string | null;
++  type: string;
++  propositions: PropositionPublique[];
++  bonnes: number[];
++  choisies: number[];
++  points: number;
++  pointsMax: number;
++  juste: boolean;
++  repondu: boolean;
++  explication: string;
++};
++
++export type ResultatFinal = {
++  resultat: {
++    id: string;
++    titre: string;
++    matiere: string;
++    surveille: boolean;
++    points: number;
++    pointsMax: number;
++    noteSur20: number;
++    nbJustes: number;
++    nbQuestions: number;
++    sorties: number;
++    dureeSecondes: number;
++  };
++  details: DetailCorrection[];
++};
+diff --git a/src/db/schema.ts b/src/db/schema.ts
+index fa76f02..a15a6df 100644
+--- a/src/db/schema.ts
++++ b/src/db/schema.ts
+@@ -74,9 +74,47 @@ export const qcm = pgTable("qcm", {
+   bonneReponse: text("bonne_reponse").notNull(),
+   explication: text("explication").notNull().default(""),
+   niveau: text("niveau").notNull().default("L1"),
++  /** QCU = 1 bonne réponse, QCD = exactement 2 bonnes réponses, QCM = 1 à n bonnes réponses. */
++  type: text("type").notNull().default("QCU"),
++  /** Indices (0-based) des bonnes propositions. Vide = ancienne question, on lit bonneReponse. */
++  bonnes: jsonb("bonnes").$type<number[]>().notNull().default([]),
++  points: doublePrecision("points").notNull().default(1),
++  penalite: doublePrecision("penalite").notNull().default(0),
++  /** TOUT_OU_RIEN ou PARTIEL (QCD/QCM uniquement). */
++  mode: text("mode").notNull().default("TOUT_OU_RIEN"),
++  imageId: uuid("image_id"),
++  propositionsImages: jsonb("propositions_images").$type<(string | null)[]>().notNull().default([]),
++  actif: boolean("actif").notNull().default(true),
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
++export const qcmImages = pgTable("qcm_images", {
++  id: uuid("id").primaryKey().defaultRandom(),
++  mime: text("mime").notNull(),
++  contenu: text("contenu").notNull(),
++  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
++});
++
++export const qcmTentatives = pgTable("qcm_tentatives", {
++  id: uuid("id").primaryKey().defaultRandom(),
++  userId: uuid("user_id").notNull(),
++  qcmAdminId: uuid("qcm_admin_id"),
++  titre: text("titre").notNull().default(""),
++  matiere: text("matiere").notNull().default(""),
++  questionIds: jsonb("question_ids").$type<string[]>().notNull().default([]),
++  reponses: jsonb("reponses").$type<Record<string, number[]>>().notNull().default({}),
++  statut: text("statut").notNull().default("EN_COURS"),
++  points: doublePrecision("points").notNull().default(0),
++  pointsMax: doublePrecision("points_max").notNull().default(0),
++  noteSur20: doublePrecision("note_sur_20").notNull().default(0),
++  nbJustes: integer("nb_justes").notNull().default(0),
++  sorties: integer("sorties").notNull().default(0),
++  surveille: boolean("surveille").notNull().default(false),
++  debutAt: timestamp("debut_at", { withTimezone: true }).notNull().defaultNow(),
++  limiteAt: timestamp("limite_at", { withTimezone: true }).notNull().defaultNow(),
++  finAt: timestamp("fin_at", { withTimezone: true }),
++});
++
+ export const qcmAdmin = pgTable("qcm_admin", {
+   id: uuid("id").primaryKey().defaultRandom(),
+   titre: text("titre").notNull(),
+@@ -85,6 +123,13 @@ export const qcmAdmin = pgTable("qcm_admin", {
+   nbQuestions: integer("nb_questions").notNull().default(20),
+   dateLancement: timestamp("date_lancement", { withTimezone: true }).notNull().defaultNow(),
+   statut: text("statut").notNull().default("PROGRAMME"),
++  /** Filières autorisées. Vide = toutes les filières. */
++  filieres: jsonb("filieres").$type<string[]>().notNull().default([]),
++  /** Questions figées de la session (tirées au lancement). */
++  questionIds: jsonb("question_ids").$type<string[]>().notNull().default([]),
++  /** Nombre de sorties d'écran tolérées avant rendu automatique. 0 = illimité. */
++  sortiesMax: integer("sorties_max").notNull().default(0),
++  melanger: boolean("melanger").notNull().default(true),
+   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+ });
+ 
+diff --git a/src/lib/qcm-server.ts b/src/lib/qcm-server.ts
+new file mode 100644
+index 0000000..0fe72ee
+--- /dev/null
++++ b/src/lib/qcm-server.ts
+@@ -0,0 +1,97 @@
++import { and, eq, inArray } from "drizzle-orm";
++import { db } from "@/db";
++import { qcm, qcmTentatives, resultatsQcm } from "@/db/schema";
++import { noterTentative, type QuestionRow } from "@/lib/qcm";
++
++export type Tentative = typeof qcmTentatives.$inferSelect;
++
++/** Délai de grâce (réseau lent) après l'heure limite, en millisecondes. */
++export const GRACE_MS = 30_000;
++
++export async function chargerQuestions(ids: string[]): Promise<QuestionRow[]> {
++  if (ids.length === 0) return [];
++  const rows = await db.select().from(qcm).where(inArray(qcm.id, ids));
++  const parId = new Map(rows.map((r) => [r.id, r]));
++  return ids.map((id) => parId.get(id)).filter((q): q is QuestionRow => Boolean(q));
++}
++
++/** Ne garde que les réponses aux questions de la tentative, sous forme d'entiers. */
++export function nettoyerReponses(brut: unknown, ids: string[]): Record<string, number[]> {
++  const sortie: Record<string, number[]> = {};
++  if (!brut || typeof brut !== "object") return sortie;
++  for (const id of ids) {
++    const valeur = (brut as Record<string, unknown>)[id];
++    if (Array.isArray(valeur)) {
++      const indices = valeur.map(Number).filter((n) => Number.isInteger(n) && n >= 0 && n < 20);
++      if (indices.length > 0) sortie[id] = Array.from(new Set(indices));
++    }
++  }
++  return sortie;
++}
++
++/**
++ * Corrige et clôture une tentative (idempotent). Une réponse envoyée trop tard est ignorée :
++ * on utilise alors la dernière sauvegarde automatique, faite avant l'heure limite.
++ */
++export async function finaliser(t: Tentative, reponsesClient: unknown, sorties: number): Promise<Tentative> {
++  if (t.statut !== "EN_COURS") return t;
++  const maintenant = Date.now();
++  const tard = maintenant > t.limiteAt.getTime() + GRACE_MS;
++  const reponses = tard || reponsesClient === undefined ? t.reponses : nettoyerReponses(reponsesClient, t.questionIds);
++
++  const questions = await chargerQuestions(t.questionIds);
++  const note = noterTentative(questions, reponses);
++  const fin = new Date(Math.min(maintenant, t.limiteAt.getTime() + GRACE_MS));
++
++  const [maj] = await db
++    .update(qcmTentatives)
++    .set({
++      reponses,
++      statut: "TERMINE",
++      points: note.points,
++      pointsMax: note.pointsMax,
++      noteSur20: note.noteSur20,
++      nbJustes: note.nbJustes,
++      sorties: Math.max(t.sorties, Math.max(0, Math.round(sorties) || 0)),
++      finAt: fin,
++    })
++    .where(and(eq(qcmTentatives.id, t.id), eq(qcmTentatives.statut, "EN_COURS")))
++    .returning();
++  if (!maj) {
++    const [courante] = await db.select().from(qcmTentatives).where(eq(qcmTentatives.id, t.id)).limit(1);
++    return courante ?? t;
++  }
++
++  // Alimente les statistiques existantes (dashboard, profil, stats).
++  await db.insert(resultatsQcm).values({
++    userId: t.userId,
++    qcmAdminId: t.qcmAdminId,
++    matiere: t.matiere,
++    score: note.nbJustes,
++    total: questions.length,
++    temps: Math.max(0, Math.round((fin.getTime() - t.debutAt.getTime()) / 1000)),
++  });
++  return maj;
++}
++
++/** Résultat complet (note + correction) d'une tentative terminée. */
++export async function construireResultat(t: Tentative) {
++  const questions = await chargerQuestions(t.questionIds);
++  const note = noterTentative(questions, t.reponses);
++  return {
++    resultat: {
++      id: t.id,
++      titre: t.titre,
++      matiere: t.matiere,
++      surveille: t.surveille,
++      points: t.points,
++      pointsMax: t.pointsMax,
++      noteSur20: t.noteSur20,
++      nbJustes: t.nbJustes,
++      nbQuestions: questions.length,
++      sorties: t.sorties,
++      dureeSecondes: t.finAt ? Math.round((t.finAt.getTime() - t.debutAt.getTime()) / 1000) : 0,
++    },
++    details: note.details,
++  };
++}
+diff --git a/src/lib/qcm.ts b/src/lib/qcm.ts
+new file mode 100644
+index 0000000..5577caa
+--- /dev/null
++++ b/src/lib/qcm.ts
+@@ -0,0 +1,189 @@
++import type { qcm } from "@/db/schema";
++
++export const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
++
++export type QuestionRow = typeof qcm.$inferSelect;
++export type TypeQuestion = "QCU" | "QCD" | "QCM";
++export type ModeNotation = "TOUT_OU_RIEN" | "PARTIEL";
++
++export const TYPES_QUESTION: { value: TypeQuestion; label: string; aide: string }[] = [
++  { value: "QCU", label: "QCU - une seule bonne réponse", aide: "L'étudiant coche 1 réponse." },
++  { value: "QCD", label: "QCD - choix double", aide: "Exactement 2 bonnes réponses." },
++  { value: "QCM", label: "QCM - choix multiple", aide: "1 à plusieurs bonnes réponses." },
++];
++
++/** Arrondi à 2 décimales pour éviter 0.30000000000000004. */
++export function arrondir(n: number): number {
++  return Math.round(n * 100) / 100;
++}
++
++/** Bonnes réponses d'une question. Les anciennes questions n'ont que bonneReponse (texte). */
++export function bonnesIndices(q: Pick<QuestionRow, "bonnes" | "bonneReponse" | "propositions">): number[] {
++  if (Array.isArray(q.bonnes) && q.bonnes.length > 0) return [...q.bonnes].sort((a, b) => a - b);
++  const i = q.propositions.indexOf(q.bonneReponse);
++  return i >= 0 ? [i] : [];
++}
++
++/**
++ * Notation d'une question. Règles (affichées telles quelles à l'étudiant) :
++ * - aucune case cochée : 0 point ;
++ * - TOUT_OU_RIEN : sélection exacte = points, sinon = moins pénalité ;
++ * - PARTIEL : points x (bonnes cochées / bonnes) - pénalité x (mauvaises cochées / mauvaises),
++ *   toujours compris entre -pénalité et +points.
++ */
++export function noterQuestion(
++  q: Pick<QuestionRow, "bonnes" | "bonneReponse" | "propositions" | "points" | "penalite" | "mode">,
++  choisies: number[],
++): { points: number; juste: boolean; repondu: boolean } {
++  const bonnes = bonnesIndices(q);
++  const valides = Array.from(new Set(choisies)).filter((i) => Number.isInteger(i) && i >= 0 && i < q.propositions.length);
++  if (valides.length === 0) return { points: 0, juste: false, repondu: false };
++
++  const bonnesCochees = valides.filter((i) => bonnes.includes(i)).length;
++  const mauvaisesCochees = valides.length - bonnesCochees;
++  const juste = bonnesCochees === bonnes.length && mauvaisesCochees === 0;
++
++  if (q.mode !== "PARTIEL" || bonnes.length <= 1) {
++    return { points: juste ? q.points : -q.penalite, juste, repondu: true };
++  }
++  const nbMauvaises = Math.max(1, q.propositions.length - bonnes.length);
++  const brut = q.points * (bonnesCochees / bonnes.length) - q.penalite * (mauvaisesCochees / nbMauvaises);
++  const borne = Math.min(q.points, Math.max(-q.penalite, brut));
++  return { points: arrondir(borne), juste, repondu: true };
++}
++
++export type Detail = {
++  id: string;
++  question: string;
++  imageId: string | null;
++  type: string;
++  propositions: { idx: number; texte: string; imageId: string | null }[];
++  bonnes: number[];
++  choisies: number[];
++  points: number;
++  pointsMax: number;
++  juste: boolean;
++  repondu: boolean;
++  explication: string;
++};
++
++export function noterTentative(questions: QuestionRow[], reponses: Record<string, number[]>) {
++  let points = 0;
++  let pointsMax = 0;
++  let nbJustes = 0;
++  const details: Detail[] = questions.map((q) => {
++    const choisies = Array.isArray(reponses[q.id]) ? reponses[q.id].map(Number) : [];
++    const r = noterQuestion(q, choisies);
++    points += r.points;
++    pointsMax += q.points;
++    if (r.juste) nbJustes += 1;
++    return {
++      id: q.id,
++      question: q.question,
++      imageId: q.imageId ?? null,
++      type: q.type,
++      propositions: q.propositions.map((texte, idx) => ({ idx, texte, imageId: q.propositionsImages?.[idx] ?? null })),
++      bonnes: bonnesIndices(q),
++      choisies: choisies.filter((i) => Number.isInteger(i)),
++      points: r.points,
++      pointsMax: q.points,
++      juste: r.juste,
++      repondu: r.repondu,
++      explication: q.explication,
++    };
++  });
++  points = arrondir(points);
++  pointsMax = arrondir(pointsMax);
++  const noteSur20 = pointsMax > 0 ? arrondir(Math.max(0, (points / pointsMax) * 20)) : 0;
++  return { points, pointsMax, noteSur20, nbJustes, details };
++}
++
++/** Version envoyée à l'étudiant PENDANT l'examen : jamais de bonnes réponses ni d'explication. */
++export function questionPublique(q: QuestionRow, melanger: boolean) {
++  const props = q.propositions.map((texte, idx) => ({ idx, texte, imageId: q.propositionsImages?.[idx] ?? null }));
++  if (melanger) {
++    for (let i = props.length - 1; i > 0; i--) {
++      const j = Math.floor(Math.random() * (i + 1));
++      [props[i], props[j]] = [props[j], props[i]];
++    }
++  }
++  const nbBonnes = bonnesIndices(q).length;
++  return {
++    id: q.id,
++    matiere: q.matiere,
++    type: q.type,
++    question: q.question,
++    imageId: q.imageId ?? null,
++    propositions: props,
++    nbAttendues: q.type === "QCU" ? 1 : q.type === "QCD" ? 2 : nbBonnes,
++    points: q.points,
++    penalite: q.penalite,
++    mode: q.mode,
++  };
++}
++
++export function melangerListe<T>(liste: T[]): T[] {
++  const copie = [...liste];
++  for (let i = copie.length - 1; i > 0; i--) {
++    const j = Math.floor(Math.random() * (i + 1));
++    [copie[i], copie[j]] = [copie[j], copie[i]];
++  }
++  return copie;
++}
++
++/** Validation d'une question saisie par l'admin. Lance une Error avec un message clair. */
++export function validerQuestion(b: Record<string, unknown>) {
++  const matiere = String(b.matiere ?? "").trim();
++  const enonce = String(b.question ?? "").trim();
++  const type = String(b.type ?? "QCU") as TypeQuestion;
++  if (!matiere) throw new Error("La matière est obligatoire.");
++  if (!enonce) throw new Error("L'énoncé est obligatoire.");
++  if (!["QCU", "QCD", "QCM"].includes(type)) throw new Error("Type de question invalide.");
++
++  const brutes = Array.isArray(b.propositions) ? b.propositions.map((x) => String(x ?? "").trim()) : [];
++  const images = Array.isArray(b.propositionsImages) ? b.propositionsImages : [];
++  // Une proposition peut n'avoir qu'une image : on garde les lignes qui ont un texte OU une image.
++  const lignes = brutes
++    .map((texte, i) => ({
++      texte,
++      image: images[i] && UUID_RE.test(String(images[i])) ? String(images[i]) : null,
++      ancienIndex: i,
++    }))
++    .filter((l) => l.texte !== "" || l.image);
++  if (lignes.length < 2) throw new Error("Il faut au moins 2 propositions.");
++  if (lignes.length > 8) throw new Error("8 propositions maximum.");
++
++  const ancienVersNouveau = new Map(lignes.map((l, n) => [l.ancienIndex, n]));
++  const bonnesBrutes = Array.isArray(b.bonnes) ? b.bonnes.map(Number) : [];
++  const bonnes = Array.from(new Set(bonnesBrutes.map((i) => ancienVersNouveau.get(i)).filter((i): i is number => i !== undefined))).sort(
++    (a, c) => a - c,
++  );
++  if (bonnes.length === 0) throw new Error("Cochez au moins une bonne réponse.");
++  if (type === "QCU" && bonnes.length !== 1) throw new Error("Un QCU a exactement 1 bonne réponse.");
++  if (type === "QCD" && bonnes.length !== 2) throw new Error("Un QCD a exactement 2 bonnes réponses.");
++  if (bonnes.length >= lignes.length) throw new Error("Il faut au moins une mauvaise proposition.");
++
++  const points = Number(b.points ?? 1);
++  const penalite = Number(b.penalite ?? 0);
++  if (!Number.isFinite(points) || points <= 0 || points > 100) throw new Error("Les points doivent être entre 0,01 et 100.");
++  if (!Number.isFinite(penalite) || penalite < 0 || penalite > 100) throw new Error("La pénalité doit être entre 0 et 100.");
++  const mode: ModeNotation = b.mode === "PARTIEL" && type !== "QCU" ? "PARTIEL" : "TOUT_OU_RIEN";
++
++  const propositions = lignes.map((l) => l.texte);
++  return {
++    matiere,
++    question: enonce,
++    type,
++    propositions,
++    propositionsImages: lignes.map((l) => l.image),
++    bonnes,
++    bonneReponse: propositions[bonnes[0]] ?? "",
++    points: arrondir(points),
++    penalite: arrondir(penalite),
++    mode,
++    explication: String(b.explication ?? "").trim(),
++    niveau: String(b.niveau ?? "L1").trim() || "L1",
++    imageId: b.imageId && UUID_RE.test(String(b.imageId)) ? String(b.imageId) : null,
++    actif: b.actif === undefined ? true : Boolean(b.actif),
++  };
++}
+diff --git a/supabase/migrations/0003_qcm_avance.sql b/supabase/migrations/0003_qcm_avance.sql
+new file mode 100644
+index 0000000..89a63fe
+--- /dev/null
++++ b/supabase/migrations/0003_qcm_avance.sql
+@@ -0,0 +1,47 @@
++-- MEDIKO+ : banque de questions avancee (QCU/QCD/QCM), notation par question,
++-- images, filieres par session, tentatives corrigees cote serveur.
++-- Idempotent : rejouable sans risque. Ne supprime aucune donnee.
++
++alter table public.qcm add column if not exists type text not null default 'QCU';
++alter table public.qcm add column if not exists bonnes jsonb not null default '[]'::jsonb;
++alter table public.qcm add column if not exists points double precision not null default 1;
++alter table public.qcm add column if not exists penalite double precision not null default 0;
++alter table public.qcm add column if not exists mode text not null default 'TOUT_OU_RIEN';
++alter table public.qcm add column if not exists image_id uuid;
++alter table public.qcm add column if not exists propositions_images jsonb not null default '[]'::jsonb;
++alter table public.qcm add column if not exists actif boolean not null default true;
++
++alter table public.qcm_admin add column if not exists filieres jsonb not null default '[]'::jsonb;
++alter table public.qcm_admin add column if not exists question_ids jsonb not null default '[]'::jsonb;
++alter table public.qcm_admin add column if not exists sorties_max integer not null default 0;
++alter table public.qcm_admin add column if not exists melanger boolean not null default true;
++
++create table if not exists public.qcm_images (
++  id uuid primary key default gen_random_uuid(),
++  mime text not null,
++  contenu text not null,
++  created_at timestamptz not null default now()
++);
++
++create table if not exists public.qcm_tentatives (
++  id uuid primary key default gen_random_uuid(),
++  user_id uuid not null,
++  qcm_admin_id uuid,
++  titre text not null default '',
++  matiere text not null default '',
++  question_ids jsonb not null default '[]'::jsonb,
++  reponses jsonb not null default '{}'::jsonb,
++  statut text not null default 'EN_COURS',
++  points double precision not null default 0,
++  points_max double precision not null default 0,
++  note_sur_20 double precision not null default 0,
++  nb_justes integer not null default 0,
++  sorties integer not null default 0,
++  surveille boolean not null default false,
++  debut_at timestamptz not null default now(),
++  limite_at timestamptz not null default now(),
++  fin_at timestamptz
++);
++
++create index if not exists qcm_tentatives_user_idx on public.qcm_tentatives (user_id, statut);
++create index if not exists qcm_tentatives_session_idx on public.qcm_tentatives (qcm_admin_id);
