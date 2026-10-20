@@ -6,9 +6,11 @@ import { isAdmin } from "@/lib/auth";
 import { FILIERES } from "@/lib/constants";
 import { UUID_RE } from "@/lib/qcm";
 import { colonnesSession } from "@/lib/qcm-server";
+import { assurerSchema } from "@/lib/schema-securite";
 
 export async function GET() {
   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  await assurerSchema();
   const rows = await db.select(colonnesSession).from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(50);
   return NextResponse.json({ sessions: rows });
 }
@@ -19,6 +21,7 @@ export async function GET() {
  */
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  await assurerSchema();
   const b = await request.json().catch(() => ({}));
   const moduleNom = String(b.module ?? "").trim();
   if (!moduleNom) return NextResponse.json({ error: "Module obligatoire" }, { status: 400 });
@@ -106,6 +109,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  await assurerSchema();
   const b = await request.json().catch(() => ({}));
   if (!UUID_RE.test(String(b.id ?? ""))) return NextResponse.json({ error: "id invalide" }, { status: 400 });
   const patch: Partial<typeof qcmAdmin.$inferInsert> = {};

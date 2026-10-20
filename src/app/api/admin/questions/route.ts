@@ -4,17 +4,19 @@ import { db } from "@/db";
 import { qcm } from "@/db/schema";
 import { isAdmin } from "@/lib/auth";
 import { UUID_RE, validerQuestion } from "@/lib/qcm";
+import { assurerSchema, messageDetaille } from "@/lib/schema-securite";
 
 function nonAutorise() {
   return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
 }
 
 function erreur(e: unknown) {
-  return NextResponse.json({ error: e instanceof Error ? e.message : "Requête invalide." }, { status: 400 });
+  return NextResponse.json({ error: e instanceof Error ? messageDetaille(e) : "Requête invalide." }, { status: 400 });
 }
 
 export async function GET(request: Request) {
   if (!(await isAdmin())) return nonAutorise();
+  await assurerSchema();
   const p = new URL(request.url).searchParams;
   const filtres: SQL[] = [];
   const matiere = p.get("matiere");
@@ -35,6 +37,7 @@ export async function GET(request: Request) {
 /** Corps : une question, ou { questions: [...] } pour un import en masse. */
 export async function POST(request: Request) {
   if (!(await isAdmin())) return nonAutorise();
+  await assurerSchema();
   const b = await request.json().catch(() => ({}));
   if (Array.isArray(b.questions)) {
     const valides: ReturnType<typeof validerQuestion>[] = [];
@@ -59,6 +62,7 @@ export async function POST(request: Request) {
 
 export async function PATCH(request: Request) {
   if (!(await isAdmin())) return nonAutorise();
+  await assurerSchema();
   const b = await request.json().catch(() => ({}));
   const id = String(b.id ?? "");
   if (!UUID_RE.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
@@ -73,6 +77,7 @@ export async function PATCH(request: Request) {
 
 export async function DELETE(request: Request) {
   if (!(await isAdmin())) return nonAutorise();
+  await assurerSchema();
   const id = new URL(request.url).searchParams.get("id") ?? "";
   if (!UUID_RE.test(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
   await db.delete(qcm).where(eq(qcm.id, id));

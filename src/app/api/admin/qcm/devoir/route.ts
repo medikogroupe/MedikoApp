@@ -4,6 +4,7 @@ import { qcmAdmin } from "@/db/schema";
 import { isAdmin } from "@/lib/auth";
 import { FILIERES } from "@/lib/constants";
 import { construireDevoir, supprimerQuestions } from "@/lib/devoir";
+import { assurerSchema, messageDetaille } from "@/lib/schema-securite";
 
 /**
  * Cree un devoir complet en un seul appel (comme un formulaire) :
@@ -12,6 +13,7 @@ import { construireDevoir, supprimerQuestions } from "@/lib/devoir";
  */
 export async function POST(request: Request) {
   if (!(await isAdmin())) return NextResponse.json({ error: "Non autorise" }, { status: 401 });
+  await assurerSchema();
   const b = await request.json().catch(() => ({}));
   const moduleNom = String(b.module ?? "").trim();
   if (!moduleNom) return NextResponse.json({ error: "Module obligatoire" }, { status: 400 });
@@ -32,7 +34,7 @@ export async function POST(request: Request) {
   try {
     devoir = await construireDevoir(b.sections, moduleNom, niveau, Boolean(b.ajouterBanque));
   } catch (e) {
-    return NextResponse.json({ error: e instanceof Error ? e.message : "Devoir invalide." }, { status: 400 });
+    return NextResponse.json({ error: e instanceof Error ? messageDetaille(e) : "Devoir invalide." }, { status: 400 });
   }
 
   try {
