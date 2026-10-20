@@ -35,6 +35,12 @@ export default function QcmResultat({ data, filigrane }: { data: ResultatFinal; 
           </p>
         </section>
 
+        {r.correctionDisponible === false ? (
+          <section className="mp-card p-4 text-center text-xs text-mp-grey">
+            La correction d&eacute;taill&eacute;e sera disponible quand le devoir sera cl&ocirc;tur&eacute;. Revenez consulter cette page ensuite.
+          </section>
+        ) : null}
+
         {details.map((d, i) => (
           <section key={d.id} className="mp-card p-4">
             <div className="flex items-start gap-2">

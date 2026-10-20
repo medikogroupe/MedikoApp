@@ -59,6 +59,7 @@ export type ResultatFinal = {
     nbQuestions: number;
     sorties: number;
     dureeSecondes: number;
+    correctionDisponible?: boolean;
   };
   details: DetailCorrection[];
 };

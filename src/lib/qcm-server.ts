@@ -118,6 +118,7 @@ export async function finaliser(t: Tentative, reponsesClient: unknown, sorties: 
 
 /** Résultat complet (note + correction) d'une tentative terminée. */
 export async function construireResultat(t: Tentative) {
+  const visible = await correctionVisible(t);
   const questions = await chargerQuestions(t.questionIds, t.qcmAdminId);
   const note = noterTentative(questions, t.reponses);
   return {
@@ -133,7 +134,15 @@ export async function construireResultat(t: Tentative) {
       nbQuestions: questions.length,
       sorties: t.sorties,
       dureeSecondes: t.finAt ? Math.round((t.finAt.getTime() - t.debutAt.getTime()) / 1000) : 0,
+      correctionDisponible: visible,
     },
-    details: note.details,
+    details: visible ? note.details : [],
   };
+}
+
+/** La correction detaillee d'un devoir n'est visible qu'une fois le devoir cloture. L'entrainement libre reste immediat. */
+export async function correctionVisible(t: Tentative): Promise<boolean> {
+  if (!t.qcmAdminId) return true;
+  const [s] = await db.select({ statut: qcmAdmin.statut }).from(qcmAdmin).where(eq(qcmAdmin.id, t.qcmAdminId)).limit(1);
+  return !s || s.statut !== "ACTIF";
 }

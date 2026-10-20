@@ -36,7 +36,7 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
   useEffect(() => {
     void (async () => {
       const res = await fetch(`/api/admin/questions?matiere=${encodeURIComponent(form.module)}`);
-      setBanque(res.ok ? ((await res.json()).questions ?? []) : []);
+      setBanque(res.ok ? (((await res.json()).questions ?? []) as { id: string; question: string; type: string; points: number; actif?: boolean }[]).filter((q) => q.actif !== false) : []);
       setSections((s) => s.map((x) => ({ ...x, ids: [] })));
     })();
   }, [form.module]);

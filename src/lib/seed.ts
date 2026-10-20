@@ -148,6 +148,14 @@ export async function ensureSeed(): Promise<void> {
       ]);
     }
 
+    for (const instruction of MIGRATIONS_SECURITE) {
+      try {
+        await db.execute(sql.raw(instruction));
+      } catch {
+        // droits insuffisants : la migration SQL officielle reste a appliquer
+      }
+    }
+
     const q = await db.select({ c: sql<number>`count(*)::int` }).from(qcm);
     if ((q[0]?.c ?? 0) === 0) {
       await db.insert(qcm).values(QCM_SEED);
@@ -199,3 +207,13 @@ export async function ensureSeed(): Promise<void> {
     // La base n'est pas encore prête : on réessaiera au prochain appel.
   }
 }
+
+/** Colonnes ajoutees apres la creation initiale : sans effet si elles existent deja. */
+const MIGRATIONS_SECURITE = [
+  "alter table qcm add column if not exists obligatoire boolean not null default false",
+  "alter table qcm_admin add column if not exists consignes text not null default ''",
+  "alter table qcm_admin add column if not exists niveau text not null default ''",
+  "alter table qcm_admin add column if not exists sections jsonb not null default '[]'::jsonb",
+  "alter table qcm_admin add column if not exists fige_at timestamptz",
+  "alter table qcm_admin add column if not exists snapshot jsonb not null default '{}'::jsonb",
+];

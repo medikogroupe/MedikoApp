@@ -98,7 +98,7 @@ export default function SurveilleClient({
               {sortiesMax > 0 ? `. Au-delà de ${sortiesMax} sortie(s), votre copie est rendue automatiquement` : ""}.
             </li>
             <li>Vos réponses sont sauvegardées automatiquement. Une question sans réponse vaut 0 point.</li>
-            <li>Votre note et la correction détaillée s&apos;affichent dès que vous avez rendu votre copie.</li>
+            <li>Votre note s&apos;affiche d&egrave;s que vous avez rendu votre copie. La correction d&eacute;taill&eacute;e est publi&eacute;e &agrave; la cl&ocirc;ture du devoir.</li>
             <li>
               Durée : {dureeMinutes} minutes · {nbQuestions} questions. Votre nom est affiché en filigrane sur chaque
               écran.
