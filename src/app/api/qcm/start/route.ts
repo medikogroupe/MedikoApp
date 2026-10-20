@@ -6,8 +6,10 @@ import { getCurrentUser } from "@/lib/auth";
 import { UUID_RE, melangerListe, questionPublique } from "@/lib/qcm";
 import { chargerQuestions, figerQuestionnaire, finaliser, type Tentative } from "@/lib/qcm-server";
 import { ensureSeed } from "@/lib/seed";
+import { indexSections, ordonnerParSections } from "@/lib/devoir";
 
-function charge(t: Tentative, questions: Awaited<ReturnType<typeof chargerQuestions>>, melanger: boolean, sortiesMax: number, nom: string) {
+function charge(t: Tentative, questions: Awaited<ReturnType<typeof chargerQuestions>>, melanger: boolean, sortiesMax: number, nom: string, sections: Record<string, unknown>[] = []) {
+  const sectionDe = indexSections(sections);
   return {
     tentative: {
       id: t.id,
@@ -18,7 +20,8 @@ function charge(t: Tentative, questions: Awaited<ReturnType<typeof chargerQuesti
       sortiesMax,
       filigrane: nom,
     },
-    questions: questions.map((q) => questionPublique(q, melanger)),
+    questions: questions.map((q) => ({ ...questionPublique(q, melanger), section: sectionDe.get(q.id) ?? null })),
+    sections: sections.map((s) => ({ titre: String(s.titre ?? ""), description: String(s.description ?? "") })),
     reponses: t.reponses,
     sorties: t.sorties,
   };
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
       ? await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, t.qcmAdminId)).limit(1)
       : [undefined];
     const questions = await chargerQuestions(t.questionIds, t.qcmAdminId);
-    return NextResponse.json(charge(t, questions, session?.melanger ?? true, session?.sortiesMax ?? 0, filigrane));
+    return NextResponse.json(charge(t, questions, session?.melanger ?? true, session?.sortiesMax ?? 0, filigrane, session?.sections ?? []));
   }
 
   // 2. Nouvelle tentative
@@ -97,7 +100,7 @@ export async function POST(request: Request) {
       ids = (await chargerQuestions(ids, session.id)).map((q) => q.id);
       if (ids.length === 0) return NextResponse.json({ error: "Aucune question disponible dans cette session." }, { status: 400 });
     }
-    if (session.melanger) ids = melangerListe(ids);
+    ids = session.sections.length > 0 ? ordonnerParSections(ids, session.sections, session.melanger) : session.melanger ? melangerListe(ids) : ids;
 
     const limite = new Date(Date.now() + session.dureeMinutes * 60_000);
     const [t] = await db
@@ -122,10 +125,10 @@ export async function POST(request: Request) {
       await db.delete(qcmTentatives).where(and(eq(qcmTentatives.id, t.id), eq(qcmTentatives.statut, "EN_COURS")));
       const gagnante = concurrentes[0];
       const qs = await chargerQuestions(gagnante.questionIds, session.id);
-      return NextResponse.json(charge(gagnante, qs, session.melanger, session.sortiesMax, filigrane));
+      return NextResponse.json(charge(gagnante, qs, session.melanger, session.sortiesMax, filigrane, session.sections));
     }
     const questions = await chargerQuestions(ids, session.id);
-    return NextResponse.json(charge(t, questions, session.melanger, session.sortiesMax, filigrane));
+    return NextResponse.json(charge(t, questions, session.melanger, session.sortiesMax, filigrane, session.sections));
   }
 
   // Entraînement libre

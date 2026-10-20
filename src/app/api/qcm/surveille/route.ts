@@ -10,7 +10,7 @@ import { colonnesSession } from "@/lib/qcm-server";
 export async function GET() {
   await ensureSeed();
   const user = await getCurrentUser();
-  if (!user) return NextResponse.json({ sessions: [] });
+  if (!user) return NextResponse.json({ sessions: [], anonyme: true });
   const rows = await db.select(colonnesSession).from(qcmAdmin).orderBy(desc(qcmAdmin.dateLancement)).limit(30);
   const visibles = rows.filter((s) => s.filieres.length === 0 || s.filieres.includes(user.filiere)).slice(0, 20);
   const tentatives = visibles.length

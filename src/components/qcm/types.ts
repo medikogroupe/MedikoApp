@@ -11,6 +11,8 @@ export type QuestionPublique = {
   points: number;
   penalite: number;
   mode: string;
+  obligatoire?: boolean;
+  section?: number | null;
 };
 
 export type Charge = {
@@ -24,6 +26,7 @@ export type Charge = {
     filigrane: string;
   };
   questions: QuestionPublique[];
+  sections?: { titre: string; description: string }[];
   reponses: Record<string, number[]>;
   sorties: number;
 };

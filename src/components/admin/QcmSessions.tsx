@@ -93,6 +93,29 @@ export default function QcmSessions() {
   const [occupe, setOccupe] = useState(false);
   const [ouvertId, setOuvertId] = useState("");
   const [resultats, setResultats] = useState<Resultats | null>(null);
+  const [importMsg, setImportMsg] = useState("");
+
+  async function importerDevoir(fichier: File | undefined) {
+    if (!fichier) return;
+    setImportMsg("Import en cours...");
+    try {
+      const donnees = JSON.parse(await fichier.text());
+      const res = await fetch("/api/admin/qcm/import", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(donnees),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok) {
+        setImportMsg(`Devoir import\u00e9 (${data.nbQuestions} question(s)). Il est cl\u00f4tur\u00e9 : cliquez sur R\u00e9activer pour l'ouvrir.`);
+        await charger();
+      } else {
+        setImportMsg(data.error ?? "Import impossible.");
+      }
+    } catch {
+      setImportMsg("Fichier invalide.");
+    }
+  }
 
   const charger = useCallback(async () => {
     const res = await fetch("/api/admin/qcm");
@@ -166,102 +189,25 @@ export default function QcmSessions() {
 
   return (
     <div className="mt-4 space-y-4">
-      <section className="mp-card p-4">
-        <h2 className="text-sm font-bold">Lancer un QCM surveillé</h2>
-        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div>
-            <label className="mp-label">Titre</label>
-            <input className="mp-input" value={form.titre} onChange={(e) => setForm({ ...form, titre: e.target.value })} />
-          </div>
-          <div>
-            <label className="mp-label">Module</label>
-            <select className="mp-input" value={form.module} onChange={(e) => setForm({ ...form, module: e.target.value })}>
-              {MATIERES.map((m) => (
-                <option key={m}>{m}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="mp-label">Date et heure d&apos;ouverture</label>
-            <input type="datetime-local" className="mp-input" value={form.dateLancement} onChange={(e) => setForm({ ...form, dateLancement: e.target.value })} />
-          </div>
-          <div>
-            <label className="mp-label">Durée (minutes)</label>
-            <input className="mp-input" inputMode="numeric" value={form.dureeMinutes} onChange={(e) => setForm({ ...form, dureeMinutes: e.target.value })} />
-          </div>
-          <div>
-            <label className="mp-label">Nombre de questions (tirage au sort)</label>
-            <input className="mp-input" inputMode="numeric" value={form.nbQuestions} disabled={form.choix} onChange={(e) => setForm({ ...form, nbQuestions: e.target.value })} />
-          </div>
-          <div>
-            <label className="mp-label">Sorties d&apos;écran tolérées (0 = illimité)</label>
-            <input className="mp-input" inputMode="numeric" value={form.sortiesMax} onChange={(e) => setForm({ ...form, sortiesMax: e.target.value })} />
-          </div>
-        </div>
 
-        <div className="mt-4">
-          <label className="mp-label">Filières concernées</label>
-          <ChoixFilieres valeur={form.filieres} onChange={(v) => setForm({ ...form, filieres: v })} />
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div>
-            <label className="mp-label">Niveau des questions</label>
-            <select className="mp-input" value={form.niveau} onChange={(e) => setForm({ ...form, niveau: e.target.value })}>
-              <option value="">Tous les niveaux</option>
-              {["L1", "L2", "L3", "M1", "M2"].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="mt-4">
-          <label className="mp-label">Consignes et libell&eacute; (affich&eacute;s &agrave; l&apos;&eacute;tudiant avant de commencer)</label>
-          <textarea className="mp-input" rows={4} maxLength={2000} value={form.consignes} onChange={(e) => setForm({ ...form, consignes: e.target.value })} />
-        </div>
-
-        <div className="mt-3 flex flex-wrap gap-x-6">
-          <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
-            <input type="checkbox" className="h-5 w-5" checked={form.melanger} onChange={(e) => setForm({ ...form, melanger: e.target.checked })} />
-            Mélanger l&apos;ordre des questions et des propositions
-          </label>
-          <label className="flex min-h-[44px] items-center gap-2 text-sm font-semibold">
-            <input type="checkbox" className="h-5 w-5" checked={form.choix} onChange={(e) => setForm({ ...form, choix: e.target.checked })} />
-            Choisir les questions moi-même
-          </label>
-        </div>
-
-        {form.choix ? (
-          <div className="mt-2 max-h-72 overflow-y-auto rounded-[10px] border border-[#dfe3e8] p-2">
-            {disponibles.length === 0 ? <p className="p-2 text-xs text-mp-grey">Aucune question dans ce module.</p> : null}
-            {disponibles.map((q) => (
-              <label key={q.id} className="flex min-h-[44px] items-start gap-2 border-b border-[#eef1f5] py-2 text-xs last:border-0">
-                <input
-                  type="checkbox"
-                  className="mt-0.5 h-5 w-5 shrink-0"
-                  checked={selection.includes(q.id)}
-                  onChange={(e) => setSelection(e.target.checked ? [...selection, q.id] : selection.filter((x) => x !== q.id))}
-                />
-                <span>
-                  <span className="mr-1 font-bold text-mp-blue">{q.type}</span>
-                  {q.question} <span className="text-mp-grey">({q.points} pt)</span>
-                </span>
-              </label>
-            ))}
-            <p className="p-2 text-xs font-semibold text-mp-blue">{selection.length} question(s) sélectionnée(s)</p>
-          </div>
-        ) : null}
-
-        {erreur ? <p className="mt-2 text-xs font-semibold text-red-700">{erreur}</p> : null}
-        {message ? <p className="mt-2 text-xs font-semibold text-green-700">{message}</p> : null}
-        <button type="button" className="mp-btn-yellow mt-3 min-h-[44px] md:w-48" onClick={lancer} disabled={occupe}>
-          {occupe ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />} Lancer
-        </button>
-      </section>
 
       <section className="mp-card p-4">
-        <h2 className="text-sm font-bold">Sessions</h2>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-bold">Devoirs cr&eacute;&eacute;s</h2>
+          <label className="mp-btn-ghost min-h-[44px] cursor-pointer md:w-auto md:px-4">
+            Importer un devoir (.json)
+            <input
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                void importerDevoir(e.target.files?.[0]);
+                e.target.value = "";
+              }}
+            />
+          </label>
+        </div>
+        {importMsg ? <p className="mt-2 text-xs font-semibold text-mp-blue">{importMsg}</p> : null}
         <ul className="mt-3 space-y-3">
           {sessions.map((s) => {
             const filieres = Array.isArray(s.filieres) ? s.filieres : [];
@@ -279,6 +225,7 @@ export default function QcmSessions() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  <a href={`/api/admin/qcm/export?id=${s.id}`} download className="flex min-h-[44px] items-center rounded-lg bg-mp-bg px-3 text-xs font-semibold">Exporter</a>
                   <button type="button" className="flex min-h-[44px] items-center gap-1 rounded-lg bg-mp-bg px-3 text-xs font-semibold" onClick={() => voirResultats(s.id)}>
                     <BarChart3 size={14} /> Résultats
                   </button>
@@ -373,7 +320,7 @@ export default function QcmSessions() {
             </li>
           );
           })}
-          {sessions.length === 0 ? <li className="text-xs text-mp-grey">Aucune session.</li> : null}
+          {sessions.length === 0 ? <li className="text-xs text-mp-grey">Aucun devoir.</li> : null}
         </ul>
       </section>
     </div>

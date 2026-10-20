@@ -16,7 +16,7 @@ function bareme(q: QuestionPublique): string {
   const fmt = (n: number) => String(n).replace(".", ",");
   const erreur = q.penalite > 0 ? `erreur : -${fmt(q.penalite)} pt` : "erreur : 0 pt";
   const partiel = q.mode === "PARTIEL" && q.type !== "QCU" ? " · points partiels" : "";
-  return `${fmt(q.points)} pt · ${erreur} · sans réponse : 0 pt${partiel}`;
+  return `${fmt(q.points)} pt · ${erreur} · sans réponse : 0 pt${partiel}${q.obligatoire ? " · obligatoire" : ""}`;
 }
 
 export default function QcmRunner({
@@ -150,6 +150,7 @@ export default function QcmRunner({
   }
 
   const q = questions[index];
+  const section = q.section != null ? charge.sections?.[q.section] : undefined;
   const choisies = reponses[q.id] ?? [];
   const minutes = String(Math.floor(restant / 60)).padStart(2, "0");
   const secondes = String(restant % 60).padStart(2, "0");
@@ -173,6 +174,12 @@ export default function QcmRunner({
   }
 
   function confirmerRendu() {
+    const manquante = questions.findIndex((x) => x.obligatoire && (reponses[x.id] ?? []).length === 0);
+    if (manquante >= 0) {
+      setIndex(manquante);
+      window.alert(`La question ${manquante + 1} est obligatoire : r\u00e9pondez-y avant de rendre votre copie.`);
+      return;
+    }
     const sansReponse = questions.length - nbRepondues;
     const message =
       sansReponse > 0
@@ -209,6 +216,12 @@ export default function QcmRunner({
             <div className="h-full rounded-full bg-mp-blue" style={{ width: `${((index + 1) / questions.length) * 100}%` }} />
           </div>
 
+          {section && (section.titre || section.description) ? (
+            <div className="mt-4 rounded-lg bg-mp-bg p-3">
+              {section.titre ? <p className="text-xs font-bold text-mp-blue">{section.titre}</p> : null}
+              {section.description ? <p className="mt-1 whitespace-pre-line text-xs text-mp-grey">{section.description}</p> : null}
+            </div>
+          ) : null}
           <p className="mt-4 text-xs font-bold uppercase tracking-wide text-mp-blue">{consigne(q)}</p>
           <p className="mt-0.5 text-xs text-mp-grey">{bareme(q)}</p>
           <h2 className="mt-3 text-sm font-bold leading-relaxed">{q.question}</h2>

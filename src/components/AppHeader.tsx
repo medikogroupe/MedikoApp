@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { LogoIcon } from "@/components/Logo";
+import Cloche from "@/components/Cloche";
 
 export default function AppHeader({
   title,
@@ -35,6 +36,7 @@ export default function AppHeader({
           <h1 className="truncate text-base font-bold uppercase tracking-wide">{title}</h1>
           {subtitle ? <p className="truncate text-xs text-white/75">{subtitle}</p> : null}
         </div>
+        <Cloche />
         {action}
       </div>
     </header>

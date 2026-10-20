@@ -16,6 +16,7 @@ type Question = {
   type: string;
   points: number;
   penalite: number;
+  obligatoire?: boolean;
   mode: string;
   explication: string;
   niveau: string;
@@ -33,6 +34,7 @@ type Formulaire = {
   lignes: { texte: string; image: string | null; bonne: boolean }[];
   points: string;
   penalite: string;
+  obligatoire: boolean;
   mode: string;
   explication: string;
   actif: boolean;
@@ -51,6 +53,7 @@ function vide(): Formulaire {
     lignes: [0, 1, 2, 3].map(() => ({ texte: "", image: null, bonne: false })),
     points: "1",
     penalite: "0",
+    obligatoire: false,
     mode: "TOUT_OU_RIEN",
     explication: "",
     actif: true,
@@ -73,6 +76,7 @@ function depuis(q: Question): Formulaire {
     })),
     points: String(q.points),
     penalite: String(q.penalite),
+    obligatoire: Boolean(q.obligatoire),
     mode: q.mode,
     explication: q.explication,
     actif: q.actif,
@@ -163,6 +167,7 @@ export default function QuestionBank() {
           ...f,
           type,
           mode: "TOUT_OU_RIEN",
+          penalite: "1",
           lignes: [
             { texte: "Vrai", image: null, bonne: false },
             { texte: "Faux", image: null, bonne: false },
@@ -174,6 +179,7 @@ export default function QuestionBank() {
         ...f,
         type,
         mode: type === "QCU" ? "TOUT_OU_RIEN" : f.mode,
+        penalite: type === "QCM" ? "0" : "1",
         lignes: etaitVraiFaux ? [0, 1, 2, 3].map(() => ({ texte: "", image: null, bonne: false })) : type === "QCU" ? f.lignes.map((l, i) => ({ ...l, bonne: l.bonne && i === f.lignes.findIndex((x) => x.bonne) })) : f.lignes,
       };
     });
@@ -219,6 +225,7 @@ export default function QuestionBank() {
       bonnes: form.lignes.map((l, i) => (l.bonne ? i : -1)).filter((i) => i >= 0),
       points: Number(form.points.replace(",", ".")),
       penalite: Number(form.penalite.replace(",", ".")),
+      obligatoire: form.obligatoire,
       mode: form.mode,
       explication: form.explication,
       actif: form.actif,
@@ -412,6 +419,10 @@ export default function QuestionBank() {
           ) : null}
         </div>
 
+                <label className="mt-4 flex min-h-[44px] items-center gap-2 text-sm font-semibold">
+          <input type="checkbox" className="h-5 w-5" checked={form.obligatoire} onChange={(e) => setForm({ ...form, obligatoire: e.target.checked })} />
+          Question obligatoire (l&apos;&eacute;tudiant doit y r&eacute;pondre pour rendre sa copie)
+        </label>
         <div className="mt-4 rounded-xl border border-dashed border-[#cfd7e0] p-3">
           <p className="mp-label">Notation de cette question</p>
           <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-3">

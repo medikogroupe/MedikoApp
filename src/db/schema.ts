@@ -22,6 +22,8 @@ export const users = pgTable("users", {
   pack: text("pack").notNull().default("FREE"),
   statut: text("statut").notNull().default("ACTIF"),
   packExpireAt: timestamp("pack_expire_at", { withTimezone: true }),
+  /** Photo de profil (data URL JPEG 256 px). Vide = initiale. */
+  photo: text("photo").notNull().default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 

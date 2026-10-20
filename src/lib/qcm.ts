@@ -119,6 +119,7 @@ export function questionPublique(q: QuestionRow, melanger: boolean) {
     points: q.points,
     penalite: q.penalite,
     mode: q.mode,
+    obligatoire: q.obligatoire,
   };
 }
 
@@ -181,6 +182,7 @@ export function validerQuestion(b: Record<string, unknown>) {
     penalite: arrondir(penalite),
     mode,
     explication: String(b.explication ?? "").trim(),
+    obligatoire: b.obligatoire === undefined ? false : Boolean(b.obligatoire),
     niveau: String(b.niveau ?? "L1").trim() || "L1",
     imageId: b.imageId && UUID_RE.test(String(b.imageId)) ? String(b.imageId) : null,
     actif: b.actif === undefined ? true : Boolean(b.actif),

@@ -50,9 +50,6 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
       subtitle={`${session.module} · ${session.dureeMinutes} min · 1 tentative`}
       nav={false}
     >
-      {session.consignes && etat === "NOUVEAU" && !clos ? (
-        <p className="mp-card mb-3 whitespace-pre-line p-4 text-sm">{session.consignes}</p>
-      ) : null}
       {clos ? (
         <p className="mp-card p-4 text-sm text-mp-grey">Cette session est clôturée.</p>
       ) : ouverture && etat === "NOUVEAU" ? (
@@ -65,6 +62,7 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
           dureeMinutes={session.dureeMinutes}
           nbQuestions={session.questionIds.length || session.nbQuestions}
           sortiesMax={session.sortiesMax}
+          consignes={session.consignes}
           etat={etat}
           tentativeId={(terminee ?? enCours)?.id ?? null}
           filigrane={`${user.nomWhatsapp} ${user.numeroWhatsapp}`}

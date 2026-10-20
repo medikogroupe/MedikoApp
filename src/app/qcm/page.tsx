@@ -114,7 +114,7 @@ export default function QcmPage() {
 
       <section className="mp-card mt-4 p-4">
         <h2 className="flex items-center gap-2 text-sm font-bold">
-          <ShieldCheck size={16} className="text-mp-blue" /> QCM surveillés
+          <ShieldCheck size={16} className="text-mp-blue" /> Devoirs
         </h2>
         {sessions.length === 0 ? (
           <p className="mt-2 text-xs text-mp-grey">Aucune session programmée pour le moment.</p>

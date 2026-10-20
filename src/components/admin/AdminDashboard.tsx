@@ -91,7 +91,7 @@ const ONGLETS = [
   { id: "packs", label: "Packs & paiements" },
   { id: "uploads", label: "Validation uploads" },
   { id: "banque", label: "Banque de questions" },
-  { id: "qcm", label: "QCM surveillés" },
+  { id: "qcm", label: "Devoirs" },
   { id: "pharmacies", label: "Pharmacies" },
 ] as const;
 

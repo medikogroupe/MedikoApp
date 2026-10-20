@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Loader2, Plus, Trash2 } from "lucide-react";
 import { FILIERES, MATIERES } from "@/lib/constants";
+import QuestionRapide from "@/components/admin/QuestionRapide";
 
 type QC = { id: string; question: string; type: string; points: number };
 type Section = { titre: string; description: string; mode: "choix" | "tirage"; nb: string; ids: string[] };
@@ -23,6 +24,7 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
     niveau: "",
     consignes: "",
     melanger: true,
+    ajouterBanque: false,
     filieres: [] as string[],
   });
   const [sections, setSections] = useState<Section[]>([vide()]);
@@ -49,7 +51,7 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
     setErreur("");
     setMessage("");
     setOccupe(true);
-    const res = await fetch("/api/admin/qcm", {
+    const res = await fetch("/api/admin/qcm/devoir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -60,13 +62,14 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
         sortiesMax: Number(form.sortiesMax) || 0,
         niveau: form.niveau,
         consignes: form.consignes,
+        ajouterBanque: form.ajouterBanque,
         melanger: form.melanger,
         filieres: form.filieres,
         sections: sections.map((s) => ({
           titre: s.titre,
           description: s.description,
-          questionIds: s.mode === "choix" ? s.ids : [],
-          nb: s.mode === "tirage" ? Number(s.nb) || 0 : 0,
+          questions: s.mode === "choix" ? s.ids.map((id) => ({ id })) : [],
+          tirage: s.mode === "tirage" ? { nb: Number(s.nb) || 0 } : undefined,
         })),
       }),
     });
@@ -149,6 +152,11 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
         Mélanger les questions et les propositions
       </label>
 
+      <label className="mt-3 flex min-h-[44px] items-center gap-2 text-sm font-semibold">
+        <input type="checkbox" className="h-5 w-5" checked={form.ajouterBanque} onChange={(e) => setForm({ ...form, ajouterBanque: e.target.checked })} />
+        Ajouter les questions r&eacute;dig&eacute;es ici &agrave; la Banque (entra&icirc;nement libre)
+      </label>
+
       <div className="mt-4 space-y-3">
         {sections.map((s, i) => (
           <div key={i} className="rounded-[10px] border border-[#eef1f5] p-3">
@@ -162,6 +170,7 @@ export default function QuestionnaireEditor({ onCreated }: { onCreated: () => vo
             </div>
             <input className="mp-input mt-1" placeholder="Titre de la section" value={s.titre} onChange={(e) => maj(i, { titre: e.target.value })} />
             <textarea className="mp-input mt-2" rows={2} placeholder="Description (facultatif)" value={s.description} onChange={(e) => maj(i, { description: e.target.value })} />
+            <QuestionRapide matiere={form.module} niveau={form.niveau} actif={form.ajouterBanque} onCreated={(q) => { setBanque((b) => [{ id: q.id, question: q.question, type: q.type, points: q.points }, ...b]); maj(i, { mode: "choix", ids: [...s.ids, q.id] }); }} />
             <div className="mt-2 flex flex-wrap gap-4">
               <label className="flex min-h-[44px] items-center gap-2 text-xs font-semibold">
                 <input type="radio" checked={s.mode === "tirage"} onChange={() => maj(i, { mode: "tirage" })} /> Tirage au sort

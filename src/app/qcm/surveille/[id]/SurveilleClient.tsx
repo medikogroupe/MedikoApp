@@ -13,6 +13,7 @@ export default function SurveilleClient({
   dureeMinutes,
   nbQuestions,
   sortiesMax,
+  consignes,
   etat,
   tentativeId,
   filigrane,
@@ -21,6 +22,7 @@ export default function SurveilleClient({
   dureeMinutes: number;
   nbQuestions: number;
   sortiesMax: number;
+  consignes: string;
   etat: Etat;
   tentativeId: string | null;
   filigrane: string;
@@ -82,6 +84,12 @@ export default function SurveilleClient({
       ) : (
         <section className="mp-card p-4">
           <h2 className="text-sm font-bold">Règles de la session surveillée</h2>
+          {consignes ? (
+            <div className="mt-3 rounded-lg bg-mp-bg p-3 text-xs">
+              <p className="font-bold">Consignes de l&apos;enseignant</p>
+              <p className="mt-1 whitespace-pre-line text-mp-grey">{consignes}</p>
+            </div>
+          ) : null}
           <ul className="mt-3 space-y-2 text-xs text-mp-grey">
             <li>Une seule tentative est autorisée. Si vous quittez la page, vous pouvez reprendre tant que le temps n&apos;est pas écoulé.</li>
             <li>Le chronomètre est géré par le serveur : il démarre immédiatement et ne peut pas être mis en pause.</li>
