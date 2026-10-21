@@ -33,6 +33,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="fr" className={inter.variable}>
+      {process.env.NODE_ENV !== "production" ? <head><meta name="darkreader-lock" /></head> : null}
       <body className="bg-mp-bg text-mp-text font-sans antialiased">
         {children}
         <PWARegister />
