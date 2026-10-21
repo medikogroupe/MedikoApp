@@ -1,4 +1,4 @@
-const CACHE = "mediko-plus-v1";
+const CACHE = "mediko-plus-v2";
 const PRECACHE = ["/", "/offline", "/manifest.json"];
 
 self.addEventListener("install", (event) => {
@@ -19,6 +19,9 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET" || !request.url.startsWith(self.location.origin)) return;
+  // Les appels API et les fichiers de build ne passent jamais par le cache du service worker.
+  const chemin = new URL(request.url).pathname;
+  if (chemin.startsWith("/api/") || chemin.startsWith("/_next/")) return;
 
   if (request.headers.get("accept")?.includes("text/html")) {
     event.respondWith(
