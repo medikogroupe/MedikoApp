@@ -30,7 +30,7 @@ export function LogoFull({
   return (
     <Image
       src={variant === "white" ? "/logo-white.svg" : "/logo.svg"}
-      alt="MEDIKO+ — Super App Étudiants Santé"
+      alt="MEDIKO+, Super App Étudiants Santé"
       width={width}
       height={height}
       priority

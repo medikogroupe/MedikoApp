@@ -113,7 +113,7 @@ export default function CommunautePage() {
               </div>
               <p className="mt-3 text-sm font-semibold">{p.titre}</p>
               <p className="mt-1 text-xs text-mp-grey">
-                {p.matiere} — {p.description}
+                {p.matiere} : {p.description}
               </p>
               <div className="mt-3 flex items-center gap-5 text-xs text-mp-grey">
                 <span className="flex items-center gap-1">

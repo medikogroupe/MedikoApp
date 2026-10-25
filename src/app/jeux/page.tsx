@@ -108,7 +108,7 @@ function ColleColle() {
     ctx.fillRect(0, canvas.height - 50, canvas.width, 50);
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "bold 28px Inter, sans-serif";
-    ctx.fillText("MEDIKO+ — Colle-Colle Anatomie", 30, 60);
+    ctx.fillText("MEDIKO+ : Colle-Colle Anatomie", 30, 60);
     ctx.font = "bold 64px Inter, sans-serif";
     ctx.fillText(`${score}/${ZONES.length}`, 30, 150);
     ctx.font = "20px Inter, sans-serif";

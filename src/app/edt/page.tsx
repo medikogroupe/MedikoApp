@@ -76,7 +76,7 @@ export default function EdtPage() {
           sessionStorage.setItem(key, "1");
           setNotif(`Rappel : ${e.titre} débute dans 15 minutes`);
           if (Notification.permission === "granted") {
-            new Notification("MEDIKO+ — Rappel", { body: `${e.titre} à ${e.heureDebut.slice(0, 5)}` });
+            new Notification("MEDIKO+ : Rappel", { body: `${e.titre} à ${e.heureDebut.slice(0, 5)}` });
           }
         }
       });
