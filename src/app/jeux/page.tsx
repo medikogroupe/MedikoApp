@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Activity, Brain, Download, Puzzle, RotateCcw, Siren, Timer } from "lucide-react";
+import { Activity, Brain, Download, Puzzle, RotateCcw, Siren, Timer, Trophy } from "lucide-react";
 import PageShell from "@/components/PageShell";
+import Link from "next/link";
 
 type Zone = { id: string; label: string; indice: string };
 
@@ -335,6 +336,16 @@ export default function JeuxPage() {
 
   return (
     <PageShell title="Jeux pédagogiques" subtitle="Réviser en s'entraînant">
+      <Link href="/jeux/super-docteur" className="mp-card mb-4 flex items-center gap-3 p-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mp-yellow text-mp-text">
+          <Trophy size={22} />
+        </span>
+        <span className="flex-1">
+          <span className="block text-sm font-bold">Jeux Super Docteur</span>
+          <span className="block text-xs text-mp-grey">15 questions de sant&eacute;, chrono et jokers. Gains fictifs.</span>
+        </span>
+      </Link>
+
       <div className="flex gap-2">
         {onglets.map((o) => {
           const Icon = o.icon;
