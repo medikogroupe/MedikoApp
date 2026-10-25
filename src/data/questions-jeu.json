@@ -1,0 +1,3885 @@
+[
+ {
+  "id": "q001",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel os forme la cuisse ?",
+  "propositions": [
+   "Le radius",
+   "Le fémur",
+   "Le tibia",
+   "L'humérus"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q002",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel organe pompe le sang dans tout le corps ?",
+  "propositions": [
+   "Le foie",
+   "Le cœur",
+   "Le rein",
+   "La rate"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q003",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel organe produit la bile ?",
+  "propositions": [
+   "Le foie",
+   "L'estomac",
+   "La rate",
+   "Le pancréas"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q004",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel organe filtre le sang pour fabriquer l'urine ?",
+  "propositions": [
+   "La vessie",
+   "Le rein",
+   "L'uretère",
+   "Le foie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q005",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel est le plus grand organe du corps humain ?",
+  "propositions": [
+   "L'intestin grêle",
+   "Le poumon",
+   "La peau",
+   "Le foie"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q006",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Combien de cavités compte le cœur ?",
+  "propositions": [
+   "Six",
+   "Trois",
+   "Quatre",
+   "Deux"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q007",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel os recouvre et protège le cerveau ?",
+  "propositions": [
+   "Le bassin",
+   "Le sternum",
+   "Le crâne",
+   "Le fémur"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q008",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel os, au milieu de la poitrine, reçoit l'attache des côtes ?",
+  "propositions": [
+   "L'omoplate",
+   "Le sacrum",
+   "Le sternum",
+   "La clavicule"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q009",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Dans quel organe se font les échanges d'oxygène et de gaz carbonique avec le sang ?",
+  "propositions": [
+   "Le cœur",
+   "Les poumons",
+   "L'estomac",
+   "Le foie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q010",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel muscle sépare le thorax de l'abdomen et joue un rôle majeur dans la respiration ?",
+  "propositions": [
+   "Le biceps",
+   "Le diaphragme",
+   "Le grand pectoral",
+   "Le deltoïde"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q011",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quelle partie du tube digestif relie la bouche à l'estomac ?",
+  "propositions": [
+   "L'œsophage",
+   "La trachée",
+   "Le côlon",
+   "Le duodénum"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q012",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quelle glande produit l'insuline ?",
+  "propositions": [
+   "Le pancréas",
+   "Le foie",
+   "La thyroïde",
+   "La rate"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q013",
+  "theme": "Anatomie",
+  "difficulte": 1,
+  "question": "Quel nerf crânien transmet les informations visuelles au cerveau ?",
+  "propositions": [
+   "Le nerf facial",
+   "Le nerf olfactif",
+   "Le nerf auditif",
+   "Le nerf optique"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q014",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle partie de l'intestin absorbe l'essentiel des nutriments ?",
+  "propositions": [
+   "Le côlon",
+   "L'œsophage",
+   "L'intestin grêle",
+   "Le rectum"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q015",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle glande, située à la base du cou, régule le métabolisme ?",
+  "propositions": [
+   "L'hypophyse",
+   "La thyroïde",
+   "Le pancréas",
+   "Le thymus"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q016",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quel est le plus gros vaisseau artériel du corps ?",
+  "propositions": [
+   "L'artère pulmonaire",
+   "L'aorte",
+   "La veine cave inférieure",
+   "L'artère fémorale"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q017",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle valve sépare l'oreillette gauche du ventricule gauche ?",
+  "propositions": [
+   "La valve tricuspide",
+   "La valve pulmonaire",
+   "La valve aortique",
+   "La valve mitrale"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q018",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Combien de lobes compte le poumon droit ?",
+  "propositions": [
+   "Deux",
+   "Cinq",
+   "Quatre",
+   "Trois"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q019",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle structure sépare les deux ventricules du cœur ?",
+  "propositions": [
+   "La valve mitrale",
+   "L'oreillette droite",
+   "Le septum interventriculaire",
+   "Le péricarde"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q020",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quel os de la jambe, plus volumineux que le péroné, porte le poids du corps ?",
+  "propositions": [
+   "Le radius",
+   "Le cubitus",
+   "Le tibia",
+   "La rotule"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q021",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quel muscle fléchit l'avant-bras sur le bras ?",
+  "propositions": [
+   "Le triceps brachial",
+   "Le deltoïde",
+   "Le grand dorsal",
+   "Le biceps brachial"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q022",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quel muscle est le principal extenseur de l'avant-bras ?",
+  "propositions": [
+   "Le triceps brachial",
+   "Le biceps brachial",
+   "Le grand pectoral",
+   "Le deltoïde"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q023",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Dans quelle région du thorax se trouve le cœur ?",
+  "propositions": [
+   "La cavité crânienne",
+   "Le médiastin",
+   "La cavité pelvienne",
+   "La cavité abdominale"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q024",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelles vertèbres portent les côtes ?",
+  "propositions": [
+   "Les vertèbres lombaires",
+   "Les vertèbres cervicales",
+   "Les vertèbres thoraciques (dorsales)",
+   "Les vertèbres sacrées"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q025",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Combien de paires de nerfs crâniens compte-t-on ?",
+  "propositions": [
+   "Vingt-quatre",
+   "Trente et une",
+   "Huit",
+   "Douze"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q026",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle structure relie un muscle à un os ?",
+  "propositions": [
+   "La synoviale",
+   "Le tendon",
+   "Le ligament",
+   "Le cartilage"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q027",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle structure relie deux os entre eux au niveau d'une articulation ?",
+  "propositions": [
+   "Le ligament",
+   "Le nerf",
+   "L'aponévrose",
+   "Le tendon"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q028",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle membrane enveloppe les poumons ?",
+  "propositions": [
+   "Les méninges",
+   "La plèvre",
+   "Le péritoine",
+   "Le péricarde"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q029",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle membrane enveloppe le cœur ?",
+  "propositions": [
+   "La plèvre",
+   "Les méninges",
+   "Le péricarde",
+   "Le péritoine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q030",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelle partie du cerveau coordonne l'équilibre et la précision des mouvements ?",
+  "propositions": [
+   "Le cervelet",
+   "Le thalamus",
+   "L'hypophyse",
+   "Le lobe frontal"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q031",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quel organe occupe en grande partie l'hypochondre droit ?",
+  "propositions": [
+   "Le côlon sigmoïde",
+   "Le foie",
+   "La rate",
+   "L'estomac"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q032",
+  "theme": "Anatomie",
+  "difficulte": 2,
+  "question": "Quelles structures sont enveloppées par les méninges ?",
+  "propositions": [
+   "Le cœur",
+   "L'encéphale et la moelle épinière",
+   "Les reins",
+   "Les poumons"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q033",
+  "theme": "Anatomie",
+  "difficulte": 3,
+  "question": "Combien de paires de nerfs rachidiens compte-t-on ?",
+  "propositions": [
+   "Vingt-quatre",
+   "Douze",
+   "Trente-trois",
+   "Trente et une"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q034",
+  "theme": "Anatomie",
+  "difficulte": 3,
+  "question": "Quelle glande, située sous le cerveau, commande plusieurs autres glandes endocrines ?",
+  "propositions": [
+   "Le pancréas",
+   "La surrénale",
+   "L'hypophyse",
+   "La thyroïde"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q035",
+  "theme": "Anatomie",
+  "difficulte": 3,
+  "question": "Dans quelle région de l'abdomen se projette habituellement l'appendice ?",
+  "propositions": [
+   "L'épigastre",
+   "La fosse iliaque droite",
+   "La fosse iliaque gauche",
+   "L'hypochondre gauche"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q036",
+  "theme": "Articulations",
+  "difficulte": 1,
+  "question": "Le terme « suture » désigne :",
+  "propositions": [
+   "Une articulation fixe",
+   "Une articulation mobile",
+   "Une articulation semi-mobile"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q037",
+  "theme": "Articulations",
+  "difficulte": 1,
+  "question": "L'articulation du coude est un exemple d' ...",
+  "propositions": [
+   "Une articulation toroïde",
+   "Une articulation trochléenne",
+   "Une articulation sphéroïde"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q038",
+  "theme": "Articulations",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on un muscle qui augmente l'angle au niveau d'une articulation ?",
+  "propositions": [
+   "Un adducteur",
+   "Un extenseur",
+   "Un fléchisseur"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q039",
+  "theme": "Articulations",
+  "difficulte": 2,
+  "question": "De quelle matière est recouverte la surface de l’os pour faciliter le mouvement au niveau d’une articulation mobile ?",
+  "propositions": [
+   "Le cartilage d’accroissement",
+   "Le cartilage articulaire",
+   "La synovie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q040",
+  "theme": "Articulations",
+  "difficulte": 2,
+  "question": "Combien de types d'articulations existe-t-il dans le corps humain (par classification structurelle)?",
+  "propositions": [
+   "2",
+   "3",
+   "5"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q041",
+  "theme": "Articulations",
+  "difficulte": 2,
+  "question": "Les sutures entre les os du crâne sont un exemple ...",
+  "propositions": [
+   "D’articulations fibreuses",
+   "D’articulations cartilagineuses",
+   "D’articulations synoviales"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q042",
+  "theme": "Articulations",
+  "difficulte": 2,
+  "question": "L'articulation radiocarpienne (la rencontre de l’avant-bras avec le poignet) est une",
+  "propositions": [
+   "Articulation condyloïde",
+   "Articulation toroïde",
+   "Articulation trochléenne"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q043",
+  "theme": "Articulations",
+  "difficulte": 3,
+  "question": "Laquelle des définitions, correspond à celle de l’articulation ?",
+  "propositions": [
+   "Réunion de plusieurs pièces osseuses par du cartilage",
+   "Zone de jonction entre deux extrémités osseuses",
+   "Surface de contact de 2 extrémités osseuses recouverte par de la synovie",
+   "Fusion de 2 pièces osseuses adjacentes au cours de leur développement"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q044",
+  "theme": "Articulations",
+  "difficulte": 3,
+  "question": "L'articulation atloïdo-axoïdienne est ?",
+  "propositions": [
+   "Une articulation trochléenne",
+   "Une articulation condyloïde",
+   "Une articulation trochoïde"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q045",
+  "theme": "Cellules et tissus",
+  "difficulte": 1,
+  "question": "Quel est le rôle des mitochondries ?",
+  "propositions": [
+   "Fabriquent le glucose",
+   "Elaborent les vitamines",
+   "Dégradent les aliments",
+   "Fournissent l’énergie"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q046",
+  "theme": "Cellules et tissus",
+  "difficulte": 1,
+  "question": "Que signifie le sigle ADN ?",
+  "propositions": [
+   "Acide désoxybonucléique",
+   "Acide désoxyribonucléïque",
+   "Acide désoxyrinibonucléïque"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q047",
+  "theme": "Cellules et tissus",
+  "difficulte": 1,
+  "question": "Comment s’appelle la membrane qui protège le noyau ?",
+  "propositions": [
+   "La membrane cytoplasmique",
+   "Le cytosol",
+   "La membrane nucléaire",
+   "Le nucléole"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q048",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "La définition de la cellule est la suivante : (choisir la bonne)",
+  "propositions": [
+   "Unité structurelle et fonctionnelle de l’information génétique",
+   "Unité structurelle et fonctionnelle du cytoplasme",
+   "Unité structurelle et fonctionnelle des êtres vivants"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q049",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Comment s’appelle le phénomène de la pénétration d’une particule de l’intérieur de la cellule vers l’extérieur ?",
+  "propositions": [
+   "Endocytose",
+   "Exocytose",
+   "Exostose"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q050",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Chaque cellule possède au moins trois éléments. Lequel des quatre (04) éléments cités ci-dessous n’en fait pas forcément partie ?",
+  "propositions": [
+   "Une membrane plasmique",
+   "Un cytoplasme",
+   "Un noyau",
+   "L’information génétique"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q051",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Comment appelle –t–on un élément délimité par une membrane dans le cytoplasme d’une cellule accomplissant une fonction précise ?",
+  "propositions": [
+   "Un organe",
+   "Un organite",
+   "Un organisme"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q052",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Dans quelle structure est contenue l’information génétique sous forme d’une molécule d’ADN ?",
+  "propositions": [
+   "Le cerveau",
+   "Les os",
+   "Les neurones",
+   "Le noyau"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q053",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Toutes les cellules d’un organisme proviennent d’une cellule unique. Laquelle ?",
+  "propositions": [
+   "La cellule œuf fécondé",
+   "Le cœur",
+   "La cellule chromosomique X ou Y"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q054",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Comment s'appelle la structure qui sépare la cellule de l'extérieur ?",
+  "propositions": [
+   "Le noyau",
+   "Le cytoplasme",
+   "La membrane plasmique"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q055",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Comment s’appelle la phase la plus longue de la mitose ?",
+  "propositions": [
+   "La prophase",
+   "La métaphase",
+   "L’anaphase",
+   "La télophase"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q056",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "La mélanine est un pigment synthétisé par l’une des variétés de tissus ci- dessous, laquelle ?",
+  "propositions": [
+   "Le tissu de régulation",
+   "Le tissu musculaire",
+   "Le tissus épithélial",
+   "Le tissus conjonctif"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q057",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Dans la cellule, les informations relatives à l’hérédité se trouvent au niveau",
+  "propositions": [
+   "De la membrane plasmique",
+   "Du cytoplasme",
+   "Du noyau",
+   "De la membrane nucléaire"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q058",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Comment s’appelle le tissu conjonctif responsable de la croissance en longueur de l’os situé entre l’épiphyse et la diaphyse ?",
+  "propositions": [
+   "Le périoste",
+   "Le cartilage articulaire",
+   "Le cartilage de conjugaison"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q059",
+  "theme": "Cellules et tissus",
+  "difficulte": 2,
+  "question": "Quelle membrane de tissu conjonctif entoure l’os et est responsable à l’origine de la croissance en diamètre de l’os ?",
+  "propositions": [
+   "Le périoste",
+   "Le cartilage articulaire",
+   "Le cartilage de conjugaison"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q060",
+  "theme": "Cellules et tissus",
+  "difficulte": 3,
+  "question": "Quel élément ne fait pas partie des structures constituantes des cellules procaryotes ?",
+  "propositions": [
+   "Le cytoplasme",
+   "La membrane plasmique",
+   "Le nucléole",
+   "La capsule"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q061",
+  "theme": "Cellules et tissus",
+  "difficulte": 3,
+  "question": "Qu’est-ce une glande amphicrine ? C’est une glande :",
+  "propositions": [
+   "Exocrine",
+   "Mixte",
+   "Endocrine"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q062",
+  "theme": "Cellules et tissus",
+  "difficulte": 3,
+  "question": "Deux affirmations sont fausses parmi les énoncés suivants, lesquelles ? Les cellules musculaires sont différenciées",
+  "propositions": [
+   "Toutes les cellules musculaires striées sont à contraction volontaire.",
+   "Toutes les cellules musculaires lisses sont à contraction involontaire. Toutes les cellules musculaires lisses ont des propriétés conductibles",
+   "Toutes les cellules musculaires squelettiques ont des propriétés conductibles"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q063",
+  "theme": "Cellules et tissus",
+  "difficulte": 3,
+  "question": "Les cellules musculaires sont spécialisées dans :",
+  "propositions": [
+   "La production et conduction de l’influx nerveux sur de longues distances",
+   "La conduction simple de l’influx neveux des centres nerveux a l’organe effecteur",
+   "La production de forces mécaniques à l’origine des mouvements"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q064",
+  "theme": "Hygiène et infections",
+  "difficulte": 1,
+  "question": "Quel geste est le plus efficace pour prévenir la transmission des infections ?",
+  "propositions": [
+   "L'hygiène des mains",
+   "Le port d'une blouse colorée",
+   "L'ouverture des fenêtres",
+   "Le nettoyage du sol une fois par semaine"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q065",
+  "theme": "Hygiène et infections",
+  "difficulte": 1,
+  "question": "Où doit-on jeter une aiguille usagée ?",
+  "propositions": [
+   "Dans un sac plastique ordinaire",
+   "Dans la poubelle ménagère",
+   "Dans le lavabo",
+   "Dans un collecteur rigide pour objets piquants et tranchants"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q066",
+  "theme": "Hygiène et infections",
+  "difficulte": 1,
+  "question": "Que signifie VIH ?",
+  "propositions": [
+   "Virus intestinal humain",
+   "Variété d'infection hospitalière",
+   "Virus de l'infection hépatique",
+   "Virus de l'immunodéficience humaine"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q067",
+  "theme": "Hygiène et infections",
+  "difficulte": 1,
+  "question": "Que signifie SIDA ?",
+  "propositions": [
+   "Syndrome d'infection digestive aiguë",
+   "Système immunitaire des adultes",
+   "Syndrome inflammatoire du dos et des articulations",
+   "Syndrome d'immunodéficience acquise"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q068",
+  "theme": "Hygiène et infections",
+  "difficulte": 1,
+  "question": "Quel moyen de prévention est efficace contre le paludisme ?",
+  "propositions": [
+   "Le jeûne",
+   "Le port de bijoux",
+   "La moustiquaire imprégnée d'insecticide",
+   "Le chauffage de la pièce"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q069",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quelle est la durée recommandée d'un lavage des mains à l'eau et au savon ?",
+  "propositions": [
+   "10 secondes",
+   "5 secondes",
+   "40 à 60 secondes",
+   "5 minutes"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q070",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel terme désigne l'ensemble des mesures empêchant l'introduction de germes dans une zone ?",
+  "propositions": [
+   "L'anesthésie",
+   "L'ischémie",
+   "L'antisepsie",
+   "L'asepsie"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q071",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel appareil stérilise le matériel à la vapeur d'eau sous pression ?",
+  "propositions": [
+   "L'autoclave",
+   "Le bain-marie",
+   "Le poupinel",
+   "Le réfrigérateur"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q072",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Un antiseptique s'applique sur :",
+  "propositions": [
+   "La peau et les muqueuses",
+   "Les instruments de chirurgie",
+   "Les sols",
+   "Les murs"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q073",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Qu'appelle-t-on une infection nosocomiale ?",
+  "propositions": [
+   "Une infection héréditaire",
+   "Une infection uniquement virale",
+   "Une infection contractée dans un établissement de santé",
+   "Une infection due à un vaccin"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q074",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Les précautions standard s'appliquent :",
+  "propositions": [
+   "Uniquement aux patients séropositifs",
+   "À tous les patients, quel que soit leur état infectieux",
+   "Uniquement en chirurgie",
+   "Uniquement aux patients en isolement"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q075",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Laquelle de ces situations ne transmet pas le VIH ?",
+  "propositions": [
+   "Partager un repas avec une personne séropositive",
+   "Un rapport sexuel non protégé",
+   "Le partage de seringues",
+   "Une transfusion de sang non contrôlé"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q076",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel parasite est responsable du paludisme ?",
+  "propositions": [
+   "Schistosoma",
+   "Plasmodium",
+   "Vibrio cholerae",
+   "Salmonella"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q077",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel moustique transmet le paludisme ?",
+  "propositions": [
+   "L'aedes mâle",
+   "La mouche tsé-tsé",
+   "Le culex mâle",
+   "L'anophèle femelle"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q078",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Comment se transmet principalement le choléra ?",
+  "propositions": [
+   "Par le sang uniquement",
+   "Par l'eau ou les aliments contaminés",
+   "Par les moustiques",
+   "Par les rapports sexuels"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q079",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel micro-organisme est responsable de la tuberculose ?",
+  "propositions": [
+   "Plasmodium",
+   "Le virus de l'hépatite B",
+   "Le virus de la rougeole",
+   "Le bacille de Koch (Mycobacterium tuberculosis)"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q080",
+  "theme": "Hygiène et infections",
+  "difficulte": 2,
+  "question": "Quel vaccin protège contre la tuberculose ?",
+  "propositions": [
+   "Le BCG",
+   "Le vaccin antitétanique",
+   "Le vaccin contre la fièvre jaune",
+   "Le vaccin contre la rougeole"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q081",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Quelle est la durée recommandée d'une friction des mains avec une solution hydro-alcoolique ?",
+  "propositions": [
+   "20 à 30 secondes",
+   "3 minutes",
+   "2 secondes",
+   "5 secondes"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q082",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Que désigne l'antisepsie ?",
+  "propositions": [
+   "La vaccination contre les germes",
+   "La destruction des germes sur le matériel",
+   "L'absence totale de germes dans une pièce",
+   "La destruction des germes sur les tissus vivants (peau, muqueuses)"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q083",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Le poupinel stérilise par :",
+  "propositions": [
+   "La chaleur sèche",
+   "Le froid",
+   "La vapeur d'eau sous pression",
+   "Les rayons ultraviolets"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q084",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Que faut-il faire d'une aiguille usagée avant de la jeter ?",
+  "propositions": [
+   "La jeter directement sans la recapuchonner",
+   "La plier à la main",
+   "La nettoyer à l'eau",
+   "La recapuchonner à deux mains"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q085",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Quelle bactérie est responsable de la fièvre typhoïde ?",
+  "propositions": [
+   "Clostridium tetani",
+   "Salmonella Typhi",
+   "Vibrio cholerae",
+   "Mycobacterium tuberculosis"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q086",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Quelle bactérie est responsable du choléra ?",
+  "propositions": [
+   "Staphylococcus aureus",
+   "Salmonella Typhi",
+   "Vibrio cholerae",
+   "Clostridium tetani"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q087",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Quel est le germe responsable du tétanos ?",
+  "propositions": [
+   "Plasmodium falciparum",
+   "Clostridium tetani",
+   "Vibrio cholerae",
+   "Salmonella Typhi"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q088",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Quel moustique transmet la fièvre jaune ?",
+  "propositions": [
+   "Anophèle",
+   "Phlébotome",
+   "Glossine (mouche tsé-tsé)",
+   "Aedes"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q089",
+  "theme": "Hygiène et infections",
+  "difficulte": 3,
+  "question": "Par quel contact se contracte la bilharziose ?",
+  "propositions": [
+   "Des aliments mal cuits uniquement",
+   "Le contact avec une eau douce contaminée",
+   "Le contact avec la peau d'un malade",
+   "Une piqûre de moustique"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q090",
+  "theme": "Muscles",
+  "difficulte": 1,
+  "question": "Les muscles, sont également appelés",
+  "propositions": [
+   "Des organes effecteurs",
+   "Des organes récepteurs",
+   "Des organes tactiles"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q091",
+  "theme": "Muscles",
+  "difficulte": 1,
+  "question": "L’unité structurale du muscle est :",
+  "propositions": [
+   "Le tendon",
+   "Le ligament",
+   "La fibre musculaire"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q092",
+  "theme": "Muscles",
+  "difficulte": 1,
+  "question": "Le muscle est un ensemble formé de :",
+  "propositions": [
+   "De faisceaux de fibres musculaires",
+   "Ligaments",
+   "De tissu adipeux"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q093",
+  "theme": "Muscles",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on un muscle qui tourne un membre pour faire face au sol ?",
+  "propositions": [
+   "Un sphincter",
+   "Un pronateur",
+   "Un supinateur"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q094",
+  "theme": "Muscles",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on un muscle qui éloigne la jambe de la ligne médiane ?",
+  "propositions": [
+   "Un adducteur",
+   "Un abducteur",
+   "Un extenseur"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q095",
+  "theme": "Muscles",
+  "difficulte": 2,
+  "question": "Le poumon droit contient l’une des variétés de muscles ci-dessous, laquelle ?",
+  "propositions": [
+   "Le muscle strié",
+   "Le muscle lisse",
+   "Le muscle horripilateur",
+   "Le muscle strié particulier"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q096",
+  "theme": "Muscles",
+  "difficulte": 2,
+  "question": "Les propriétés essentielles du muscle sont",
+  "propositions": [
+   "L’excitabilité ; l’élasticité ; la tonicité",
+   "La tonicité ; la contractilité ; l’excitabilité",
+   "La contractilité ; l’excitabilité.",
+   "L’excitabilité ; la contractilité ; l’élasticité ; la tonicité"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q097",
+  "theme": "Muscles",
+  "difficulte": 3,
+  "question": "Les organes creux abdominaux contiennent l’une des variétés de muscles ci-dessous, laquelle ?",
+  "propositions": [
+   "Le muscle strié particulier",
+   "Le muscle strié",
+   "Le muscle lisse La liste ci-dessus contient un élément appartenant au tissu nerveux, lequel ?"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q098",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "L'excitation d'une terminaison nerveuse sensitive est",
+  "propositions": [
+   "Un réflexe",
+   "Une impulsion",
+   "Un stimulus"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q099",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "Combien de sens a l’être humain ?",
+  "propositions": [
+   "5",
+   "6",
+   "7",
+   "10"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q100",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "Comment se nomme la partie apparente de l'oreille ?",
+  "propositions": [
+   "Le lobe",
+   "Le pavillon",
+   "Le cartilage",
+   "Le papillon"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q101",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "Les papilles gustatives sont",
+  "propositions": [
+   "Fongiformes, spongiformes",
+   "Caliciformes, fongiformes",
+   "Caliciformes, spongiformes"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q102",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "Quelles couleurs un daltonien confond-il ?",
+  "propositions": [
+   "Vert et bleu",
+   "Rouge et vert",
+   "Jaune et bleu"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q103",
+  "theme": "Organes des sens",
+  "difficulte": 1,
+  "question": "Comment appelle-t-on l'absence du sens du goût ?",
+  "propositions": [
+   "L'hypogueusie",
+   "La dysgueusie",
+   "L'agueusie"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q104",
+  "theme": "Organes des sens",
+  "difficulte": 2,
+  "question": "Le nez est un organe permettant de percevoir les stimulations :",
+  "propositions": [
+   "Tactiles",
+   "Gustatives",
+   "Olfactives"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q105",
+  "theme": "Organes des sens",
+  "difficulte": 2,
+  "question": "Les cornets inférieurs, les plus grands, servent principalement et orienter le flux aérien.",
+  "propositions": [
+   "Humidifier l’air et sentir les odeurs",
+   "Sentir uniquement les odeurs",
+   "Réchauffer, humidifier l’air et filtrer les poussières"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q106",
+  "theme": "Organes des sens",
+  "difficulte": 2,
+  "question": "Quel os, qui se trouve dans l'oreille, est le plus petit du corps humain ?",
+  "propositions": [
+   "L’étrier",
+   "L’enclume",
+   "Le marteau"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q107",
+  "theme": "Organes des sens",
+  "difficulte": 2,
+  "question": "Comment s'appellent les récepteurs situés sur la langue, permettant le goût ?",
+  "propositions": [
+   "Les papilles gourmandes",
+   "Les papilles de salive",
+   "Les papilles gustatives"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q108",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "L’étude des os et des cartilages, c’est quoi ?",
+  "propositions": [
+   "L’ostéopathie",
+   "L’ostéologie",
+   "La syndesmologie",
+   "L’arthrologie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q109",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Combien d’os y-a-t-il dans le corps humain adulte ?",
+  "propositions": [
+   "168",
+   "206",
+   "268",
+   "306"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q110",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Combien d’os composent le crâne ?",
+  "propositions": [
+   "6",
+   "8",
+   "14"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q111",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Combien d’os comprend la face ?",
+  "propositions": [
+   "8",
+   "12",
+   "14",
+   "16"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q112",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Quel est le nombre des vertèbres cervicales ?",
+  "propositions": [
+   "5",
+   "7",
+   "10",
+   "12"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q113",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Quel est le nom de la première vertèbre cervicale ?",
+  "propositions": [
+   "Atlas",
+   "Axis",
+   "Sternum",
+   "Scapula"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q114",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Quel est le nom de la mâchoire inférieure ?",
+  "propositions": [
+   "Le vomer",
+   "Le zygomatique",
+   "Le maxillaire",
+   "La mandibule"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q115",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Le sacrum est composé de combien de vertèbres ?",
+  "propositions": [
+   "2",
+   "5",
+   "7",
+   "12"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q116",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’extrémité de l’os long ?",
+  "propositions": [
+   "La diaphyse",
+   "L’épiphyse",
+   "L’os compact",
+   "L’os spongieux"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q117",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Quels sont les os de la ceinture scapulaire ?",
+  "propositions": [
+   "La scapula (omoplate) et clavicule",
+   "Le sternum et la clavicule",
+   "La scapula (omoplate) et l’humérus"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q118",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Que fabrique la moelle rouge des os ?",
+  "propositions": [
+   "Les cellules sanguines",
+   "Les cellules nerveuses",
+   "Les cellules musculaires"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q119",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’os de la nuque ?",
+  "propositions": [
+   "L’os cervical",
+   "L’os pariétal",
+   "L’os temporal",
+   "L’os occipital"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q120",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appellent les os qui forment le rachis ?",
+  "propositions": [
+   "Les disques",
+   "Les os dorsaux",
+   "Les vertèbres",
+   "Les scaphoïdes"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q121",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Combien de vertèbres y-a-t-il dans le rachis ?",
+  "propositions": [
+   "12",
+   "16",
+   "20",
+   "33"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q122",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’os du bras situé au-dessus du coude ?",
+  "propositions": [
+   "L’humérus",
+   "Le radius",
+   "Le cubitus",
+   "Le fémur"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q123",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Quels sont les 2 os qui constituent l’avant-bras ?",
+  "propositions": [
+   "Le tibia et le péroné",
+   "Le fémur et le sacrum",
+   "Le radius et le cubitus",
+   "Le tibia et le fémur"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q124",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’os du genou ?",
+  "propositions": [
+   "Le péroné",
+   "La rotule",
+   "Le tibia",
+   "L’ischion"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q125",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "La main humaine contient combien d’os ?",
+  "propositions": [
+   "14",
+   "20",
+   "24",
+   "27"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q126",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s'appellent les os des doigts ?",
+  "propositions": [
+   "Les digitaux",
+   "Les Jointures",
+   "Les métacarpiens",
+   "Les phalanges"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q127",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’os de la cuisse ?",
+  "propositions": [
+   "Le fémur",
+   "Le péroné",
+   "Le tibia",
+   "L’humérus"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q128",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Combien de paires de côtes possède la femme ?",
+  "propositions": [
+   "10",
+   "11",
+   "12",
+   "24"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q129",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Comment s’appelle l’os du tarse qui forme le talon ?",
+  "propositions": [
+   "La fibula",
+   "Le tibia",
+   "Le talus",
+   "Le calcanéum",
+   "La patella"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q130",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "Les deux avant-bras et bras totalisent",
+  "propositions": [
+   "3 pièces osseuses",
+   "4 pièces osseuse",
+   "6 pièces osseuses",
+   "8 pièces osseuses"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q131",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "La respiration, la circulation, la digestion sont contrôlées par",
+  "propositions": [
+   "Le système nerveux central",
+   "La moelle épinière",
+   "Le système nerveux végétatif"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q132",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "La substance blanche est une voie",
+  "propositions": [
+   "Coordination",
+   "Conduction",
+   "D’inhibition"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q133",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "La constriction de l'iris est sous l'action",
+  "propositions": [
+   "Le système parasympathique",
+   "Le système sympathique",
+   "Le nerf optique"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q134",
+  "theme": "Os et squelette",
+  "difficulte": 1,
+  "question": "L’organe permettant de percevoir les stimulations gustatives est :",
+  "propositions": [
+   "La bouche",
+   "La langue",
+   "Le palais"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q135",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "En position anatomique, tourner la paume de la main pour faire face au corps est un exemple de ?",
+  "propositions": [
+   "Rotation latérale",
+   "Circumduction",
+   "Rotation médiale"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q136",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "L’ordre exact de la structure des êtres vivants est : (choisir bon)",
+  "propositions": [
+   "Cellule – Appareil –Tissu – Organe – Molécule",
+   "Molécule – Cellule – Tissu – Organe –appareil",
+   "Système – Molécules – Cellules – Tissu - Organe"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q137",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Parmi les phases de division cellulaire ci-dessous, la troisième phase est",
+  "propositions": [
+   "La télophase",
+   "L’anaphase",
+   "La métaphase",
+   "La prophase"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q138",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Les bébés ont-ils plus ou moins d’os que les adultes ?",
+  "propositions": [
+   "Ils en ont plus",
+   "Ils en ont moins",
+   "Ils en ont autant",
+   "Ils n’en ont pas"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q139",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment s’appelle la matière gluante qui recouvre les extrémités des os longs ?",
+  "propositions": [
+   "Le cartilage articulaire",
+   "Le cartilage de conjugaison",
+   "Le périoste",
+   "Le ligament",
+   "Le tendon"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q140",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Quel squelette est composé du crâne, de la colonne vertébrale ou rachis, et de la cage thoracique ?",
+  "propositions": [
+   "Le squelette appendiculaire",
+   "Le squelette axial",
+   "Le squelette zonal"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q141",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Quel squelette se compose de la ceinture scapulaire, des membres supérieurs, de la ceinture pelvienne et des membres inférieurs ?",
+  "propositions": [
+   "Le squelette zonal",
+   "Le squelette appendiculaire",
+   "Le squelette axial"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q142",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on la matière osseuse qui constitue le tube osseux de la diaphyse ?",
+  "propositions": [
+   "L’os compact",
+   "L’os spongieux",
+   "La moelle jaune"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q143",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Quels sont les os de la ceinture pelvienne ?",
+  "propositions": [
+   "Ischion, coccyx et os iliaque",
+   "Sacrum, coccyx et os iliaque",
+   "Sacrum, symphyse pubienne et os iliaque"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q144",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Chez l’adulte, dans la diaphyse de l’os long, quelle matière remplit la cavité médullaire ?",
+  "propositions": [
+   "La moelle épinière",
+   "La moelle jaune",
+   "La moelle rouge"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q145",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on la matière osseuse qui constitue la partie centrale de l’épiphyse ?",
+  "propositions": [
+   "L’os compact",
+   "L’os spongieux",
+   "La moelle jaune"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q146",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Dans quelle partie de l’os long trouve-t-on la moelle rouge ?",
+  "propositions": [
+   "La diaphyse",
+   "La métaphyse",
+   "L’épiphyse"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q147",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment s’appellent les os situés sous le cou auxquels se rattachent les épaules ?",
+  "propositions": [
+   "Les deltoïdes",
+   "Les épaules",
+   "Les clavicules"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q148",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment s’appellent les 2 grands os triangulaires derrière les épaules ?",
+  "propositions": [
+   "Les clavicules",
+   "Les dorsaux",
+   "Les épaules",
+   "Les omoplates"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q149",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Où se trouve le plus petit os du corps humain ?",
+  "propositions": [
+   "Dans le dos",
+   "Dans la main",
+   "Dans l’oreille",
+   "Dans le pied"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q150",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Qu’est-ce qui intéresse le médecin lorsqu’il fait une radiographie du poignet chez un enfant qui a des problèmes de croissance ?",
+  "propositions": [
+   "L’épiphyse proximale",
+   "L’épiphyse distale",
+   "Le cartilage de croissance",
+   "Le périoste"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q151",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "La colonne vertébrale est creusée d'un canal qui loge une substance appelée :",
+  "propositions": [
+   "La moelle épinière",
+   "La moelle jaune",
+   "La moelle osseuse"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q152",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Combien existe-t-il de paires de côtes dans la cage thoracique ?",
+  "propositions": [
+   "Il existe 16 paires de côtes",
+   "Il existe 13 paires de côtes",
+   "Il existe 12 paires de côtes"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q153",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Des quatre variétés de luxation de l’épaule ci-dessous, la plus fréquente est",
+  "propositions": [
+   "Luxation postérieure de l’épaule",
+   "Luxation antérieure de l’épaule",
+   "Luxation inférieure de l’épaule",
+   "Luxation supérieure de l’épaule"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q154",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Parmi ces propositions, quels sont les trois (03) systèmes de l’appareil locomoteur ?",
+  "propositions": [
+   "Le système nerveux, le système musculaire et le système sensoriel",
+   "Le système osseux, le système articulaire et le système musculaire",
+   "Le système musculaire, le système nerveux et le système vasculaire"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q155",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "De combien de systèmes se compose l'appareil locomoteur ?",
+  "propositions": [
+   "L’appareil locomoteur est composé de deux (02) systèmes",
+   "L’appareil locomoteur est composé de trois (03) systèmes",
+   "L’appareil locomoteur est composé de quatre (0’) systèmes",
+   "L’appareil locomoteur est composé de cinq (05) systèmes"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q156",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Parmi ces propositions, quels sont les trois systèmes de l'appareil locomoteur ?",
+  "propositions": [
+   "Le système nerveux, musculaire et sensoriel",
+   "Le système osseux, articulaire et musculaire",
+   "Le système musculaire, vasculaire et nerveux"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q157",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Comment s’appelle les parties terminales des côtes qui rattachent celles-ci au sternum ?",
+  "propositions": [
+   "Les articulations costales",
+   "Les cartilages costaux",
+   "Les vertèbres"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q158",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Une exposition prolongée à des sons trop intenses détruit :",
+  "propositions": [
+   "Définitivement les récepteurs auditifs des oreilles",
+   "Provisoirement les récepteurs auditifs des oreilles",
+   "Définitivement les récepteurs olfactifs et auditifs des oreilles"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q159",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "Les fibres efférentes via leurs fibres végétatives activent également certaines structures. Laquelle n’en fait pas partie ?",
+  "propositions": [
+   "Les muscles lisses",
+   "Les glandes",
+   "Le muscle cardiaque",
+   "La conscience"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q160",
+  "theme": "Os et squelette",
+  "difficulte": 2,
+  "question": "L’une des affections suivantes a pour point de départ une annexe de la peau.",
+  "propositions": [
+   "Lymphangite",
+   "Abcès froid",
+   "Furoncle",
+   "Panaris péri unguéal"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q161",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "L’une des divisions cellulaires ci-dessous est dite réductionnelle, laquelle ?",
+  "propositions": [
+   "Mitose",
+   "Méiose",
+   "Amitose",
+   "Division directe"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q162",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "Quel est le nom de la rotule dans la nouvelle nomenclature ?",
+  "propositions": [
+   "Patulla",
+   "Patellia",
+   "Patella"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q163",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "Quel est le nom du péroné dans la nouvelle nomenclature ?",
+  "propositions": [
+   "Fabula",
+   "Fibula",
+   "Fabilia",
+   "Fabiola"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q164",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "Quel est le seul os du corps humain qui n’est pas relié à un autre os ?",
+  "propositions": [
+   "Le frontal",
+   "Le vomer",
+   "Le sphénoïde",
+   "L’hyoïde"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q165",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "Quelle affirmation est vraie parmi celles qui sont énumérées en dessous ?",
+  "propositions": [
+   "La cage thoracique se constitue de 8 paires de vraies côtes, 2 paires de fausses côtes et 2 paires de côtes flottantes",
+   "La cage thoracique se constitue de 7 paires de vraies côtes, 3 paires de fausses côtes et 2 paires de côtes flottantes",
+   "La cage thoracique se constitue de 6 paires de vraies côtes, 5 paires de fausses côtes et 1 paire de côtes flottantes"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q166",
+  "theme": "Os et squelette",
+  "difficulte": 3,
+  "question": "Choisir la bonne définition",
+  "propositions": [
+   "L’infirmier est une personne qui ayant suivi un enseignement infirmier et une formation professionnelle et officieusement reconnue, est habileté à dispenser les soins infirmiers",
+   "L’infirmier est une personne qui ayant suivi un enseignement infirmier et une formation professionnelle et officiellement reconnue, est habileté à dispenser les soins obstétricaux",
+   "L’infirmier (e) est une personne qui ayant suivi un enseignement infirmier et une formation professionnelle et officiellement reconnue, est habileté à dispenser les soins infirmiers"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q167",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 1,
+  "question": "La fracture de l’olécrâne est une fracture",
+  "propositions": [
+   "Au-dessus du coude",
+   "En dessous du coude",
+   "Articulaire du coude G-"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q168",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 1,
+  "question": "Quel est l’agent responsable du furoncle ?",
+  "propositions": [
+   "Le gonocoque",
+   "Le staphylocoque doré",
+   "Le streptocoque"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q169",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 1,
+  "question": "Quelle est la zone de prédilection de l’anthrax?",
+  "propositions": [
+   "Le dos",
+   "L’aile du nez",
+   "La fesse",
+   "La nuque"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q170",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 2,
+  "question": "Le mélaena et l’hématémèse se rencontrent dans l’une des lésions traumatiques ci- dessous, laquelle ?",
+  "propositions": [
+   "Lésion du nerf phrénique ou diaphragmatique",
+   "Lésion de l’œsophage",
+   "Hémothorax"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q171",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 2,
+  "question": "Le bandage en huit de chiffre se fait dans la prise en charge de l’un des traumatismes ci-dessous ; lequel ?",
+  "propositions": [
+   "Le volet costal",
+   "La fracture de Pouteau-colles",
+   "La fracture claviculaire",
+   "La fracture des deux de l’avant-bras"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q172",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 2,
+  "question": "La fracture de Pouteau-colles est une fracture sus-articulaire de quoi ?",
+  "propositions": [
+   "De l’extrémité supérieure du cubitus",
+   "De l’extrémité inférieure du radius",
+   "De l’extrémité inférieure du cubitus",
+   "De l’extrémité supérieure du radius"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q173",
+  "theme": "Pathologies chirurgicales",
+  "difficulte": 2,
+  "question": "L’ostéomyélite aigüe se localise généralement au niveau de l’une des parties des os longs. Laquelle? (1 réponse)",
+  "propositions": [
+   "La métaphyse",
+   "La diaphyse",
+   "Le condyle",
+   "L’épiphyse"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q174",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelle cellule du sang transporte l'oxygène ?",
+  "propositions": [
+   "La plaquette",
+   "Le globule rouge",
+   "Le globule blanc",
+   "Le lymphocyte"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q175",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelles cellules du sang participent surtout à la défense contre les infections ?",
+  "propositions": [
+   "Les hématies",
+   "Les globules rouges",
+   "Les globules blancs",
+   "Les plaquettes"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q176",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelles cellules du sang interviennent dans la coagulation ?",
+  "propositions": [
+   "Les globules blancs",
+   "Les lymphocytes",
+   "Les globules rouges",
+   "Les plaquettes"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q177",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelle est la fréquence cardiaque normale d'un adulte au repos ?",
+  "propositions": [
+   "60 à 100 battements par minute",
+   "20 à 40 battements par minute",
+   "180 à 220 battements par minute",
+   "120 à 160 battements par minute"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q178",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelle est la température corporelle normale d'un adulte ?",
+  "propositions": [
+   "Environ 39 à 40 °C",
+   "Environ 36,5 à 37,5 °C",
+   "Environ 41 à 42 °C",
+   "Environ 33 à 34 °C"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q179",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Que signifie « tachycardie » ?",
+  "propositions": [
+   "Arrêt du cœur",
+   "Accélération du rythme cardiaque",
+   "Douleur du cœur",
+   "Ralentissement du rythme cardiaque"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q180",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quelle est la fonction principale des reins ?",
+  "propositions": [
+   "Digérer les graisses",
+   "Produire la bile",
+   "Stocker le sang",
+   "Filtrer le sang et éliminer les déchets dans l'urine"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q181",
+  "theme": "Physiologie",
+  "difficulte": 1,
+  "question": "Quel minéral est le constituant principal des os et des dents ?",
+  "propositions": [
+   "Le calcium",
+   "L'iode",
+   "Le fer",
+   "Le sodium"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q182",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quelle hormone fait baisser la glycémie ?",
+  "propositions": [
+   "Le cortisol",
+   "L'adrénaline",
+   "L'insuline",
+   "La thyroxine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q183",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Comment s'appelle le pigment des globules rouges qui fixe l'oxygène ?",
+  "propositions": [
+   "La kératine",
+   "La mélanine",
+   "La bilirubine",
+   "L'hémoglobine"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q184",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel gaz est beaucoup plus abondant dans l'air expiré que dans l'air inspiré ?",
+  "propositions": [
+   "L'hydrogène",
+   "Le dioxyde de carbone",
+   "Le néon",
+   "L'hélium"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q185",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel groupe sanguin est donneur universel pour les globules rouges ?",
+  "propositions": [
+   "A positif",
+   "B positif",
+   "AB positif",
+   "O négatif"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q186",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quelle est la fréquence respiratoire normale d'un adulte au repos ?",
+  "propositions": [
+   "4 à 6 cycles par minute",
+   "12 à 20 cycles par minute",
+   "40 à 60 cycles par minute",
+   "30 à 40 cycles par minute"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q187",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "À partir de quelle température centrale parle-t-on généralement de fièvre ?",
+  "propositions": [
+   "38 °C",
+   "36,5 °C",
+   "35 °C",
+   "36 °C"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q188",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Que signifie « bradycardie » ?",
+  "propositions": [
+   "Accélération du rythme cardiaque",
+   "Pression artérielle élevée",
+   "Douleur thoracique",
+   "Ralentissement du rythme cardiaque"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q189",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Que signifie « dyspnée » ?",
+  "propositions": [
+   "Crachement de sang",
+   "Difficulté à respirer",
+   "Respiration très lente",
+   "Arrêt de la respiration"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q190",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Que sécrète le pancréas pour digérer les aliments ?",
+  "propositions": [
+   "De la salive",
+   "De la bile",
+   "De l'acide chlorhydrique",
+   "Des enzymes digestives"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q191",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel est le rôle de la bile ?",
+  "propositions": [
+   "Faciliter la digestion des graisses",
+   "Filtrer le sang",
+   "Digérer les protéines",
+   "Produire de l'insuline"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q192",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Où commence la digestion de l'amidon (sucres complexes) ?",
+  "propositions": [
+   "Dans le foie",
+   "Dans la bouche",
+   "Dans l'estomac",
+   "Dans le côlon"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q193",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quelle vitamine favorise la fixation du calcium sur les os ?",
+  "propositions": [
+   "La vitamine E",
+   "La vitamine D",
+   "La vitamine B12",
+   "La vitamine C"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q194",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Une carence en vitamine C provoque :",
+  "propositions": [
+   "Le rachitisme",
+   "La pellagre",
+   "Le scorbut",
+   "Le béribéri"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q195",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Une carence en vitamine D chez l'enfant provoque :",
+  "propositions": [
+   "L'anémie",
+   "Le rachitisme",
+   "Le scorbut",
+   "Le goitre"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q196",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Une carence en iode peut provoquer :",
+  "propositions": [
+   "Un rachitisme",
+   "Un goitre",
+   "Un scorbut",
+   "Un diabète"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q197",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Une carence en fer entraîne le plus souvent :",
+  "propositions": [
+   "Un scorbut",
+   "Un goitre",
+   "Un rachitisme",
+   "Une anémie"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q198",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "À partir de quelles valeurs parle-t-on habituellement d'hypertension artérielle ?",
+  "propositions": [
+   "90/50 mmHg",
+   "140/90 mmHg ou plus",
+   "80/40 mmHg",
+   "100/60 mmHg"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q199",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Où se forment les cellules sanguines chez l'adulte ?",
+  "propositions": [
+   "Dans la moelle osseuse rouge",
+   "Dans l'estomac",
+   "Dans le rein",
+   "Dans le cœur"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q200",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel est le rôle des alvéoles pulmonaires ?",
+  "propositions": [
+   "Digérer les graisses",
+   "Fabriquer les globules rouges",
+   "Assurer les échanges gazeux",
+   "Filtrer l'urine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q201",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "La systole correspond à :",
+  "propositions": [
+   "La contraction du cœur",
+   "L'ouverture des poumons",
+   "L'arrêt du cœur",
+   "Le relâchement du cœur"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q202",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel est le rôle principal des protéines dans l'alimentation ?",
+  "propositions": [
+   "Remplacer le sommeil",
+   "Fournir uniquement de l'eau",
+   "Construire et réparer les tissus",
+   "Éliminer les toxines"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q203",
+  "theme": "Physiologie",
+  "difficulte": 2,
+  "question": "Quel groupe d'aliments fournit surtout de l'énergie rapidement utilisable ?",
+  "propositions": [
+   "Les protéines",
+   "Les vitamines",
+   "Les glucides",
+   "Les minéraux"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q204",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quel groupe sanguin est receveur universel pour les globules rouges ?",
+  "propositions": [
+   "O négatif",
+   "A négatif",
+   "B négatif",
+   "AB positif"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q205",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quel terme désigne l'arrêt de la respiration ?",
+  "propositions": [
+   "La bradypnée",
+   "L'apnée",
+   "La dyspnée",
+   "La polypnée"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q206",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quelle hormone, sécrétée par les glandes surrénales, prépare le corps à une situation de stress ?",
+  "propositions": [
+   "L'insuline",
+   "L'œstrogène",
+   "L'adrénaline",
+   "La mélatonine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q207",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Une carence en vitamine A peut provoquer :",
+  "propositions": [
+   "Le rachitisme",
+   "Un goitre",
+   "Des troubles de la vision, notamment la nuit",
+   "Le scorbut"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q208",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quel est l'effet du système nerveux parasympathique sur la fréquence cardiaque ?",
+  "propositions": [
+   "Il la ralentit",
+   "Il l'arrête définitivement",
+   "Il l'accélère",
+   "Il n'a aucun effet"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q209",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quelle est la glycémie normale à jeun chez l'adulte ?",
+  "propositions": [
+   "2,00 à 3,00 g/L",
+   "1,80 à 2,50 g/L",
+   "0,70 à 1,10 g/L",
+   "0,10 à 0,30 g/L"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q210",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Une pression artérielle systolique inférieure à 90 mmHg correspond à :",
+  "propositions": [
+   "Une hypotension",
+   "Une hypertension",
+   "Une pression normale",
+   "Une tachycardie"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q211",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Quelle est la durée de vie moyenne d'un globule rouge ?",
+  "propositions": [
+   "Environ 6 heures",
+   "Environ 2 jours",
+   "Environ 10 ans",
+   "Environ 120 jours"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q212",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Comment appelle-t-on le maintien de l'équilibre du milieu intérieur de l'organisme ?",
+  "propositions": [
+   "L'osmose",
+   "La mitose",
+   "L'homéostasie",
+   "La diurèse"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q213",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Que mesure un électrocardiogramme (ECG) ?",
+  "propositions": [
+   "Le taux de sucre dans le sang",
+   "La pression dans les artères",
+   "L'activité électrique du cerveau",
+   "L'activité électrique du cœur"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q214",
+  "theme": "Physiologie",
+  "difficulte": 3,
+  "question": "Que mesure un électroencéphalogramme (EEG) ?",
+  "propositions": [
+   "L'activité électrique du cerveau",
+   "La capacité des poumons",
+   "L'activité électrique du cœur",
+   "La fonction des reins"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q215",
+  "theme": "Position anatomique",
+  "difficulte": 1,
+  "question": "Le plan médian divise le corps…..",
+  "propositions": [
+   "Moitié antérieure et postérieure",
+   "Moitié gauche et droite",
+   "Section supérieure et inférieure"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q216",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "Un plan frontal (coronal) divise le corps en quels éléments ?",
+  "propositions": [
+   "Partie antérieure et postérieure",
+   "Partie supérieure et inférieure",
+   "Partie latérale et médiane"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q217",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "Un plan transverse (horizontal) divise le corps en lequel des éléments suivants ?",
+  "propositions": [
+   "Partie proximale et distale",
+   "Partie supérieure et inférieure",
+   "Partie antérieure et postérieure"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q218",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "Lequel de ces éléments suivants est latéral par rapport à l’œil ?",
+  "propositions": [
+   "L’oreille",
+   "Le front",
+   "Le nez"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q219",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "Que fait un fléchisseur ?",
+  "propositions": [
+   "Diminue l’angle au niveau d’une articulation",
+   "Etend un membre",
+   "Déplace un membre vers la ligne médiane"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q220",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "Qu’est-ce qu’un mouvement supinateur ? Un supinateur ...",
+  "propositions": [
+   "Tourne un membre pour faire face vers le bas",
+   "Éloigne un membre de la ligne médiane",
+   "Tourne un membre pour faire face vers le haut"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q221",
+  "theme": "Position anatomique",
+  "difficulte": 2,
+  "question": "La circumduction d'un membre signifie le déplacer de quelle manière ?",
+  "propositions": [
+   "Antérieurement et postérieurement",
+   "Médialement et latéralement",
+   "En mouvements circulaires"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q222",
+  "theme": "Soins et secours",
+  "difficulte": 1,
+  "question": "Face à une hémorragie externe, quel est le premier geste ?",
+  "propositions": [
+   "Faire un garrot immédiatement",
+   "Laver la plaie longuement",
+   "Comprimer directement la plaie",
+   "Donner à boire"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q223",
+  "theme": "Soins et secours",
+  "difficulte": 1,
+  "question": "Comment appelle-t-on la rupture d'un os ?",
+  "propositions": [
+   "Une contusion",
+   "Une luxation",
+   "Une fracture",
+   "Une entorse"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q224",
+  "theme": "Soins et secours",
+  "difficulte": 1,
+  "question": "Que faire devant une fracture suspectée d'un membre ?",
+  "propositions": [
+   "Faire marcher la victime",
+   "Immobiliser le membre dans la position trouvée",
+   "Remettre l'os en place soi-même",
+   "Masser vigoureusement"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q225",
+  "theme": "Soins et secours",
+  "difficulte": 1,
+  "question": "Où prend-on classiquement le pouls radial ?",
+  "propositions": [
+   "Au front",
+   "Au genou",
+   "Au poignet, côté du pouce",
+   "À la cheville"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q226",
+  "theme": "Soins et secours",
+  "difficulte": 1,
+  "question": "Que désigne le post-partum ?",
+  "propositions": [
+   "Le dernier mois de la grossesse",
+   "La période des règles",
+   "La période avant la conception",
+   "La période qui suit l'accouchement"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q227",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Une victime est inconsciente et ne respire pas. Que faire en priorité ?",
+  "propositions": [
+   "Alerter les secours et débuter les compressions thoraciques",
+   "Lui donner à boire",
+   "La faire marcher",
+   "La laisser dormir"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q228",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Dans quelle position place-t-on une personne inconsciente qui respire ?",
+  "propositions": [
+   "En position latérale de sécurité",
+   "Assise",
+   "À plat ventre",
+   "Debout"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q229",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Comment refroidir une brûlure récente ?",
+  "propositions": [
+   "Avec du beurre",
+   "Avec de la glace directement sur la peau",
+   "Avec du dentifrice",
+   "Avec de l'eau tempérée pendant environ 15 minutes"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q230",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Une brûlure avec des cloques (phlyctènes) est une brûlure du :",
+  "propositions": [
+   "Premier degré",
+   "Troisième degré",
+   "Degré zéro",
+   "Deuxième degré"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q231",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Qu'est-ce qu'une entorse ?",
+  "propositions": [
+   "Une rupture d'un os",
+   "Une brûlure",
+   "Une lésion des ligaments d'une articulation",
+   "Une plaie de la peau"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q232",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Qu'est-ce qu'une luxation ?",
+  "propositions": [
+   "Un saignement abondant",
+   "Un déplacement des surfaces articulaires",
+   "Une déchirure de la peau",
+   "Une brûlure"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q233",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Un diabétique conscient présente sueurs, tremblements et faim brutale. Que lui donner ?",
+  "propositions": [
+   "Un repas très gras",
+   "De l'insuline",
+   "Du sucre ou une boisson sucrée",
+   "Rien du tout"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q234",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Que faire pendant une crise de convulsions ?",
+  "propositions": [
+   "Maintenir fermement la personne",
+   "Protéger la tête et ne rien mettre dans la bouche",
+   "Mettre un objet entre les dents",
+   "Lui jeter de l'eau froide"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q235",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Une personne s'étouffe et ne peut plus parler ni tousser. Quel geste de secours après les claques dans le dos ?",
+  "propositions": [
+   "Lui faire boire de l'eau",
+   "La manœuvre de Heimlich",
+   "Lui faire lever les bras",
+   "La position latérale de sécurité"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q236",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quelle voie d'administration dépose le médicament sous la langue ?",
+  "propositions": [
+   "La voie sublinguale",
+   "La voie rectale",
+   "La voie intramusculaire",
+   "La voie intradermique"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q237",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quelle voie d'administration injecte le produit directement dans une veine ?",
+  "propositions": [
+   "La voie orale",
+   "La voie intramusculaire",
+   "La voie sous-cutanée",
+   "La voie intraveineuse"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q238",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quel site d'injection intramusculaire est classiquement utilisé chez l'adulte ?",
+  "propositions": [
+   "Le quadrant supéro-externe de la fesse",
+   "Le lobe de l'oreille",
+   "Le front",
+   "Le dos de la main"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q239",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Lequel de ces éléments ne fait pas partie des vérifications avant d'administrer un médicament ?",
+  "propositions": [
+   "La couleur de la blouse du patient",
+   "La bonne voie",
+   "La bonne dose",
+   "Le bon patient"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q240",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Comment calcule-t-on l'indice de masse corporelle (IMC) ?",
+  "propositions": [
+   "Poids (kg) divisé par la taille (m) au carré",
+   "Taille divisée par le poids",
+   "Poids divisé par l'âge",
+   "Poids multiplié par la taille"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q241",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quelle est la diurèse normale d'un adulte en 24 heures ?",
+  "propositions": [
+   "Environ 20 mL",
+   "Environ 5 litres",
+   "Environ 1 à 1,5 litre",
+   "Environ 100 mL"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q242",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Combien de besoins fondamentaux compte le modèle de Virginia Henderson ?",
+  "propositions": [
+   "9",
+   "14",
+   "12",
+   "20"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q243",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Que protège le secret professionnel ?",
+  "propositions": [
+   "Les informations personnelles et médicales du patient",
+   "Les plans du bâtiment",
+   "Les horaires du personnel",
+   "Le prix des médicaments"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q244",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quelle zone du corps est la plus exposée aux escarres chez un patient alité sur le dos ?",
+  "propositions": [
+   "Les mains",
+   "Les paupières",
+   "Le front",
+   "Le sacrum"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q245",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quel est un moyen essentiel de prévention des escarres ?",
+  "propositions": [
+   "Limiter l'hydratation",
+   "Le laisser immobile",
+   "Changer régulièrement la position du patient",
+   "Masser fortement les zones rouges"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q246",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Que signifie le score d'Apgar ?",
+  "propositions": [
+   "Une évaluation de l'état du nouveau-né à la naissance",
+   "Un examen du cœur de l'adulte",
+   "Un test de grossesse",
+   "Une mesure de la tension artérielle"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q247",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Quelle est la durée habituelle d'une grossesse ?",
+  "propositions": [
+   "Environ 6 mois",
+   "Environ 3 mois",
+   "Environ 12 mois",
+   "Environ 9 mois"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q248",
+  "theme": "Soins et secours",
+  "difficulte": 2,
+  "question": "Pendant combien de temps l'OMS recommande-t-elle l'allaitement maternel exclusif ?",
+  "propositions": [
+   "12 mois",
+   "Environ 6 mois",
+   "2 mois",
+   "1 mois"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q249",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Quelle est la fréquence recommandée des compressions thoraciques chez l'adulte ?",
+  "propositions": [
+   "30 à 40 par minute",
+   "60 à 80 par minute",
+   "100 à 120 par minute",
+   "160 à 180 par minute"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q250",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Quel est le rapport compressions/insufflations en réanimation de l'adulte ?",
+  "propositions": [
+   "10 compressions pour 10 insufflations",
+   "15 compressions pour 5 insufflations",
+   "30 compressions pour 2 insufflations",
+   "5 compressions pour 1 insufflation"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q251",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Selon la règle des 9, quelle part de la surface corporelle représente la tête chez l'adulte ?",
+  "propositions": [
+   "36 %",
+   "18 %",
+   "9 %",
+   "1 %"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q252",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Dans quelle couche de la peau se fait une injection intradermique ?",
+  "propositions": [
+   "Le muscle",
+   "L'os",
+   "Le derme",
+   "La veine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q253",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Un brassard trop petit pour le bras du patient donne une pression artérielle :",
+  "propositions": [
+   "Faussement basse",
+   "Faussement élevée",
+   "Exacte",
+   "Impossible à mesurer"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q254",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Quelle voie de mesure est la plus proche de la température centrale ?",
+  "propositions": [
+   "Le lobe de l'oreille",
+   "La voie rectale",
+   "Le dos de la main",
+   "Le creux axillaire"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q255",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Quel IMC correspond à un poids normal chez l'adulte ?",
+  "propositions": [
+   "40 à 45 kg/m²",
+   "10 à 15 kg/m²",
+   "18,5 à 24,9 kg/m²",
+   "30 à 35 kg/m²"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q256",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Quel est le premier des 14 besoins fondamentaux selon Virginia Henderson ?",
+  "propositions": [
+   "Boire et manger",
+   "Dormir et se reposer",
+   "Communiquer",
+   "Respirer"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q257",
+  "theme": "Soins et secours",
+  "difficulte": 3,
+  "question": "Pourquoi vérifie-t-on le groupe sanguin avant une transfusion ?",
+  "propositions": [
+   "Pour déterminer l'âge du patient",
+   "Pour éviter une incompatibilité entre donneur et receveur",
+   "Pour choisir la taille de l'aiguille",
+   "Pour mesurer la glycémie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q258",
+  "theme": "Soins infirmiers",
+  "difficulte": 3,
+  "question": "Selon l’OMS (1947) : (choisir la bonne définition)",
+  "propositions": [
+   "« La santé est un état de parfaite bien-être physique, mental et social et non seulement une présence de maladie ou d’infirmité ».",
+   "« La santé est un état de parfaite bien-être physique, mental et social et non seulement une absence de maladie ou d’infirmité ».",
+   "« La santé est un état de parfaite bien-être physique, mental et social et parfois une absence de maladie ou d’infirmité ».",
+   "« La santé est seulement un état de bien-être sans maladie ou infirmité »"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q259",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "La zone de connexion entre deux neurones se nomme",
+  "propositions": [
+   "Le corps cellulaire",
+   "La synapse",
+   "L’axone"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q260",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "Le cortex cérébral est également appelé :",
+  "propositions": [
+   "Substance cérébrale",
+   "Substance blanche",
+   "Substance grise"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q261",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "Un nerf sensitif est un nerf",
+  "propositions": [
+   "Afférent",
+   "Efférent",
+   "Déférent"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q262",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "Un nerf moteur est un nerf",
+  "propositions": [
+   "Afférent",
+   "Efférent",
+   "Déférent"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q263",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "La majorité des nerfs sont",
+  "propositions": [
+   "Moteurs",
+   "Sensitifs",
+   "Moteurs et sensitifs"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q264",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "Le blocage de la transmission neuronale est dû à",
+  "propositions": [
+   "Des signaux stimulateurs",
+   "Des signaux inhibiteurs",
+   "Des signaux activateurs"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q265",
+  "theme": "Système nerveux",
+  "difficulte": 1,
+  "question": "Les nerfs reliant le cerveau aux muscles sont appelés :",
+  "propositions": [
+   "Des nerfs sensitifs",
+   "Des nerfs crâniens",
+   "Des nerfs moteurs"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q266",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "A quelle variété de tissu appartient le neurone parmi celles qui sont énumérés en dessous ?",
+  "propositions": [
+   "Le tissu de régulation",
+   "Les tissus conjonctifs",
+   "Le tissu musculaire",
+   "Les épithéliums"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q267",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Le neurone possédant un prolongement cellulaire pouvant être beaucoup plus long que les autres se nomment ?",
+  "propositions": [
+   "La dendrite",
+   "L’axone",
+   "La membrane cytoplasmique"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q268",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "On dit que les cellules nerveuses du cortex cérébral forment un réseau car",
+  "propositions": [
+   "Elles sont nombreuses",
+   "Elles sont interconnectées",
+   "Elles sont macroscopiques"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q269",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Au niveau du neurone, le message nerveux se propage :",
+  "propositions": [
+   "Du corps cellulaire jusqu’à la synapse",
+   "De la synapse jusqu’au corps cellulaire",
+   "Du corps cellulaire jusqu’à la synapse et inversement"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q270",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Le système parasympathique permet en général",
+  "propositions": [
+   "La mise au repos de l’organisme",
+   "La stimulation de l’organisme",
+   "La mise au repos et la stimulation de l’organisme"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q271",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Quel neuromédiateur est commun aux systèmes sympathique et parasympathique pré- ganglionnaires",
+  "propositions": [
+   "L’adrénaline",
+   "La noradrénaline",
+   "L’acétylcholine"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q272",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Quel est l'état de conscience d'un patient évalué entre 9 et 11 sur l'échelle de Glasgow",
+  "propositions": [
+   "Coma avec dommage cérébral sévère",
+   "Coma très profond",
+   "Etat d’éveil avec dommage cérébral modéré"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q273",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Les nerfs reliant les organes récepteurs au cerveau sont appelés :",
+  "propositions": [
+   "Des nerfs sensitifs",
+   "Des nerfs crâniens",
+   "Des nerfs moteurs"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q274",
+  "theme": "Système nerveux",
+  "difficulte": 2,
+  "question": "Les messages nerveux qui parcourent les nerfs sont de nature :",
+  "propositions": [
+   "Chimique",
+   "Electrique",
+   "Hormonale"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q275",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie le suffixe « -ite » ?",
+  "propositions": [
+   "Douleur",
+   "Ablation",
+   "Inflammation",
+   "Tumeur"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q276",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie le suffixe « -ectomie » ?",
+  "propositions": [
+   "Examen visuel",
+   "Ablation chirurgicale",
+   "Inflammation",
+   "Incision"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q277",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie le suffixe « -algie » ?",
+  "propositions": [
+   "Paralysie",
+   "Inflammation",
+   "Tumeur",
+   "Douleur"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q278",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie le préfixe « hyper- » ?",
+  "propositions": [
+   "Insuffisance, en dessous de la normale",
+   "Excès, au-dessus de la normale",
+   "Inflammation",
+   "Absence"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q279",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie le préfixe « hypo- » ?",
+  "propositions": [
+   "Rapidité",
+   "Insuffisance, en dessous de la normale",
+   "Absence",
+   "Excès"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q280",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie « céphalée » ?",
+  "propositions": [
+   "Mal de dos",
+   "Mal de dents",
+   "Mal de gorge",
+   "Mal de tête"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q281",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Que signifie « otalgie » ?",
+  "propositions": [
+   "Douleur de l'œil",
+   "Douleur de l'oreille",
+   "Douleur du ventre",
+   "Douleur de la gorge"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q282",
+  "theme": "Terminologie médicale",
+  "difficulte": 1,
+  "question": "Comment appelle-t-on un médicament qui soulage la douleur ?",
+  "propositions": [
+   "Un anticoagulant",
+   "Un antalgique",
+   "Un diurétique",
+   "Un antipyrétique"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q283",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que signifie le suffixe « -otomie » ?",
+  "propositions": [
+   "Suture",
+   "Incision chirurgicale",
+   "Ablation",
+   "Radiographie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q284",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que signifie le suffixe « -scopie » ?",
+  "propositions": [
+   "Inflammation",
+   "Ablation",
+   "Examen visuel d'un organe",
+   "Douleur"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q285",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que signifie le suffixe « -émie » ?",
+  "propositions": [
+   "Inflammation",
+   "Présence dans l'urine",
+   "Douleur",
+   "Présence dans le sang"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q286",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que signifie le suffixe « -urie » ?",
+  "propositions": [
+   "Relatif au sang",
+   "Relatif aux selles",
+   "Relatif aux urines",
+   "Relatif à la peau"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q287",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on le crachement de sang ?",
+  "propositions": [
+   "Le méléna",
+   "L'hémoptysie",
+   "L'hématémèse",
+   "L'hématurie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q288",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on le vomissement de sang ?",
+  "propositions": [
+   "L'hémoptysie",
+   "L'hématurie",
+   "Le méléna",
+   "L'hématémèse"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q289",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on la présence de sang dans les urines ?",
+  "propositions": [
+   "L'hématémèse",
+   "L'hématurie",
+   "Le méléna",
+   "L'hémoptysie"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q290",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que désigne un œdème ?",
+  "propositions": [
+   "Une accumulation anormale de liquide dans les tissus",
+   "Une diminution du sang",
+   "Une fracture",
+   "Une rougeur"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q291",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que désigne la cyanose ?",
+  "propositions": [
+   "Une pâleur",
+   "Une rougeur",
+   "Une coloration jaune de la peau",
+   "Une coloration bleutée de la peau et des muqueuses"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q292",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que désigne l'ictère (jaunisse) ?",
+  "propositions": [
+   "Une pâleur",
+   "Une coloration bleutée",
+   "Une rougeur",
+   "Une coloration jaune de la peau et des muqueuses"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q293",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que désigne l'asthénie ?",
+  "propositions": [
+   "Une difficulté à avaler",
+   "Une fatigue intense",
+   "Un mal de tête",
+   "Une perte d'appétit"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q294",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Que désigne l'hémiplégie ?",
+  "propositions": [
+   "La paralysie des quatre membres",
+   "La paralysie d'une moitié du corps",
+   "La paralysie des deux jambes",
+   "La perte de la parole"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q295",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Qu'est-ce qu'une cystite ?",
+  "propositions": [
+   "Une inflammation de la vessie",
+   "Une inflammation du foie",
+   "Une inflammation du rein",
+   "Une inflammation de l'estomac"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q296",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Qu'est-ce que l'appendicite ?",
+  "propositions": [
+   "Une fracture",
+   "Une inflammation de l'estomac",
+   "Une infection du poumon",
+   "Une inflammation de l'appendice"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q297",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Comment appelle-t-on un médicament qui fait baisser la fièvre ?",
+  "propositions": [
+   "Un antalgique",
+   "Un antibiotique",
+   "Un antipyrétique",
+   "Un diurétique"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q298",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Les antibiotiques sont efficaces contre :",
+  "propositions": [
+   "Les rayons ultraviolets",
+   "Toutes les maladies sans exception",
+   "Les virus",
+   "Les bactéries"
+  ],
+  "bonne": 3
+ },
+ {
+  "id": "q299",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Un diurétique :",
+  "propositions": [
+   "Arrête la douleur",
+   "Fait baisser la fièvre",
+   "Augmente la production d'urine",
+   "Ralentit le cœur"
+  ],
+  "bonne": 2
+ },
+ {
+  "id": "q300",
+  "theme": "Terminologie médicale",
+  "difficulte": 2,
+  "question": "Un anticoagulant :",
+  "propositions": [
+   "Empêche ou ralentit la coagulation du sang",
+   "Stimule les globules blancs",
+   "Augmente la tension",
+   "Favorise la formation de caillots"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q301",
+  "theme": "Terminologie médicale",
+  "difficulte": 3,
+  "question": "Que désigne le méléna ?",
+  "propositions": [
+   "Du sang dans les urines",
+   "Des selles noires contenant du sang digéré",
+   "Un crachement de sang",
+   "Des vomissements de sang"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q302",
+  "theme": "Terminologie médicale",
+  "difficulte": 3,
+  "question": "Que désigne l'anurie ?",
+  "propositions": [
+   "Une augmentation des urines",
+   "L'absence d'urine",
+   "Une diminution des urines",
+   "Du sang dans les urines"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q303",
+  "theme": "Terminologie médicale",
+  "difficulte": 3,
+  "question": "Que désigne la polyurie ?",
+  "propositions": [
+   "Une douleur à la miction",
+   "Une augmentation importante du volume d'urine",
+   "Une absence d'urine",
+   "Du sang dans les urines"
+  ],
+  "bonne": 1
+ },
+ {
+  "id": "q304",
+  "theme": "Terminologie médicale",
+  "difficulte": 3,
+  "question": "Que désigne la dysphagie ?",
+  "propositions": [
+   "Une difficulté à avaler",
+   "Une douleur de ventre",
+   "Une difficulté à respirer",
+   "Une perte de la voix"
+  ],
+  "bonne": 0
+ },
+ {
+  "id": "q305",
+  "theme": "Terminologie médicale",
+  "difficulte": 3,
+  "question": "Que désigne la paraplégie ?",
+  "propositions": [
+   "La paralysie d'une moitié du corps",
+   "La paralysie des deux membres inférieurs",
+   "La paralysie du visage",
+   "La paralysie d'un seul bras"
+  ],
+  "bonne": 1
+ }
+]
