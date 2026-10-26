@@ -9,6 +9,10 @@ export default function InstallPrompt() {
   const [installee, setInstallee] = useState(true);
   const [aide, setAide] = useState(false);
   const [ios, setIos] = useState(false);
+  const [diag, setDiag] = useState(false);
+  const [sw, setSw] = useState("...");
+  const [manifest, setManifest] = useState("...");
+  const [ua, setUa] = useState("");
 
   useEffect(() => {
     const standalone =
@@ -16,6 +20,17 @@ export default function InstallPrompt() {
       (navigator as unknown as { standalone?: boolean }).standalone === true;
     setInstallee(standalone);
     setIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
+    setDiag(window.location.search.includes("diag=1"));
+    setUa(navigator.userAgent.slice(0, 110));
+    setManifest(document.querySelector('link[rel="manifest"]') ? "oui" : "NON");
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .getRegistration()
+        .then((r) => setSw(r ? (r.active ? "actif" : "en cours") : "ABSENT"))
+        .catch(() => setSw("erreur"));
+    } else {
+      setSw("non pris en charge");
+    }
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setEvt(e as EvenementInstall);
@@ -38,26 +53,37 @@ export default function InstallPrompt() {
     setAide((v) => !v);
   }
 
-  if (installee) return null;
+  if (installee && !diag) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
-      {aide ? (
-        <div className="max-w-[240px] rounded-2xl border border-[#dfe3e8] bg-white p-3 text-xs leading-relaxed shadow-lg">
-          {ios
-            ? "Touchez Partager dans Safari, puis « Sur l'écran d'accueil »."
-            : "Touchez le menu ⋮ de Chrome, puis « Ajouter à l'écran d'accueil »."}
+    <>
+      {diag ? (
+        <div className="fixed inset-x-2 top-2 z-50 rounded-xl bg-black/90 p-3 text-[11px] leading-relaxed text-white">
+          <p>Autorisation d&apos;installation reçue : {evt ? "OUI" : "NON"}</p>
+          <p>Service worker : {sw}</p>
+          <p>Lien manifest dans la page : {manifest}</p>
+          <p>Mode : {installee ? "application" : "navigateur"}</p>
+          <p>Navigateur : {ua}</p>
         </div>
       ) : null}
-      <button
-        type="button"
-        onClick={toucher}
-        aria-label="Installer l'application MEDIKO+"
-        className="flex h-14 w-14 items-center justify-center rounded-full border border-[#dfe3e8] bg-white shadow-lg"
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/logo-icon.svg" alt="" className="h-9 w-9" />
-      </button>
-    </div>
+      <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2">
+        {aide ? (
+          <div className="max-w-[240px] rounded-2xl border border-[#dfe3e8] bg-white p-3 text-xs leading-relaxed shadow-lg">
+            {ios
+              ? "Touchez Partager dans Safari, puis « Sur l'écran d'accueil »."
+              : "Touchez le menu ⋮ de Chrome, puis « Ajouter à l'écran d'accueil »."}
+          </div>
+        ) : null}
+        <button
+          type="button"
+          onClick={toucher}
+          aria-label="Installer l'application MEDIKO+"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-[#dfe3e8] bg-white shadow-lg"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo-icon.svg" alt="" className="h-9 w-9" />
+        </button>
+      </div>
+    </>
   );
 }
