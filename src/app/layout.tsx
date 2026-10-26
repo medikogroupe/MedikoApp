@@ -36,9 +36,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="fr" className={inter.variable}>
       {process.env.NODE_ENV !== "production" ? <head><meta name="darkreader-lock" /></head> : null}
       <body className="bg-mp-bg text-mp-text font-sans antialiased">
+        <InstallPrompt />
         {children}
         <PWARegister />
-        <InstallPrompt />
       </body>
     </html>
   );
