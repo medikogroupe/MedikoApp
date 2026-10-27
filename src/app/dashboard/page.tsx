@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { desc, eq, sql } from "drizzle-orm";
 import {
   BookOpen,
+  ClipboardCheck,
+  FileText,
   CalendarDays,
   CreditCard,
   Gamepad2,
@@ -26,6 +28,8 @@ const MODULES = [
   { href: "/notes", label: "Mes notes", icon: LineChart },
   { href: "/scanner", label: "Scanner docs", icon: ScanLine },
   { href: "/bibliotheque", label: "Bibliothèque", icon: BookOpen },
+  { href: "/examen", label: "Examen aléatoire", icon: ClipboardCheck },
+  { href: "/cours-pdf", label: "Cours en PDF", icon: FileText },
   { href: "/pharmacies", label: "Pharmacies", icon: MapPin },
   { href: "/jeux", label: "Jeux pédagogiques", icon: Gamepad2 },
   { href: "/carriere", label: "Projet carrière", icon: Target },
