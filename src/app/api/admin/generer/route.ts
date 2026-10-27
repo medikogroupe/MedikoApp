@@ -80,11 +80,12 @@ export async function POST(request: Request) {
     "tableau JSON valide.";
 
   const modeles = [process.env.GEMINI_MODEL || "gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
-  const appel = (modele: string) => fetch(
+  const appelBrut = (modele: string) => fetch(
     "https://generativelanguage.googleapis.com/v1beta/models/" + modele + ":generateContent",
     {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": cle },
+      signal: AbortSignal.timeout(15000),
       body: JSON.stringify({
         systemInstruction: {
           parts: [
@@ -94,19 +95,20 @@ export async function POST(request: Request) {
           ],
         },
         contents: [{ role: "user", parts: [{ text: consigne }] }],
-        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8000, temperature: 0.4 },
+        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4000, thinkingConfig: { thinkingLevel: "low" }, temperature: 0.4 },
       }),
     },
   );
+  const appel = (m: string) => appelBrut(m).catch(() => new Response(null, { status: 504 }));
   let reponse = await appel(modeles[0]);
-  for (let essai = 1; essai < 6 && (reponse.status === 503 || reponse.status === 500 || reponse.status === 404); essai++) {
+  for (let essai = 1; essai < 3 && (reponse.status === 503 || reponse.status === 500 || reponse.status === 404 || reponse.status === 504); essai++) {
     await new Promise((r) => setTimeout(r, 2500));
     reponse = await appel(modeles[essai % modeles.length]);
   }
   if (reponse.status === 429) {
     return NextResponse.json({ error: "Limite gratuite atteinte. Réessayez dans une minute." }, { status: 429 });
   }
-  if (reponse.status === 503) {
+  if (reponse.status === 503 || reponse.status === 504) {
     return NextResponse.json({ error: "Les serveurs de Google sont surchargés. Réessayez dans quelques minutes." }, { status: 503 });
   }
   if (!reponse.ok) {
