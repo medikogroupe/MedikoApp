@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { BookOpen, Loader2, Trash2, Upload } from "lucide-react";
+import { BookOpen, ListChecks, Loader2, Trash2, Upload } from "lucide-react";
 
 type Matiere = { id: string; nom: string; semestre: number };
 type Pdf = { id: string; titre: string; nomFichier: string; taille: number; createdAt: string; matiere: string | null };
@@ -18,6 +18,7 @@ export default function AdminPdf() {
   const [envoi, setEnvoi] = useState(false);
   const [message, setMessage] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [genId, setGenId] = useState("");
 
   const charger = useCallback(async () => {
     const [m, p] = await Promise.all([fetch("/api/matieres"), fetch("/api/admin/pdf")]);
@@ -73,6 +74,65 @@ export default function AdminPdf() {
       setMessage("Envoi impossible. Vérifiez votre connexion.");
     }
     setEnvoi(false);
+  }
+
+  async function generer(p: Pdf) {
+    if (genId) return;
+    if (!p.matiere) {
+      setMessage("Ce document n'a pas de matière. Supprimez-le puis ajoutez-le en choisissant une matière.");
+      return;
+    }
+    setGenId(p.id);
+    setMessage("Lecture du document...");
+    try {
+      const res = await fetch(`/api/pdf-cours/${p.id}`);
+      if (!res.ok) throw new Error("lecture");
+      const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+      pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
+      const doc = await pdfjs.getDocument({ data: new Uint8Array(await res.arrayBuffer()) }).promise;
+      let texte = "";
+      for (let n = 1; n <= doc.numPages; n++) {
+        const page = await doc.getPage(n);
+        const contenu = await page.getTextContent();
+        texte += contenu.items.map((i) => ("str" in i ? i.str : "")).join(" ") + " ";
+      }
+      texte = texte.replace(/\s+/g, " ").trim();
+      if (texte.length < 500) {
+        setMessage("Ce PDF ne contient pas de texte lisible (probablement un scan).");
+        setGenId("");
+        return;
+      }
+      const TAILLE = 3500;
+      let morceaux: string[] = [];
+      for (let i = 0; i < texte.length; i += TAILLE) morceaux.push(texte.slice(i, i + TAILLE));
+      morceaux = morceaux.filter((m) => m.length >= 300);
+      const MAX = 12;
+      if (morceaux.length > MAX) {
+        const pas = morceaux.length / MAX;
+        morceaux = Array.from({ length: MAX }, (_, k) => morceaux[Math.floor(k * pas)]);
+      }
+      let total = 0;
+      for (let k = 0; k < morceaux.length; k++) {
+        setMessage(`Génération ${k + 1} sur ${morceaux.length}...`);
+        const r = await fetch("/api/admin/generer", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ pdfId: p.id, texte: morceaux[k] }),
+        });
+        const data = await r.json().catch(() => ({}));
+        if (!r.ok) {
+          setMessage(data.error ?? "Génération impossible.");
+          setGenId("");
+          return;
+        }
+        total += Number(data.ajoutees) || 0;
+        await new Promise((r) => setTimeout(r, 5000));
+      }
+      setMessage(`${total} questions ajoutées en brouillon. Elles attendent votre relecture.`);
+    } catch {
+      setMessage("Génération impossible. Vérifiez votre connexion.");
+    }
+    setGenId("");
   }
 
   async function supprimer(p: Pdf) {
@@ -145,6 +205,15 @@ export default function AdminPdf() {
               >
                 <BookOpen size={18} className="text-mp-blue" />
               </Link>
+              <button
+                type="button"
+                onClick={() => generer(p)}
+                disabled={genId !== ""}
+                aria-label="Générer des questions"
+                className="flex h-11 w-11 items-center justify-center"
+              >
+                {genId === p.id ? <Loader2 size={18} className="animate-spin" /> : <ListChecks size={18} className="text-mp-blue" />}
+              </button>
               <button
                 type="button"
                 onClick={() => supprimer(p)}

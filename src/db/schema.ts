@@ -239,3 +239,16 @@ export const pdfCours = pgTable("pdf_cours", {
   estActif: boolean("est_actif").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+export const questionsGenerees = pgTable("questions_generees", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  matiereId: uuid("matiere_id").notNull(),
+  pdfId: uuid("pdf_id"),
+  type: text("type").notNull(),
+  contexte: text("contexte").notNull().default(""),
+  question: text("question").notNull(),
+  options: jsonb("options").$type<string[]>().notNull().default([]),
+  bonnesReponses: jsonb("bonnes_reponses").$type<number[]>().notNull().default([]),
+  explication: text("explication").notNull().default(""),
+  statut: text("statut").notNull().default("BROUILLON"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
