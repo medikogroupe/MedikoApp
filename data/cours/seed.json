@@ -1,0 +1,125 @@
+{
+  "domaines": [
+    {
+      "slug": "sciences-fondamentales-corps-humain",
+      "nom": "Sciences fondamentales : corps humain",
+      "description": "Anatomie et physiologie générales et obstétricales.",
+      "ordre": 1,
+      "matieres": [
+        { "slug": "anatomie-physiologie-cellule-tissus-osteologie-myologie-systeme-nerveux", "code_officiel": "CHF1111", "nom": "Anatomie Physiologie : cellule et tissus, ostéologie, myologie, système nerveux", "semestre": 1, "ordre": 1 },
+        { "slug": "anatomie-physiologie-obstetricale", "code_officiel": "CHF1112", "nom": "Anatomie Physiologie Obstétricale", "semestre": 1, "ordre": 2 },
+        { "slug": "anatomie-physiologie-respiratoire-cardiovasculaire-urinaire-reproducteur", "code_officiel": "CHF1211", "nom": "Anatomie Physiologie : appareil respiratoire, cardio-vasculaire, urinaire, reproducteur", "semestre": 2, "ordre": 3 },
+        { "slug": "anatomie-physiologie-obstetricale-bassin", "code_officiel": "CHF1212", "nom": "Anatomie Physiologie obstétricale : bassin osseux, bassin mou", "semestre": 2, "ordre": 4 }
+      ]
+    },
+    {
+      "slug": "sciences-biologiques-laboratoire",
+      "nom": "Sciences biologiques et laboratoire",
+      "description": "Microbes, sang, chimie du corps, défenses de l'organisme et parasites.",
+      "ordre": 2,
+      "matieres": [
+        { "slug": "microbiologie", "code_officiel": "NBS1111", "nom": "Microbiologie", "semestre": 1, "ordre": 1 },
+        { "slug": "hematologie", "code_officiel": "NBS1112", "nom": "Hématologie", "semestre": 1, "ordre": 2 },
+        { "slug": "biochimie", "code_officiel": "TLB1211", "nom": "Biochimie", "semestre": 2, "ordre": 3 },
+        { "slug": "immunologie", "code_officiel": "TLB1212", "nom": "Immunologie", "semestre": 2, "ordre": 4 },
+        { "slug": "parasitologie", "code_officiel": "TLB1213", "nom": "Parasitologie", "semestre": 2, "ordre": 5 }
+      ]
+    },
+    {
+      "slug": "pathologies-prise-en-charge",
+      "nom": "Pathologies et prise en charge",
+      "description": "Maladies fréquentes, signes cliniques et conduite à tenir.",
+      "ordre": 3,
+      "matieres": [
+        { "slug": "ist-vih-sida", "code_officiel": "PMC1121", "nom": "IST / VIH Sida", "semestre": 1, "ordre": 1 },
+        { "slug": "pathologies-chirurgicales-semiologie", "code_officiel": "PMC1122", "nom": "Pathologies chirurgicales / sémiologie", "semestre": 1, "ordre": 2 },
+        { "slug": "pathologies-medicales-semiologie", "code_officiel": "PMC1123", "nom": "Pathologies médicales / sémiologie", "semestre": 1, "ordre": 3 },
+        { "slug": "maladies-parasitaires-et-infectieuses", "code_officiel": "PAC1211", "nom": "Maladies parasitaires et infectieuses", "semestre": 2, "ordre": 4 },
+        { "slug": "pathologies-respiratoires", "code_officiel": "PAC1212", "nom": "Pathologies respiratoires", "semestre": 2, "ordre": 5 },
+        { "slug": "maladies-non-transmissibles", "code_officiel": "PAC1213", "nom": "Maladies non transmissibles", "semestre": 2, "ordre": 6 },
+        { "slug": "sport-et-pathologies", "code_officiel": "SSA1241", "nom": "Sport et pathologies", "semestre": 2, "ordre": 7 }
+      ]
+    },
+    {
+      "slug": "sante-infantile-maternelle-nutrition",
+      "nom": "Santé infantile, maternelle et nutrition",
+      "description": "Soins à l'enfant et au nouveau-né, alimentation et nutrition.",
+      "ordre": 4,
+      "matieres": [
+        { "slug": "soins-aux-enfants", "code_officiel": "SIN1111", "nom": "Soins aux enfants", "semestre": 1, "ordre": 1 },
+        { "slug": "pediatrie", "code_officiel": "SIN1112", "nom": "Pédiatrie", "semestre": 1, "ordre": 2 },
+        { "slug": "dietetique", "code_officiel": "SIN1113", "nom": "Diététique", "semestre": 1, "ordre": 3 },
+        { "slug": "nutrition", "code_officiel": "SPB1112", "nom": "Nutrition", "semestre": 1, "ordre": 4 },
+        { "slug": "soins-infirmiers-obstetricaux-neonataux-infantiles", "code_officiel": "MSO1233", "nom": "Soins Infirmiers obstétricaux / néonataux de base / infantiles", "semestre": 2, "ordre": 5 }
+      ]
+    },
+    {
+      "slug": "sante-publique-communautaire",
+      "nom": "Santé publique et communautaire",
+      "description": "Santé de la population, hygiène, prévention et organisation du système de santé.",
+      "ordre": 5,
+      "matieres": [
+        { "slug": "etude-du-milieu", "code_officiel": "SPB1111", "nom": "Étude du milieu", "semestre": 1, "ordre": 1 },
+        { "slug": "systeme-national-de-sante", "code_officiel": "SPB1113", "nom": "Système National de Santé", "semestre": 1, "ordre": 2 },
+        { "slug": "prevention-des-infections-hygiene-hospitaliere", "code_officiel": "MSO1133", "nom": "Prévention des infections / hygiène hospitalière", "semestre": 1, "ordre": 3 },
+        { "slug": "hygiene-et-assainissement", "code_officiel": "SCM1221", "nom": "Hygiène et assainissement", "semestre": 2, "ordre": 4 },
+        { "slug": "soins-de-sante-primaire", "code_officiel": "SCM1222", "nom": "Soins de santé primaire", "semestre": 2, "ordre": 5 },
+        { "slug": "generalites-sur-l-epidemiologie", "code_officiel": "SCM1223", "nom": "Généralités sur l'Épidémiologie", "semestre": 2, "ordre": 6 },
+        { "slug": "iec-ccc", "code_officiel": "SCM1224", "nom": "IEC / CCC", "semestre": 2, "ordre": 7 }
+      ]
+    },
+    {
+      "slug": "sciences-techniques-infirmieres",
+      "nom": "Sciences et techniques infirmières",
+      "description": "Théories de soins, gestes techniques et méthode de travail du soignant.",
+      "ordre": 6,
+      "matieres": [
+        { "slug": "theorie-concepts-soins-infirmiers-relation-d-aide", "code_officiel": "SHU1121", "nom": "Théorie et concepts des soins infirmiers et Relation d'aide", "semestre": 1, "ordre": 1 },
+        { "slug": "techniques-de-soins-de-base-medecine-chirurgie", "code_officiel": "MSO1131", "nom": "Techniques de soins de base en médecine et en chirurgie", "semestre": 1, "ordre": 2 },
+        { "slug": "secourisme", "code_officiel": "MSO1132", "nom": "Secourisme", "semestre": 1, "ordre": 3 },
+        { "slug": "demarche-de-soin", "code_officiel": "MSO1231", "nom": "Démarche de soin", "semestre": 2, "ordre": 4 },
+        { "slug": "techniques-de-soins-de-base", "code_officiel": "MSO1232", "nom": "Techniques de soins de base", "semestre": 2, "ordre": 5 }
+      ]
+    },
+    {
+      "slug": "sciences-humaines-droit-ethique",
+      "nom": "Sciences humaines, droit et éthique",
+      "description": "Société, culture, règles de la profession et droit.",
+      "ordre": 7,
+      "matieres": [
+        { "slug": "psycho-sociologie", "code_officiel": "SHU1122", "nom": "Psycho-sociologie", "semestre": 1, "ordre": 1 },
+        { "slug": "anthropologie-de-la-sante", "code_officiel": "SHU1123", "nom": "Anthropologie de la santé", "semestre": 1, "ordre": 2 },
+        { "slug": "deontologie-et-ethique-professionnelle", "code_officiel": "CFI1141", "nom": "Déontologie et éthique professionnelle", "semestre": 1, "ordre": 3 },
+        { "slug": "legislation-du-travail", "code_officiel": "CFI1142", "nom": "Législation du travail", "semestre": 1, "ordre": 4 },
+        { "slug": "profession-infirmiere-sage-femme", "code_officiel": "CFI1143", "nom": "Profession infirmière / sage-femme", "semestre": 1, "ordre": 5 },
+        { "slug": "droit-administratif", "code_officiel": "DRT1241", "nom": "Droit administratif", "semestre": 2, "ordre": 6 },
+        { "slug": "droit-civil", "code_officiel": "DRT1242", "nom": "Droit civil", "semestre": 2, "ordre": 7 },
+        { "slug": "sport-et-societe", "code_officiel": "SSA1242", "nom": "Sport et société", "semestre": 2, "ordre": 8 }
+      ]
+    },
+    {
+      "slug": "competences-transversales-recherche",
+      "nom": "Compétences transversales et recherche",
+      "description": "Méthode de recherche, langue, informatique et rédaction.",
+      "ordre": 8,
+      "matieres": [
+        { "slug": "du-choix-du-sujet-a-la-problematique", "code_officiel": "IER1131", "nom": "Du choix du sujet à la problématique", "semestre": 1, "ordre": 1 },
+        { "slug": "revue-de-litterature", "code_officiel": "IER1132", "nom": "Revue de littérature", "semestre": 1, "ordre": 2 },
+        { "slug": "anglais-de-la-sante", "code_officiel": "OCM1141", "nom": "Anglais de la santé", "semestre": 1, "ordre": 3 },
+        { "slug": "informatique-bureautique", "code_officiel": "OCM1142", "nom": "Informatique : bureautique", "semestre": 1, "ordre": 4 },
+        { "slug": "informatique-internet", "code_officiel": "PRR1231", "nom": "Informatique : Internet", "semestre": 2, "ordre": 5 },
+        { "slug": "methodologie-redaction-rapport-de-stage", "code_officiel": "PRR1232", "nom": "Méthodologie de rédaction de rapport de stage", "semestre": 2, "ordre": 6 }
+      ]
+    },
+    {
+      "slug": "stages-professionnels",
+      "nom": "Stages professionnels",
+      "description": "Stages de découverte et rapports de stage.",
+      "ordre": 9,
+      "matieres": [
+        { "slug": "stage-peri-urbain-rapport", "code_officiel": "STG1221", "nom": "Stage péri-urbain + rapport", "semestre": 2, "ordre": 1 },
+        { "slug": "stages-milieu-hospitalier-rapport", "code_officiel": "STG1222", "nom": "Stages en milieu hospitalier + rapport", "semestre": 2, "ordre": 2 }
+      ]
+    }
+  ]
+}

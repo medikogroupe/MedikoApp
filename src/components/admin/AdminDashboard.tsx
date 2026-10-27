@@ -1,4 +1,5 @@
 "use client";
+import AdminPdf from "@/components/admin/AdminPdf";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -92,6 +93,7 @@ const ONGLETS = [
   { id: "uploads", label: "Validation uploads" },
   { id: "banque", label: "Banque de questions" },
   { id: "qcm", label: "Devoirs" },
+  { id: "pdf", label: "Cours PDF" },
   { id: "pharmacies", label: "Pharmacies" },
 ] as const;
 
@@ -680,6 +682,7 @@ export default function AdminDashboard() {
       {onglet === "banque" ? <QuestionBank /> : null}
 
       {onglet === "qcm" ? <Questionnaires /> : null}
+      {onglet === "pdf" ? <AdminPdf /> : null}
 
       {onglet === "pharmacies" ? (
         <div className="mt-4 space-y-4">

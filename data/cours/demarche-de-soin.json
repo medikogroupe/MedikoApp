@@ -1,0 +1,166 @@
+{
+  "matiere_slug": "demarche-de-soin",
+  "cours": {
+    "definition": "La démarche de soin, ou processus de soins infirmiers, est une méthode de travail organisée en étapes qui se suivent. Elle permet à l'infirmier ou à la sage-femme de recueillir des informations sur le patient, d'identifier ses problèmes de santé, de planifier les soins, de les réaliser, puis d'en évaluer les résultats.",
+    "objectifs": [
+      "Définir la démarche de soin et expliquer son utilité.",
+      "Citer dans l'ordre les 5 étapes de la démarche.",
+      "Recueillir des données subjectives et objectives sur un patient.",
+      "Formuler un diagnostic infirmier avec le problème, la cause et les signes.",
+      "Fixer un objectif de soin précis et planifier les actions.",
+      "Évaluer les résultats et ajuster les soins."
+    ],
+    "sections": [
+      {
+        "titre": "Pourquoi une démarche de soin ?",
+        "texte": "Soigner sans méthode expose à oublier des problèmes du patient, à répéter des gestes inutiles et à mal transmettre l'information à l'équipe suivante. La démarche rend les soins plus sûrs, plus personnalisés et plus faciles à suivre. Elle donne un langage commun aux soignants et laisse une trace écrite dans le dossier de soins. Elle s'appuie souvent sur un modèle de soins, comme celui de Virginia Henderson et ses 14 besoins fondamentaux (respirer, boire et manger, éliminer, se mouvoir, dormir, se vêtir, maintenir sa température, être propre, éviter les dangers, communiquer, pratiquer sa religion, s'occuper, se divertir, apprendre).",
+        "points": []
+      },
+      {
+        "titre": "Étape 1 : le recueil de données",
+        "texte": "On rassemble toutes les informations utiles sur le patient. Les sources sont le patient lui-même, sa famille, son dossier médical et l'observation directe. On distingue deux types de données.",
+        "points": [
+          "Données subjectives : ce que le patient ou son entourage dit (« j'ai mal à la tête », « il a froid »).",
+          "Données objectives : ce que le soignant observe ou mesure (température, pouls, tension, aspect de la peau, respiration).",
+          "Le dossier : antécédents, examens déjà faits, traitement en cours."
+        ]
+      },
+      {
+        "titre": "Étape 2 : le diagnostic infirmier",
+        "texte": "Après avoir analysé les données, on identifie les problèmes que l'infirmier peut traiter par ses propres soins. Le diagnostic infirmier n'est pas un diagnostic médical. Le médecin dit « paludisme » ; l'infirmier dit « hyperthermie liée à l'infection palustre, manifestée par une température de 39,5 °C ».",
+        "points": [
+          "Le problème : ce qui ne va pas chez le patient.",
+          "La cause : ce qui explique le problème (« lié à »).",
+          "Les signes : les données qui le prouvent (« manifesté par »)."
+        ]
+      },
+      {
+        "titre": "Étape 3 : la planification",
+        "texte": "On classe d'abord les problèmes par priorité : ce qui menace la vie (respiration, circulation, conscience) passe avant le confort. Pour chaque problème, on fixe un objectif de soin, c'est-à-dire le résultat attendu chez le patient. Un bon objectif est précis, mesurable, réaliste et limité dans le temps. Exemple : « La température du patient sera inférieure à 37,5 °C dans les 24 heures. » On choisit ensuite les actions : qui fait quoi, quand et comment.",
+        "points": []
+      },
+      {
+        "titre": "Étape 4 : l'exécution",
+        "texte": "On réalise les soins prévus, on explique chaque geste au patient, on respecte l'hygiène (lavage des mains) et on surveille ses réactions. Après chaque soin, on note dans le dossier l'heure, le soin réalisé, la réaction du patient et le nom du soignant. Ce qui n'est pas écrit est considéré comme non fait.",
+        "points": []
+      },
+      {
+        "titre": "Étape 5 : l'évaluation",
+        "texte": "On compare le résultat obtenu à l'objectif fixé. Trois cas sont possibles. Si l'objectif est atteint, on arrête l'action ou on passe à un autre problème. S'il est partiellement atteint, on continue en ajustant les actions. S'il n'est pas atteint, on cherche pourquoi et on change de stratégie. La démarche est donc un cycle : l'évaluation peut conduire à un nouveau recueil de données.",
+        "points": []
+      },
+      {
+        "titre": "Sur le terrain",
+        "texte": "Dans un dispensaire rural ou un CHR, le personnel est peu nombreux et le temps manque. Une fiche de surveillance simple (heure, température, pouls, soins faits) et des transmissions orales claires à chaque changement d'équipe suffisent pour appliquer la démarche correctement. Quand un signe de gravité apparaît (convulsions, somnolence, détresse respiratoire), on prévient sans attendre le responsable et on prépare la référence vers l'établissement supérieur.",
+        "points": []
+      }
+    ],
+    "resume": [
+      "La démarche de soin compte 5 étapes : recueil de données, diagnostic infirmier, planification, exécution, évaluation.",
+      "Données subjectives : dites par le patient. Données objectives : mesurées ou observées par le soignant.",
+      "Diagnostic infirmier = problème + « lié à » la cause + « manifesté par » les signes.",
+      "On traite en priorité ce qui menace la vie.",
+      "Un bon objectif est précis, mesurable, réaliste et limité dans le temps.",
+      "Tout soin réalisé doit être noté dans le dossier.",
+      "L'évaluation décide de la suite : arrêter, ajuster ou changer les actions."
+    ]
+  },
+  "qcm": [
+    {
+      "ordre": 1,
+      "question": "Combien d'étapes comporte la démarche de soin ?",
+      "options": ["3", "5", "7", "4"],
+      "bonne_reponse": 1,
+      "explication": "Il y a 5 étapes : recueil de données, diagnostic infirmier, planification, exécution et évaluation."
+    },
+    {
+      "ordre": 2,
+      "question": "Quelle est la première étape de la démarche de soin ?",
+      "options": ["L'évaluation", "La planification", "Le recueil de données", "L'exécution"],
+      "bonne_reponse": 2,
+      "explication": "On ne peut pas soigner correctement sans d'abord rassembler les informations sur le patient."
+    },
+    {
+      "ordre": 3,
+      "question": "Laquelle de ces données est subjective ?",
+      "options": ["Une température mesurée à 39 °C", "« J'ai mal au ventre », dit le patient", "Un pouls à 110 battements par minute", "Un test de paludisme positif"],
+      "bonne_reponse": 1,
+      "explication": "Une donnée subjective est exprimée par le patient. Les autres sont mesurées ou observées."
+    },
+    {
+      "ordre": 4,
+      "question": "Laquelle de ces données est objective ?",
+      "options": ["Le patient dit qu'il a soif", "Le patient dit qu'il a peur", "Le pouls est mesuré à 110 battements par minute", "Le patient dit qu'il dort mal"],
+      "bonne_reponse": 2,
+      "explication": "Le pouls est une mesure faite par le soignant, donc une donnée objective."
+    },
+    {
+      "ordre": 5,
+      "question": "Le diagnostic infirmier est :",
+      "options": ["Le même que le diagnostic du médecin", "Un problème de santé que l'infirmier peut traiter par ses propres soins", "Le nom de la maladie et de son traitement", "Réservé au médecin-chef"],
+      "bonne_reponse": 1,
+      "explication": "Le diagnostic infirmier décrit une réaction du patient que le soignant peut prendre en charge par ses soins."
+    },
+    {
+      "ordre": 6,
+      "question": "Quelle formulation est un diagnostic infirmier correct ?",
+      "options": ["Hyperthermie liée à l'infection palustre, manifestée par une température à 39,5 °C", "Paludisme grave", "Donner du paracétamol toutes les 6 heures", "Le patient va mieux"],
+      "bonne_reponse": 0,
+      "explication": "Un diagnostic infirmier contient le problème, sa cause et les signes qui le prouvent."
+    },
+    {
+      "ordre": 7,
+      "question": "Comment fixe-t-on les priorités lors de la planification ?",
+      "options": ["On commence par le problème le plus facile", "On commence par ce qui menace la vie du patient", "On traite d'abord les problèmes de confort", "On suit l'ordre alphabétique des problèmes"],
+      "bonne_reponse": 1,
+      "explication": "Respiration, circulation et conscience passent toujours avant le confort."
+    },
+    {
+      "ordre": 8,
+      "question": "Quel objectif de soin est bien formulé ?",
+      "options": ["Améliorer l'état du patient", "Donner un bon traitement", "La température du patient sera inférieure à 37,5 °C dans les 24 heures", "Surveiller le patient"],
+      "bonne_reponse": 2,
+      "explication": "Cet objectif est précis, mesurable et limité dans le temps."
+    },
+    {
+      "ordre": 9,
+      "question": "Après avoir réalisé un soin, que doit faire le soignant ?",
+      "options": ["Rien, le soin est terminé", "Le noter dans le dossier avec l'heure et la réaction du patient", "Prévenir seulement la famille", "Attendre la prochaine garde pour l'écrire"],
+      "bonne_reponse": 1,
+      "explication": "Un soin non noté est considéré comme non fait. La traçabilité protège le patient et le soignant."
+    },
+    {
+      "ordre": 10,
+      "question": "Si l'objectif est seulement partiellement atteint, que fait-on ?",
+      "options": ["On arrête tous les soins", "On change de patient", "On supprime l'objectif", "On continue en ajustant les actions"],
+      "bonne_reponse": 3,
+      "explication": "Un objectif partiellement atteint demande de poursuivre les soins en les adaptant."
+    }
+  ],
+  "cas_clinique": {
+    "titre": "Fièvre chez une enfant au dispensaire rural",
+    "enonce": "Au dispensaire d'un village, l'infirmier reçoit Aya, 5 ans, amenée par sa mère. Depuis 2 jours, elle a de la fièvre et refuse de manger. La mère dit : « Elle est chaude et elle pleure la nuit. » À l'examen : température 39,5 °C, pouls 120 battements par minute, peau chaude et sèche, lèvres sèches, enfant fatiguée mais consciente. Le test de diagnostic rapide du paludisme est positif. Le traitement antipaludique est prescrit selon le protocole national.",
+    "questions": [
+      {
+        "question": "1. Classez les données en données subjectives et données objectives.",
+        "correction": "Données subjectives : « elle est chaude », elle pleure la nuit, fièvre depuis 2 jours, refus de manger (rapportés par la mère). Données objectives : température 39,5 °C, pouls 120 par minute, peau chaude et sèche, lèvres sèches, enfant consciente, test de diagnostic rapide positif."
+      },
+      {
+        "question": "2. Formulez deux diagnostics infirmiers.",
+        "correction": "Hyperthermie liée à l'infection palustre, manifestée par une température de 39,5 °C et une peau chaude. Risque de déshydratation lié à la fièvre et au refus de manger, manifesté par des lèvres sèches et une peau sèche."
+      },
+      {
+        "question": "3. Quel problème est prioritaire ? Écrivez un objectif de soin pour chaque problème.",
+        "correction": "L'hyperthermie est prioritaire, car chez le jeune enfant une forte fièvre peut provoquer des convulsions. Objectif 1 : la température d'Aya sera inférieure à 37,5 °C dans les 24 heures. Objectif 2 : Aya boira régulièrement et ses lèvres seront humides dans les 24 heures."
+      },
+      {
+        "question": "4. Quelles actions l'infirmier planifie-t-il ?",
+        "correction": "Administrer le traitement antipaludique et l'antipyrétique prescrits. Découvrir l'enfant, ne pas trop l'habiller, aérer la pièce. Proposer à boire souvent et en petites quantités. Prendre la température et le pouls à intervalles réguliers et les noter sur la fiche de surveillance. Surveiller les signes de gravité (convulsions, somnolence, vomissements répétés) et préparer la référence au CHR si ils apparaissent. Expliquer à la mère le traitement, l'importance de le terminer et les signes qui doivent la faire revenir."
+      },
+      {
+        "question": "5. Le lendemain, la température est de 37,2 °C et Aya boit bien. Comment évaluez-vous ?",
+        "correction": "Les deux objectifs sont atteints : la température est inférieure à 37,5 °C et les lèvres sont humides. On poursuit le traitement jusqu'à la fin de la durée prescrite, on note l'évaluation dans le dossier et on donne à la mère des conseils de prévention (moustiquaire imprégnée, élimination des eaux stagnantes). Si la fièvre était restée élevée et l'enfant somnolente, l'objectif n'aurait pas été atteint : il aurait fallu chercher la cause et référer l'enfant."
+      }
+    ]
+  }
+}

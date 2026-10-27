@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { Download, FolderOpen, Loader2, ScanLine, Search, Trash2, Upload } from "lucide-react";
+import { BookOpen, Download, FolderOpen, Loader2, ScanLine, Search, Trash2, Upload } from "lucide-react";
 import PageShell from "@/components/PageShell";
 
 type Document = {
@@ -149,6 +149,7 @@ export default function BibliothequePage() {
         </div>
       </section>
 
+      <div className="mt-4"><Link href="/cours-pdf" className="mp-btn-yellow"><BookOpen size={16} /> Cours en PDF</Link></div>
       <section className="mt-4 space-y-3">
         {loading ? (
           <p className="flex items-center gap-2 text-xs text-mp-grey">
@@ -167,6 +168,7 @@ export default function BibliothequePage() {
                   {new Date(d.createdAt).toLocaleDateString("fr-FR")}
                 </p>
               </div>
+              {d.nomFichier.toLowerCase().endsWith(".pdf") ? (<Link href={`/lecteur?url=${encodeURIComponent(d.urlStorage)}&titre=${encodeURIComponent(d.nomFichier)}`} aria-label="Lire"><BookOpen size={18} className="text-mp-blue" /></Link>) : null}
               <a href={d.urlStorage} target="_blank" rel="noreferrer" aria-label="Ouvrir">
                 <Download size={18} className="text-mp-grey" />
               </a>

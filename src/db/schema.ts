@@ -216,3 +216,26 @@ export const fichiers = pgTable("fichiers", {
   contenu: text("contenu").notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+export const matieres = pgTable("matieres", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  domaineId: uuid("domaine_id").notNull(),
+  slug: text("slug").notNull(),
+  codeOfficiel: text("code_officiel").notNull().default(""),
+  nom: text("nom").notNull(),
+  semestre: integer("semestre").notNull(),
+  ordre: integer("ordre").notNull().default(0),
+  estActif: boolean("est_actif").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const pdfCours = pgTable("pdf_cours", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  matiereId: uuid("matiere_id"),
+  titre: text("titre").notNull(),
+  nomFichier: text("nom_fichier").notNull(),
+  taille: integer("taille").notNull().default(0),
+  contenu: text("contenu").notNull(),
+  estActif: boolean("est_actif").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
