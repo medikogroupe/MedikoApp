@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 
 type Question = {
   id: string;
-  type: "QCM" | "QCD" | "CAS";
+  type: "QCU" | "QCM" | "QCD" | "CAS";
   contexte: string;
   question: string;
   options: string[];
@@ -19,7 +19,7 @@ const ONGLETS = [
   { id: "VALIDE", label: "Validées" },
   { id: "REJETE", label: "Rejetées" },
 ];
-const NOMS = { QCM: "QCM", QCD: "QCD (plusieurs réponses)", CAS: "Cas clinique" };
+const NOMS = { QCU: "QCU (choix unique)", QCM: "QCM (choix multiple)", QCD: "QCD (vrai ou faux)", CAS: "Cas clinique" };
 const BTN = "min-h-[44px] rounded-lg px-3 text-xs font-bold uppercase";
 
 export default function AdminQuestions() {

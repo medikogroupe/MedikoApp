@@ -18,7 +18,7 @@ type Brute = {
 };
 
 function nettoyer(b: Brute) {
-  const type = b.type === "QCM" || b.type === "QCD" || b.type === "CAS" ? b.type : null;
+  const type = b.type === "QCU" || b.type === "QCM" || b.type === "QCD" || b.type === "CAS" ? b.type : null;
   if (!type) return null;
   const question = typeof b.question === "string" ? b.question.trim() : "";
   const contexte = typeof b.contexte === "string" ? b.contexte.trim() : "";
@@ -38,9 +38,11 @@ function nettoyer(b: Brute) {
       ).sort((x, y) => x - y)
     : [];
   const explication = typeof b.explication === "string" ? b.explication.trim() : "";
-  if (!question || options.length < 3 || bonnes.length === 0) return null;
-  if (type !== "QCD" && bonnes.length !== 1) return null;
-  if (type === "QCD" && (bonnes.length < 2 || bonnes.length >= options.length)) return null;
+  if (!question || options.length < 2 || bonnes.length === 0) return null;
+  if (type !== "QCD" && options.length < 3) return null;
+  if (type !== "QCM" && bonnes.length !== 1) return null;
+  if (type === "QCM" && (bonnes.length < 2 || bonnes.length >= options.length)) return null;
+  if (type === "QCD" && options.length !== 2) return null;
   if (type === "CAS" && !contexte) return null;
   return { type, contexte: type === "CAS" ? contexte : "", question, options, bonnes, explication };
 }
@@ -70,9 +72,9 @@ export async function POST(request: Request) {
 
   const consigne =
     "Matière : " + (pdf.nom ?? "") + "\n\nTexte du cours :\n" + texte +
-    "\n\nÉcris exactement 4 questions : 2 de type QCM (une seule bonne réponse parmi 4 propositions), " +
-    "1 de type QCD (2 ou 3 bonnes réponses parmi 5 propositions) et 1 de type CAS (un court cas clinique " +
-    "de 3 à 5 phrases dans un contexte africain réaliste, suivi d'une question à choix multiple avec " +
+    "\n\nÉcris exactement 5 questions : 2 de type QCU (une seule bonne réponse parmi 4 propositions), " +
+    "1 de type QCM (2 ou 3 bonnes réponses parmi 5 propositions), 1 de type QCD (une affirmation avec exactement deux propositions, Vrai et Faux, dont une seule est correcte) et 1 de type CAS (un court cas clinique " +
+    "de 3 à 5 phrases dans un contexte africain réaliste, suivi d'une question à choix unique avec " +
     "4 propositions et une seule bonne réponse). Chaque élément contient : type, contexte (vide sauf pour CAS), " +
     "question, options, bonnes_reponses (positions des bonnes propositions, en commençant à 0) et " +
     "explication (une ou deux phrases). Français simple, niveau Licence 1. Ne pose que des questions " +
