@@ -79,8 +79,8 @@ export async function POST(request: Request) {
     "dont la réponse se trouve dans le texte. N'utilise jamais de tiret long. Réponds uniquement par un " +
     "tableau JSON valide.";
 
-  const modele = process.env.GEMINI_MODEL || "gemini-3.8-flash";
-  const reponse = await fetch(
+  const modeles = [process.env.GEMINI_MODEL || "gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
+  const appel = (modele: string) => fetch(
     "https://generativelanguage.googleapis.com/v1beta/models/" + modele + ":generateContent",
     {
       method: "POST",
@@ -98,8 +98,16 @@ export async function POST(request: Request) {
       }),
     },
   );
+  let reponse = await appel(modeles[0]);
+  for (let essai = 1; essai < 6 && (reponse.status === 503 || reponse.status === 500 || reponse.status === 404); essai++) {
+    await new Promise((r) => setTimeout(r, 2500));
+    reponse = await appel(modeles[essai % modeles.length]);
+  }
   if (reponse.status === 429) {
     return NextResponse.json({ error: "Limite gratuite atteinte. Réessayez dans une minute." }, { status: 429 });
+  }
+  if (reponse.status === 503) {
+    return NextResponse.json({ error: "Les serveurs de Google sont surchargés. Réessayez dans quelques minutes." }, { status: 503 });
   }
   if (!reponse.ok) {
     return NextResponse.json({ error: "La génération a échoué (code " + reponse.status + ")." }, { status: 502 });
