@@ -27,6 +27,17 @@ export default function AdminQuestions() {
   const [liste, setListe] = useState<Question[]>([]);
   const [chargement, setChargement] = useState(true);
   const [message, setMessage] = useState("");
+  const [matieres, setMatieres] = useState<{ id: string; nom: string; semestre: number }[]>([]);
+  const [matiereId, setMatiereId] = useState("");
+  const [duree, setDuree] = useState("60");
+  const [publication, setPublication] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/matieres")
+      .then((r) => (r.ok ? r.json() : { matieres: [] }))
+      .then((d: { matieres?: { id: string; nom: string; semestre: number }[] }) => setMatieres(d.matieres ?? []))
+      .catch(() => undefined);
+  }, []);
 
   const charger = useCallback(async (s: string) => {
     setChargement(true);
@@ -56,6 +67,23 @@ export default function AdminQuestions() {
     if (res.ok) void charger(statut);
   }
 
+  async function publier() {
+    if (!matiereId) return;
+    setPublication(true);
+    const res = await fetch("/api/admin/publier-devoir", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ matiereId, dureeMinutes: Number(duree) || 60 }),
+    });
+    const data = await res.json().catch(() => ({}));
+    setMessage(
+      res.ok
+        ? "Devoir publié avec " + data.nbQuestions + " questions. Les étudiants le voient dans QCM & Examens."
+        : (data.error ?? "Publication impossible."),
+    );
+    setPublication(false);
+  }
+
   function toutValider() {
     if (liste.length === 0) return;
     if (!window.confirm("Valider les " + liste.length + " questions affichées ? Relisez-les d'abord.")) return;
@@ -81,6 +109,46 @@ export default function AdminQuestions() {
           </button>
         ) : null}
       </div>
+
+      <section className="mp-card p-4">
+        <h2 className="text-sm font-bold">Publier un devoir pour les étudiants</h2>
+        <p className="mt-1 text-xs text-mp-grey">
+          Le devoir reprend jusqu&apos;à 50 questions validées de la matière, tirées au hasard. Il apparaît tout de suite
+          dans l&apos;espace des étudiants.
+        </p>
+        <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="md:col-span-2">
+            <label className="mp-label">Matière</label>
+            <select className="mp-input" value={matiereId} onChange={(e) => setMatiereId(e.target.value)}>
+              <option value="">Choisir une matière</option>
+              {matieres.map((m) => (
+                <option key={m.id} value={m.id}>
+                  S{m.semestre} : {m.nom}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="mp-label">Durée (minutes)</label>
+            <input
+              className="mp-input"
+              type="number"
+              min={5}
+              inputMode="numeric"
+              value={duree}
+              onChange={(e) => setDuree(e.target.value)}
+            />
+          </div>
+        </div>
+        <button
+          type="button"
+          className="mp-btn-yellow mt-3 min-h-[44px] md:w-56"
+          onClick={publier}
+          disabled={publication || !matiereId}
+        >
+          {publication ? "Publication..." : "Publier le devoir"}
+        </button>
+      </section>
 
       {message ? <p className="rounded-lg bg-mp-bg px-3 py-2 text-xs">{message}</p> : null}
 
