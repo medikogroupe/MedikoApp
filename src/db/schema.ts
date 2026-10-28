@@ -252,3 +252,18 @@ export const questionsGenerees = pgTable("questions_generees", {
   statut: text("statut").notNull().default("BROUILLON"),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+export const parametres = pgTable("parametres", {
+  cle: text("cle").primaryKey(),
+  valeur: text("valeur").notNull().default(""),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const tutos = pgTable("tutos", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  titre: text("titre").notNull(),
+  lien: text("lien").notNull(),
+  description: text("description").notNull().default(""),
+  ordre: integer("ordre").notNull().default(0),
+  estActif: boolean("est_actif").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
