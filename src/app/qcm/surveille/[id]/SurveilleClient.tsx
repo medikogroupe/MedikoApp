@@ -74,7 +74,8 @@ export default function SurveilleClient({
   }
 
   return (
-    <div ref={conteneur} className="bg-mp-bg">
+    <div ref={conteneur} className="mp-plein bg-mp-bg">
+      <style>{`.mp-plein:fullscreen{overflow-y:auto;height:100%}.mp-plein:-webkit-full-screen{overflow-y:auto;height:100%}`}</style>
       {correction ? (
         <QcmResultat data={correction} filigrane={filigrane} antiTriche={antiTriche} />
       ) : charge ? (
