@@ -46,6 +46,7 @@ export async function POST(request: Request) {
     ? b.filieres.map(String).filter((f: string) => (FILIERES as readonly string[]).includes(f))
     : [];
   const sortiesMax = Math.min(Math.max(Math.round(Number(b?.sortiesMax)) || 0, 0), 50);
+  const antiTriche = Boolean(b?.antiTriche);
 
   let dateLancement = new Date();
   if (b?.dateLancement) {
@@ -149,6 +150,7 @@ export async function POST(request: Request) {
       filieres,
       questionIds: devoir.ids,
       sortiesMax,
+      antiTriche,
       melanger: b?.melanger === undefined ? true : Boolean(b.melanger),
       niveau,
       consignes:

@@ -134,6 +134,8 @@ export const qcmAdmin = pgTable("qcm_admin", {
   /** Nombre de sorties d'écran tolérées avant rendu automatique. 0 = illimité. */
   sortiesMax: integer("sorties_max").notNull().default(0),
   melanger: boolean("melanger").notNull().default(true),
+  /** Filigrane anti-capture et blocage de la copie pendant le devoir. */
+  antiTriche: boolean("anti_triche").notNull().default(false),
   /** Consignes affichees a l'etudiant avant de commencer. */
   consignes: text("consignes").notNull().default(""),
   /** Niveau des questions tirees (L1 a M2). Vide = tous. */

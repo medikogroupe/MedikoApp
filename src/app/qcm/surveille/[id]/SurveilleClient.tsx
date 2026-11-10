@@ -17,6 +17,7 @@ export default function SurveilleClient({
   etat,
   tentativeId,
   filigrane,
+  antiTriche = false,
 }: {
   sessionId: string;
   dureeMinutes: number;
@@ -26,6 +27,7 @@ export default function SurveilleClient({
   etat: Etat;
   tentativeId: string | null;
   filigrane: string;
+  antiTriche?: boolean;
 }) {
   const [charge, setCharge] = useState<Charge | null>(null);
   const [correction, setCorrection] = useState<ResultatFinal | null>(null);
@@ -74,9 +76,9 @@ export default function SurveilleClient({
   return (
     <div ref={conteneur} className="bg-mp-bg">
       {correction ? (
-        <QcmResultat data={correction} filigrane={filigrane} />
+        <QcmResultat data={correction} filigrane={filigrane} antiTriche={antiTriche} />
       ) : charge ? (
-        <QcmRunner charge={charge} />
+        <QcmRunner charge={charge} antiTriche={antiTriche} />
       ) : etat === "TERMINE" && chargement ? (
         <p className="mp-card flex items-center gap-2 p-4 text-sm text-mp-grey">
           <Loader2 size={16} className="animate-spin" /> Chargement de votre correction...
@@ -98,6 +100,9 @@ export default function SurveilleClient({
               {sortiesMax > 0 ? `. Au-delà de ${sortiesMax} sortie(s), votre copie est rendue automatiquement` : ""}.
             </li>
             <li>Vos réponses sont sauvegardées automatiquement. Une question sans réponse vaut 0 point.</li>
+            {antiTriche ? (
+              <li>Un filigrane (votre nom et un avis de contr&ocirc;le) est affich&eacute; sur tout le sujet : toute capture d&apos;&eacute;cran est tra&ccedil;able &agrave; votre nom. Le copier-coller est d&eacute;sactiv&eacute;.</li>
+            ) : null}
             <li>Votre note s&apos;affiche d&egrave;s que vous avez rendu votre copie. La correction d&eacute;taill&eacute;e est publi&eacute;e &agrave; la cl&ocirc;ture du devoir.</li>
             <li>
               Durée : {dureeMinutes} minutes · {nbQuestions} questions. Votre nom est affiché en filigrane sur chaque

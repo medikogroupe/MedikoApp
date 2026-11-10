@@ -23,10 +23,12 @@ export default function QcmRunner({
   charge,
   onClose,
   onFinish,
+  antiTriche = false,
 }: {
   charge: Charge;
   onClose?: () => void;
   onFinish?: () => void;
+  antiTriche?: boolean;
 }) {
   const { tentative, questions } = charge;
   const decalage = useRef(Date.parse(tentative.serverNow) - Date.now());
@@ -135,7 +137,7 @@ export default function QcmRunner({
   if (final) {
     return (
       <div>
-        <QcmResultat data={final} filigrane={tentative.filigrane} />
+        <QcmResultat data={final} filigrane={tentative.filigrane} antiTriche={antiTriche} />
         {onClose ? (
           <button type="button" className="mp-btn-ghost mt-4" onClick={onClose}>
             Revenir aux QCM
@@ -189,7 +191,7 @@ export default function QcmRunner({
   }
 
   return (
-    <ProtectedZone filigrane={tentative.filigrane} masque={masque}>
+    <ProtectedZone filigrane={tentative.filigrane} masque={masque} antiTriche={antiTriche}>
       <div>
         {sorties > 0 && tentative.surveille ? (
           <div className="mp-card mb-3 flex items-start gap-2 border-l-4 border-red-500 p-3">

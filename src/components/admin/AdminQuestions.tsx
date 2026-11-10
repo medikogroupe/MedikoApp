@@ -57,6 +57,7 @@ export default function AdminQuestions() {
   const [dateProg, setDateProg] = useState("");
   const [filieres, setFilieres] = useState<string[]>([]);
   const [sortiesMax, setSortiesMax] = useState("0");
+  const [antiTriche, setAntiTriche] = useState(false);
   const [publication, setPublication] = useState(false);
   const [edition, setEdition] = useState<Edition | null>(null);
   const [erreurEdition, setErreurEdition] = useState("");
@@ -110,6 +111,7 @@ export default function AdminQuestions() {
         dateLancement: dateProg ? new Date(dateProg).toISOString() : undefined,
         filieres,
         sortiesMax: Number(sortiesMax) || 0,
+        antiTriche,
       }),
     });
     const data = await res.json().catch(() => ({}));
@@ -274,6 +276,14 @@ export default function AdminQuestions() {
             {filieres.length === 0 ? "Aucune filière cochée : ouvert à toutes les filières." : "Ouvert uniquement aux filières cochées."}
           </p>
         </div>
+
+        <label className="mt-3 flex min-h-[44px] items-start gap-3 rounded-lg border border-[#dfe3e8] bg-white p-3 text-xs">
+          <input type="checkbox" className="mt-0.5 h-5 w-5" checked={antiTriche} onChange={(e) => setAntiTriche(e.target.checked)} />
+          <span>
+            <span className="block text-sm font-bold">Activer l&apos;anti-triche</span>
+            <span className="block text-mp-grey">Filigrane au nom de l&apos;&eacute;tudiant sur tout le sujet, copier-coller et menu clic long d&eacute;sactiv&eacute;s.</span>
+          </span>
+        </label>
 
         <button type="button" className="mp-btn-yellow mt-3 min-h-[44px] md:w-64" onClick={publier} disabled={publication || !matiereId}>
           {publication ? "Enregistrement..." : dateProg ? "Programmer le devoir" : "Publier le devoir"}

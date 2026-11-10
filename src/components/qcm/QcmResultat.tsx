@@ -13,12 +13,12 @@ function formatDuree(s: number) {
   return `${m} min ${String(s % 60).padStart(2, "0")} s`;
 }
 
-export default function QcmResultat({ data, filigrane }: { data: ResultatFinal; filigrane: string }) {
+export default function QcmResultat({ data, filigrane, antiTriche = false }: { data: ResultatFinal; filigrane: string; antiTriche?: boolean }) {
   const { resultat: r, details } = data;
   const pourcentage = r.pointsMax > 0 ? Math.round((Math.max(0, r.points) / r.pointsMax) * 100) : 0;
 
   return (
-    <ProtectedZone filigrane={filigrane}>
+    <ProtectedZone filigrane={filigrane} antiTriche={antiTriche}>
       <div className="space-y-3">
         <section className="mp-card p-4 text-center">
           <p className="text-xs font-semibold uppercase tracking-wide text-mp-grey">Résultat : {r.titre}</p>

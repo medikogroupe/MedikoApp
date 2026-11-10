@@ -66,6 +66,7 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
           etat={etat}
           tentativeId={(terminee ?? enCours)?.id ?? null}
           filigrane={`${user.nomWhatsapp} ${user.numeroWhatsapp}`}
+          antiTriche={session.antiTriche}
         />
       )}
     </PageShell>
