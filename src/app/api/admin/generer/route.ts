@@ -3,48 +3,47 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { matieres, pdfCours, questionsGenerees } from "@/db/schema";
 import { isAdmin } from "@/lib/auth";
+import {
+  MARQUEUR_A_VERIFIER,
+  empreinte,
+  estDoublon,
+  nettoyerQuestion,
+  type Brute,
+  type Empreinte,
+} from "@/lib/generation";
 
 export const maxDuration = 60;
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-type Brute = {
-  type?: unknown;
-  contexte?: unknown;
-  question?: unknown;
-  options?: unknown;
-  bonnes_reponses?: unknown;
-  explication?: unknown;
-};
+const FORMAT =
+  "Chaque élément contient : type, contexte (vide sauf pour CAS), question, options (sans les lettres A, B, C), " +
+  "bonnes_reponses (positions des bonnes propositions, en commençant à 0) et explication (une ou deux phrases). " +
+  "N'utilise jamais de tiret long. Réponds uniquement par un tableau JSON valide.";
 
-function nettoyer(b: Brute) {
-  const type = b.type === "QCU" || b.type === "QCM" || b.type === "QCD" || b.type === "CAS" ? b.type : null;
-  if (!type) return null;
-  const question = typeof b.question === "string" ? b.question.trim() : "";
-  const contexte = typeof b.contexte === "string" ? b.contexte.trim() : "";
-  const options = Array.isArray(b.options)
-    ? (b.options as unknown[])
-        .filter((o): o is string => typeof o === "string")
-        .map((o) => o.trim())
-        .filter(Boolean)
-    : [];
-  const bonnes = Array.isArray(b.bonnes_reponses)
-    ? Array.from(
-        new Set(
-          (b.bonnes_reponses as unknown[]).filter(
-            (n): n is number => typeof n === "number" && Number.isInteger(n) && n >= 0 && n < options.length,
-          ),
-        ),
-      ).sort((x, y) => x - y)
-    : [];
-  const explication = typeof b.explication === "string" ? b.explication.trim() : "";
-  if (!question || options.length < 2 || bonnes.length === 0) return null;
-  if (type !== "QCD" && options.length < 3) return null;
-  if (type !== "QCM" && bonnes.length !== 1) return null;
-  if (type === "QCM" && (bonnes.length < 2 || bonnes.length >= options.length)) return null;
-  if (type === "QCD" && options.length !== 2) return null;
-  if (type === "CAS" && !contexte) return null;
-  return { type, contexte: type === "CAS" ? contexte : "", question, options, bonnes, explication };
+function consigneGeneration(matiere: string, texte: string): string {
+  return (
+    "Matière : " + matiere + "\n\nTexte du cours :\n" + texte +
+    "\n\nÉcris exactement 5 questions : 2 de type QCU (une seule bonne réponse parmi 4 propositions), " +
+    "1 de type QCM (2 ou 3 bonnes réponses parmi 5 propositions), 1 de type QCD (une affirmation avec exactement deux propositions, Vrai et Faux, dont une seule est correcte) et 1 de type CAS (un court cas clinique " +
+    "de 3 à 5 phrases dans un contexte africain réaliste, suivi d'une question à choix unique avec " +
+    "4 propositions et une seule bonne réponse). " + FORMAT +
+    " Français simple, niveau Licence 1. Ne pose que des questions dont la réponse se trouve dans le texte."
+  );
+}
+
+function consigneExtraction(matiere: string, texte: string): string {
+  return (
+    "Matière : " + matiere + "\n\nTexte du document :\n" + texte +
+    "\n\nCe texte contient des questions d'examen (choix unique, choix multiples, vrai ou faux, cas cliniques). " +
+    "Recopie chaque question COMPLÈTE présente dans ce texte, sans en inventer et sans reformuler l'énoncé ni les propositions. " +
+    "Ignore toute question coupée au début ou à la fin du texte. " +
+    "Types : QCU (une seule bonne réponse), QCM (plusieurs bonnes réponses), QCD (vrai ou faux, exactement deux propositions), " +
+    "CAS (cas clinique : mets le récit dans contexte et la question dans question). " + FORMAT +
+    " Ajoute aussi reponse_dans_document : true si le document indique lui-même la bonne réponse (corrigé, cases cochées, " +
+    "réponses en fin de document), false sinon. Si le document ne donne pas la réponse, propose celle que tu juges la plus probable " +
+    "et mets reponse_dans_document à false. Reprends l'explication du document si elle existe, sinon écris une phrase courte."
+  );
 }
 
 export async function POST(request: Request) {
@@ -55,7 +54,8 @@ export async function POST(request: Request) {
   }
   const b = await request.json().catch(() => null);
   const pdfId = String(b?.pdfId ?? "");
-  const texte = String(b?.texte ?? "").trim().slice(0, 8000);
+  const extraire = b?.mode === "extraire";
+  const texte = String(b?.texte ?? "").trim().slice(0, extraire ? 9000 : 8000);
   if (!UUID.test(pdfId)) return NextResponse.json({ error: "Document invalide." }, { status: 400 });
   if (texte.length < 300) return NextResponse.json({ error: "Texte trop court." }, { status: 400 });
 
@@ -70,40 +70,35 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Rattachez ce PDF à une matière avant de générer." }, { status: 400 });
   }
 
-  const consigne =
-    "Matière : " + (pdf.nom ?? "") + "\n\nTexte du cours :\n" + texte +
-    "\n\nÉcris exactement 5 questions : 2 de type QCU (une seule bonne réponse parmi 4 propositions), " +
-    "1 de type QCM (2 ou 3 bonnes réponses parmi 5 propositions), 1 de type QCD (une affirmation avec exactement deux propositions, Vrai et Faux, dont une seule est correcte) et 1 de type CAS (un court cas clinique " +
-    "de 3 à 5 phrases dans un contexte africain réaliste, suivi d'une question à choix unique avec " +
-    "4 propositions et une seule bonne réponse). Chaque élément contient : type, contexte (vide sauf pour CAS), " +
-    "question, options, bonnes_reponses (positions des bonnes propositions, en commençant à 0) et " +
-    "explication (une ou deux phrases). Français simple, niveau Licence 1. Ne pose que des questions " +
-    "dont la réponse se trouve dans le texte. N'utilise jamais de tiret long. Réponds uniquement par un " +
-    "tableau JSON valide.";
+  const consigne = extraire ? consigneExtraction(pdf.nom ?? "", texte) : consigneGeneration(pdf.nom ?? "", texte);
+  const systeme = extraire
+    ? "Tu es enseignant en sciences infirmières et obstétricales en Côte d'Ivoire. Tu recopies fidèlement des questions d'évaluation existantes, sans rien inventer ni modifier."
+    : "Tu es enseignant en sciences infirmières et obstétricales en Côte d'Ivoire. Tu écris des questions d'évaluation fiables, uniquement à partir du texte fourni, sans rien inventer.";
 
   const modeles = [process.env.GEMINI_MODEL || "gemini-3.8-flash", "gemini-3.6-flash", "gemini-3.1-flash-lite"];
-  const appelBrut = (modele: string) => fetch(
-    "https://generativelanguage.googleapis.com/v1beta/models/" + modele + ":generateContent",
-    {
+  const appelBrut = (modele: string) =>
+    fetch("https://generativelanguage.googleapis.com/v1beta/models/" + modele + ":generateContent", {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": cle },
       signal: AbortSignal.timeout(15000),
       body: JSON.stringify({
-        systemInstruction: {
-          parts: [
-            {
-              text: "Tu es enseignant en sciences infirmières et obstétricales en Côte d'Ivoire. Tu écris des questions d'évaluation fiables, uniquement à partir du texte fourni, sans rien inventer.",
-            },
-          ],
-        },
+        systemInstruction: { parts: [{ text: systeme }] },
         contents: [{ role: "user", parts: [{ text: consigne }] }],
-        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 4000, thinkingConfig: { thinkingLevel: "low" }, temperature: 0.4 },
+        generationConfig: {
+          responseMimeType: "application/json",
+          maxOutputTokens: extraire ? 6000 : 4000,
+          thinkingConfig: { thinkingLevel: "low" },
+          temperature: extraire ? 0.1 : 0.4,
+        },
       }),
-    },
-  );
+    });
   const appel = (m: string) => appelBrut(m).catch(() => new Response(null, { status: 504 }));
   let reponse = await appel(modeles[0]);
-  for (let essai = 1; essai < 3 && (reponse.status === 503 || reponse.status === 500 || reponse.status === 404 || reponse.status === 504); essai++) {
+  for (
+    let essai = 1;
+    essai < 3 && (reponse.status === 503 || reponse.status === 500 || reponse.status === 404 || reponse.status === 504);
+    essai++
+  ) {
     await new Promise((r) => setTimeout(r, 2500));
     reponse = await appel(modeles[essai % modeles.length]);
   }
@@ -127,20 +122,51 @@ export async function POST(request: Request) {
   } catch {
     liste = [];
   }
-  const valides = liste.map(nettoyer).filter((x): x is NonNullable<ReturnType<typeof nettoyer>> => x !== null);
-  if (valides.length === 0) return NextResponse.json({ ajoutees: 0 });
 
-  await db.insert(questionsGenerees).values(
-    valides.map((v) => ({
-      matiereId: pdf.matiereId as string,
-      pdfId,
-      type: v.type,
-      contexte: v.contexte,
-      question: v.question,
-      options: v.options,
-      bonnesReponses: v.bonnes,
-      explication: v.explication,
-    })),
-  );
-  return NextResponse.json({ ajoutees: valides.length });
+  const valides = liste
+    .map((item) => ({ q: nettoyerQuestion(item), incertaine: extraire && item.reponse_dans_document !== true }))
+    .filter((x): x is { q: NonNullable<ReturnType<typeof nettoyerQuestion>>; incertaine: boolean } => x.q !== null);
+  if (valides.length === 0) return NextResponse.json({ ajoutees: 0, doublons: 0, incertaines: 0, recues: liste.length });
+
+  // Doublons : on compare à toutes les questions de la matière (y compris rejetées) et au lot en cours.
+  const existantes: Empreinte[] = (
+    await db
+      .select({ question: questionsGenerees.question })
+      .from(questionsGenerees)
+      .where(eq(questionsGenerees.matiereId, pdf.matiereId))
+      .limit(3000)
+  ).map((e) => empreinte(e.question));
+
+  const retenues: typeof valides = [];
+  let doublons = 0;
+  for (const v of valides) {
+    const e = empreinte(v.q.question);
+    if (estDoublon(e, existantes)) {
+      doublons += 1;
+      continue;
+    }
+    existantes.push(e);
+    retenues.push(v);
+  }
+
+  if (retenues.length > 0) {
+    await db.insert(questionsGenerees).values(
+      retenues.map(({ q, incertaine }) => ({
+        matiereId: pdf.matiereId as string,
+        pdfId,
+        type: q.type,
+        contexte: q.contexte,
+        question: q.question,
+        options: q.options,
+        bonnesReponses: q.bonnes,
+        explication: incertaine ? MARQUEUR_A_VERIFIER + q.explication : q.explication,
+      })),
+    );
+  }
+  return NextResponse.json({
+    ajoutees: retenues.length,
+    doublons,
+    incertaines: retenues.filter((r) => r.incertaine).length,
+    recues: liste.length,
+  });
 }
