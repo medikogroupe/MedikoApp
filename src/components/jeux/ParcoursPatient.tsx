@@ -3,9 +3,9 @@
 import { useEffect, useState } from "react";
 import { HeartPulse, Loader2, RotateCcw, Stethoscope } from "lucide-react";
 
-type CasInfo = { id: string; titre: string; gravite: string; duree: string; patient: string; resume: string; nbEtapes: number };
+type CasInfo = { id: string; titre: string; gravite: string; duree: string; patient: string; icone: string; resume: string; nbEtapes: number };
 type Vue = {
-  cas: { id: string; titre: string; gravite: string; patient: string };
+  cas: { id: string; titre: string; gravite: string; patient: string; icone: string };
   etape: number;
   total: number;
   moment: string;
@@ -27,6 +27,19 @@ type Fin = {
 };
 type Reponse = Fin | (Retour & { termine: false; token: string; vue: Vue });
 
+function Icone({ nom, taille = 56, gris = false }: { nom: string; taille?: number; gris?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/jeux/icones/${nom}.png`}
+      alt=""
+      width={taille}
+      height={taille}
+      draggable={false}
+      className={`shrink-0 object-contain drop-shadow-md ${gris ? "grayscale opacity-70" : ""}`}
+    />
+  );
+}
 const GRAVITE: Record<string, { label: string; classe: string }> = {
   LEGER: { label: "Léger", classe: "bg-green-100 text-green-800" },
   MODERE: { label: "Modéré", classe: "bg-yellow-100 text-yellow-800" },
@@ -177,7 +190,10 @@ export default function ParcoursPatient() {
       <div>
         <div className="mp-card p-4">
           <div className="flex items-center justify-between text-xs">
-            <span className="font-bold text-mp-blue">{vue.cas.patient}</span>
+            <span className="flex items-center gap-2 font-bold text-mp-blue">
+              <Icone nom={vue.cas.icone} taille={40} />
+              {vue.cas.patient}
+            </span>
             <span className="text-mp-grey">
               Étape {vue.etape}/{vue.total}
             </span>
@@ -227,6 +243,9 @@ export default function ParcoursPatient() {
               <Correction retour={{ niveau: fin.niveau, retour: fin.retour, attendu: fin.attendu, sante: fin.sante }} />
             ) : null}
             <div className="mp-card mt-3 p-4 text-center">
+              <div className="mb-2 flex justify-center">
+                <Icone nom={vue.cas.icone} taille={72} gris={fin.issue === "DECES"} />
+              </div>
               <p className={`text-base font-bold ${ISSUE[fin.issue].classe}`}>{ISSUE[fin.issue].titre}</p>
               <p className="mt-2 text-sm">{fin.bilan}</p>
               <p className="mt-2 text-xs text-mp-grey">
@@ -271,7 +290,10 @@ export default function ParcoursPatient() {
               className="mp-card block min-h-[44px] w-full p-4 text-left"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="text-sm font-bold">{c.titre}</span>
+                <span className="flex items-center gap-3 text-sm font-bold">
+                  <Icone nom={c.icone} taille={48} />
+                  {c.titre}
+                </span>
                 <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${(GRAVITE[c.gravite] ?? GRAVITE.MODERE).classe}`}>
                   {(GRAVITE[c.gravite] ?? GRAVITE.MODERE).label}
                 </span>

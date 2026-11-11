@@ -347,8 +347,8 @@ export default function JeuxPage() {
       </Link>
 
       <Link href="/jeux/parcours" className="mp-card mb-4 flex items-center gap-3 p-4">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mp-blue text-white">
-          <Activity size={22} />
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mp-bg">
+          <img src="/jeux/icones/stetho.png" alt="" width={34} height={34} className="object-contain" draggable={false} />
         </span>
         <span className="flex-1">
           <span className="block text-sm font-bold">Parcours patient</span>
