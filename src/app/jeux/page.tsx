@@ -346,6 +346,16 @@ export default function JeuxPage() {
         </span>
       </Link>
 
+      <Link href="/jeux/parcours" className="mp-card mb-4 flex items-center gap-3 p-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mp-blue text-white">
+          <Activity size={22} />
+        </span>
+        <span className="flex-1">
+          <span className="block text-sm font-bold">Parcours patient</span>
+          <span className="block text-xs text-mp-grey">De l&apos;accueil &agrave; la gu&eacute;rison : soignez un patient, une erreur peut lui co&ucirc;ter la vie.</span>
+        </span>
+      </Link>
+
       <div className="flex gap-2">
         {onglets.map((o) => {
           const Icon = o.icon;
