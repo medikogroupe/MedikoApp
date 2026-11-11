@@ -1,5 +1,5 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
-import { CAS, type Cas, type Gravite } from "@/lib/parcours-cas";
+import type { Cas, Gravite } from "@/lib/parcours-cas";
 
 export const SANTE_DEPART = 60;
 const DUREE_MAX_MS = 12 * 3600 * 1000;
@@ -52,10 +52,7 @@ export function signer(e: Etat): string {
   return `${charge}.${signature}`;
 }
 
-function trouver(id: string): Cas | undefined {
-  return CAS.find((c) => c.id === id);
-}
-
+/** Verifie la signature et la forme du jeton. Le cas lui-meme est verifie ensuite avec verifier(). */
 export function lire(jeton: unknown): Etat | null {
   if (typeof jeton !== "string") return null;
   const [charge, signature] = jeton.split(".");
@@ -65,9 +62,8 @@ export function lire(jeton: unknown): Etat | null {
   if (recu.length !== attendu.length || !timingSafeEqual(recu, attendu)) return null;
   try {
     const e = JSON.parse(Buffer.from(charge, "base64url").toString("utf8")) as Etat;
-    const cas = trouver(String(e.c));
-    if (e.v !== 1 || !cas) return null;
-    if (!Number.isInteger(e.e) || e.e < 0 || e.e >= cas.etapes.length) return null;
+    if (e.v !== 1 || typeof e.c !== "string" || !e.c) return null;
+    if (!Number.isInteger(e.e) || e.e < 0) return null;
     if (!Number.isFinite(e.s) || e.s <= 0 || e.s > 100) return null;
     if (!Number.isInteger(e.seed) || !Number.isInteger(e.f) || e.f < 0) return null;
     if (!Number.isFinite(e.t) || Date.now() - e.t > DUREE_MAX_MS) return null;
@@ -77,7 +73,11 @@ export function lire(jeton: unknown): Etat | null {
   }
 }
 
-/** Ordre d'affichage des choix : mélangé de façon stable pour une partie donnée. */
+export function verifier(e: Etat, cas: Cas): boolean {
+  return e.c === cas.id && e.e < cas.etapes.length;
+}
+
+/** Ordre d'affichage des choix : melange de facon stable pour une partie donnee. */
 function melange(seed: number, etape: number, n: number): number[] {
   const a = Array.from({ length: n }, (_, i) => i);
   let x = (seed ^ Math.imul(etape + 1, 0x9e3779b1)) | 0;
@@ -94,28 +94,11 @@ function melange(seed: number, etape: number, n: number): number[] {
   return a;
 }
 
-export function listeCas() {
-  return CAS.map((c) => ({
-    id: c.id,
-    titre: c.titre,
-    gravite: c.gravite,
-    duree: c.duree,
-    icone: c.icone,
-    patient: c.patient,
-    resume: c.resume,
-    nbEtapes: c.etapes.length,
-  }));
-}
-
-export function nouvellePartie(id: string): Etat {
-  const cas = trouver(id);
-  if (!cas) throw new Error("Patient inconnu.");
+export function nouvellePartie(cas: Cas): Etat {
   return { v: 1, c: cas.id, e: 0, s: SANTE_DEPART, seed: randomInt(1, 2147483647), f: 0, t: Date.now() };
 }
 
-export function vue(e: Etat): Vue {
-  const cas = trouver(e.c);
-  if (!cas) throw new Error("Patient inconnu.");
+export function vue(e: Etat, cas: Cas): Vue {
   const etape = cas.etapes[e.e];
   const ordre = melange(e.seed, e.e, etape.choix.length);
   return {
@@ -135,9 +118,7 @@ function conclure(cas: Cas, issue: Issue, niveau: Niveau | null, retour: string,
   return { termine: true, issue, niveau, retour, attendu, sante, erreurs, bilan };
 }
 
-export function choisir(e: Etat, choixAffiche: number): Fin | Suite {
-  const cas = trouver(e.c);
-  if (!cas) throw new Error("Patient inconnu.");
+export function choisir(e: Etat, cas: Cas, choixAffiche: number): Fin | Suite {
   const etape = cas.etapes[e.e];
   const ordre = melange(e.seed, e.e, etape.choix.length);
   if (!Number.isInteger(choixAffiche) || choixAffiche < 0 || choixAffiche >= ordre.length) throw new Error("Choix invalide.");
@@ -154,11 +135,9 @@ export function choisir(e: Etat, choixAffiche: number): Fin | Suite {
     return conclure(cas, issue, niveau, choix.retour, attendu, sante, erreurs);
   }
   const suivant: Etat = { ...e, e: e.e + 1, s: sante, f: erreurs };
-  return { termine: false, niveau, retour: choix.retour, attendu, sante, token: signer(suivant), vue: vue(suivant) };
+  return { termine: false, niveau, retour: choix.retour, attendu, sante, token: signer(suivant), vue: vue(suivant, cas) };
 }
 
-export function abandonner(e: Etat): Fin {
-  const cas = trouver(e.c);
-  if (!cas) throw new Error("Patient inconnu.");
+export function abandonner(e: Etat, cas: Cas): Fin {
   return conclure(cas, "ABANDON", null, "", "", e.s, e.f);
 }

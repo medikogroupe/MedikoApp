@@ -269,3 +269,19 @@ export const tutos = pgTable("tutos", {
   estActif: boolean("est_actif").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Cas cliniques du jeu Parcours patient : actifs (visibles des etudiants) ou en brouillon. */
+export const jeuCas = pgTable("jeu_cas", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  slug: text("slug").notNull().unique(),
+  titre: text("titre").notNull(),
+  gravite: text("gravite").notNull().default("MODERE"),
+  patient: text("patient").notNull().default(""),
+  duree: text("duree").notNull().default(""),
+  icone: text("icone").notNull().default("stetho"),
+  resume: text("resume").notNull().default(""),
+  contenu: jsonb("contenu").$type<Record<string, unknown>>().notNull().default({}),
+  statut: text("statut").notNull().default("BROUILLON"),
+  ordre: integer("ordre").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
