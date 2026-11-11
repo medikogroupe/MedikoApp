@@ -5,6 +5,7 @@ import { CAS, type Cas, type Etape, type Gravite } from "@/lib/parcours-cas";
 
 const GRAVITES = ["LEGER", "MODERE", "GRAVE", "CRITIQUE"];
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const AVATARS = ["enfant", "bebe", "homme", "femme", "enceinte"];
 
 type Ligne = typeof jeuCas.$inferSelect;
 
@@ -20,6 +21,7 @@ export function versCas(r: Ligne): Cas {
     gravite: (GRAVITES.includes(r.gravite) ? r.gravite : "MODERE") as Gravite,
     duree: r.duree,
     icone: r.icone,
+    avatar: typeof k.avatar === "string" && k.avatar ? k.avatar : undefined,
     patient: r.patient,
     resume: r.resume,
     finBonne: String(k.finBonne ?? ""),
@@ -40,6 +42,7 @@ export async function enregistrerCas(c: Cas, statut: "BROUILLON" | "ACTIF"): Pro
     resume: c.resume,
     contenu: {
       format: 1,
+      avatar: c.avatar ?? "",
       finBonne: c.finBonne,
       finMoyenne: c.finMoyenne,
       finMauvaise: c.finMauvaise,
@@ -80,6 +83,7 @@ export async function listerCasActifs() {
       icone: c.icone,
       resume: c.resume,
       nbEtapes: c.etapes.length,
+      avatar: c.avatar ?? "homme",
     };
   });
 }
@@ -156,6 +160,7 @@ export function validerCas(brut: unknown): { cas: Cas } | { erreur: string } {
       duree: txt(b.duree, 60),
       icone,
       patient,
+      avatar: AVATARS.includes(txt(b.avatar, 20)) ? txt(b.avatar, 20) : undefined,
       resume: txt(b.resume, 300),
       finBonne,
       finMoyenne,

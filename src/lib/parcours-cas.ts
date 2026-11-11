@@ -19,6 +19,8 @@ export type Cas = {
   duree: string;
   /** Nom du fichier icone 3D (public/jeux/icones, sans extension). */
   icone: string;
+  /** Silhouette du patient : enfant, bebe, homme, femme ou enceinte. */
+  avatar?: string;
   patient: string;
   resume: string;
   finBonne: string;
@@ -34,6 +36,7 @@ export const CAS: Cas[] = [
     gravite: "GRAVE",
     duree: "1 semaine de suivi",
     icone: "moustique",
+    avatar: "enfant",
     patient: "Koffi, 4 ans",
     resume: "Un enfant arrive somnolent après une convulsion. Saurez-vous le sauver ?",
     finBonne: "Koffi sort guéri au bout d'une semaine, sans séquelle. Votre rapidité et vos bons choix lui ont sauvé la vie.",

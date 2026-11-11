@@ -2,6 +2,7 @@
 import AdminPdf from "@/components/admin/AdminPdf";
 import AdminQuestions from "@/components/admin/AdminQuestions";
 import AdminParametres from "@/components/admin/AdminParametres";
+import AdminCasCliniques from "@/components/admin/AdminCasCliniques";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -97,7 +98,7 @@ const ONGLETS = [
   { id: "qcm", label: "Devoirs" },
   { id: "pdf", label: "Cours PDF" },
   { id: "questions", label: "Questions à relire" },
-  { id: "parametres", label: "Paramètres" },
+  { id: "parametres", label: "Paramètres" }, { id: "cas", label: "Cas cliniques" },
   { id: "pharmacies", label: "Pharmacies" },
 ] as const;
 
@@ -689,6 +690,7 @@ export default function AdminDashboard() {
       {onglet === "pdf" ? <AdminPdf /> : null}
       {onglet === "questions" ? <AdminQuestions /> : null}
       {onglet === "parametres" ? <AdminParametres /> : null}
+      {onglet === "cas" ? <AdminCasCliniques /> : null}
 
       {onglet === "pharmacies" ? (
         <div className="mt-4 space-y-4">

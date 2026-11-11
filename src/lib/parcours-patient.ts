@@ -7,7 +7,7 @@ const DUREE_MAX_MS = 12 * 3600 * 1000;
 export type Etat = { v: 1; c: string; e: number; s: number; seed: number; f: number; t: number };
 
 export type Vue = {
-  cas: { id: string; titre: string; gravite: Gravite; patient: string; icone: string };
+  cas: { id: string; titre: string; gravite: Gravite; patient: string; icone: string; avatar: string };
   etape: number;
   total: number;
   moment: string;
@@ -102,7 +102,7 @@ export function vue(e: Etat, cas: Cas): Vue {
   const etape = cas.etapes[e.e];
   const ordre = melange(e.seed, e.e, etape.choix.length);
   return {
-    cas: { id: cas.id, titre: cas.titre, gravite: cas.gravite, patient: cas.patient, icone: cas.icone },
+    cas: { id: cas.id, titre: cas.titre, gravite: cas.gravite, patient: cas.patient, icone: cas.icone, avatar: cas.avatar ?? "homme" },
     etape: e.e + 1,
     total: cas.etapes.length,
     moment: etape.moment,

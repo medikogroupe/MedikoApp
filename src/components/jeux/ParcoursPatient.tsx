@@ -2,10 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { HeartPulse, Loader2, RotateCcw, Stethoscope } from "lucide-react";
+import Portrait, { avatarSur } from "@/components/jeux/Portrait";
+import SceneHopital from "@/components/jeux/SceneHopital";
 
-type CasInfo = { id: string; titre: string; gravite: string; duree: string; patient: string; icone: string; resume: string; nbEtapes: number };
+type CasInfo = {
+  id: string;
+  titre: string;
+  gravite: string;
+  duree: string;
+  patient: string;
+  avatar: string;
+  icone: string;
+  resume: string;
+  nbEtapes: number;
+};
 type Vue = {
-  cas: { id: string; titre: string; gravite: string; patient: string; icone: string };
+  cas: { id: string; titre: string; gravite: string; patient: string; icone: string; avatar: string };
   etape: number;
   total: number;
   moment: string;
@@ -27,25 +39,20 @@ type Fin = {
 };
 type Reponse = Fin | (Retour & { termine: false; token: string; vue: Vue });
 
-function Icone({ nom, taille = 56, gris = false }: { nom: string; taille?: number; gris?: boolean }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={`/jeux/icones/${nom}.png`}
-      alt=""
-      width={taille}
-      height={taille}
-      draggable={false}
-      className={`shrink-0 object-contain drop-shadow-md ${gris ? "grayscale opacity-70" : ""}`}
-    />
-  );
-}
-const GRAVITE: Record<string, { label: string; classe: string }> = {
-  LEGER: { label: "Léger", classe: "bg-green-100 text-green-800" },
-  MODERE: { label: "Modéré", classe: "bg-yellow-100 text-yellow-800" },
-  GRAVE: { label: "Grave", classe: "bg-orange-100 text-orange-800" },
-  CRITIQUE: { label: "Critique", classe: "bg-red-100 text-red-800" },
+const GRAVITE: Record<string, { label: string; classe: string; niveau: number }> = {
+  LEGER: { label: "Léger", classe: "bg-green-100 text-green-800", niveau: 1 },
+  MODERE: { label: "Modéré", classe: "bg-yellow-100 text-yellow-800", niveau: 2 },
+  GRAVE: { label: "Grave", classe: "bg-orange-100 text-orange-800", niveau: 3 },
+  CRITIQUE: { label: "Critique", classe: "bg-red-100 text-red-800", niveau: 4 },
 };
+
+const FILTRES = [
+  { id: "TOUS", label: "Tous" },
+  { id: "LEGER", label: "Léger" },
+  { id: "MODERE", label: "Modéré" },
+  { id: "GRAVE", label: "Grave" },
+  { id: "CRITIQUE", label: "Critique" },
+];
 
 const NIVEAU: Record<Niveau, { label: string; classe: string }> = {
   BON: { label: "Bonne décision", classe: "bg-green-100 text-green-800" },
@@ -69,6 +76,32 @@ async function appel<T>(corps: Record<string, unknown>): Promise<T> {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error((data as { error?: string }).error ?? "Erreur du jeu.");
   return data as T;
+}
+
+function Icone({ nom, taille = 56, gris = false }: { nom: string; taille?: number; gris?: boolean }) {
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      src={`/jeux/icones/${nom}.png`}
+      alt=""
+      width={taille}
+      height={taille}
+      draggable={false}
+      className={`shrink-0 object-contain drop-shadow-md ${gris ? "grayscale opacity-70" : ""}`}
+    />
+  );
+}
+
+function BarresGravite({ gravite }: { gravite: string }) {
+  const n = (GRAVITE[gravite] ?? GRAVITE.MODERE).niveau;
+  const couleur = n === 1 ? "bg-green-500" : n === 2 ? "bg-yellow-400" : n === 3 ? "bg-orange-500" : "bg-red-600";
+  return (
+    <span className="flex gap-0.5" aria-hidden="true">
+      {[1, 2, 3, 4].map((i) => (
+        <span key={i} className={`h-1.5 w-4 rounded-full ${i <= n ? couleur : "bg-[#e1e6ec]"}`} />
+      ))}
+    </span>
+  );
 }
 
 function Jauge({ valeur }: { valeur: number }) {
@@ -97,7 +130,7 @@ function Correction({ retour }: { retour: Retour }) {
       <p className="mt-2 text-sm">{retour.retour}</p>
       {retour.attendu ? (
         <div className="mt-3 rounded-lg bg-mp-bg p-3 text-xs">
-          <p className="font-bold">Ce qu&apos;il fallait faire</p>
+          <p className="font-bold">Ce qu’il fallait faire</p>
           <p className="mt-1 text-mp-grey">{retour.attendu}</p>
         </div>
       ) : null}
@@ -107,6 +140,7 @@ function Correction({ retour }: { retour: Retour }) {
 
 export default function ParcoursPatient() {
   const [liste, setListe] = useState<CasInfo[]>([]);
+  const [filtre, setFiltre] = useState("TOUS");
   const [chargement, setChargement] = useState(true);
   const [occupe, setOccupe] = useState(false);
   const [erreur, setErreur] = useState("");
@@ -128,6 +162,8 @@ export default function ParcoursPatient() {
       .finally(() => {
         if (actif) setChargement(false);
       });
+    const direct = new URLSearchParams(window.location.search).get("cas");
+    if (direct) void demarrer(direct);
     return () => {
       actif = false;
     };
@@ -186,12 +222,15 @@ export default function ParcoursPatient() {
 
   if (vue) {
     const sante = fin ? fin.sante : retour ? retour.sante : vue.sante;
+    const mort = fin?.issue === "DECES";
     return (
       <div>
-        <div className="mp-card p-4">
-          <div className="flex items-center justify-between text-xs">
+        <SceneHopital avatar={avatarSur(vue.cas.avatar)} sante={sante} mort={mort} />
+
+        <div className="mp-card mt-3 p-4">
+          <div className="flex items-center justify-between gap-2 text-xs">
             <span className="flex items-center gap-2 font-bold text-mp-blue">
-              <Icone nom={vue.cas.icone} taille={40} />
+              <Icone nom={vue.cas.icone} taille={36} gris={mort} />
               {vue.cas.patient}
             </span>
             <span className="text-mp-grey">
@@ -243,9 +282,6 @@ export default function ParcoursPatient() {
               <Correction retour={{ niveau: fin.niveau, retour: fin.retour, attendu: fin.attendu, sante: fin.sante }} />
             ) : null}
             <div className="mp-card mt-3 p-4 text-center">
-              <div className="mb-2 flex justify-center">
-                <Icone nom={vue.cas.icone} taille={72} gris={fin.issue === "DECES"} />
-              </div>
               <p className={`text-base font-bold ${ISSUE[fin.issue].classe}`}>{ISSUE[fin.issue].titre}</p>
               <p className="mt-2 text-sm">{fin.bilan}</p>
               <p className="mt-2 text-xs text-mp-grey">
@@ -263,25 +299,47 @@ export default function ParcoursPatient() {
     );
   }
 
+  const visibles = liste.filter((c) => filtre === "TOUS" || c.gravite === filtre);
+
   return (
     <div>
       <div className="mp-card p-4">
         <p className="flex items-center gap-2 text-sm font-bold">
-          <Stethoscope size={16} className="text-mp-blue" /> Choisissez un patient
+          <Stethoscope size={16} className="text-mp-blue" /> Choisissez un patient à soigner
         </p>
         <p className="mt-1 text-xs text-mp-grey">
-          Prenez en charge un patient de l&apos;accueil jusqu&apos;à la guérison. Chaque décision compte : une erreur grave
-          peut entraîner le décès. Jeu de révision : il ne remplace pas les protocoles officiels.
+          Prenez en charge un patient de l’accueil jusqu’à la guérison. Chaque décision compte : une erreur grave peut entraîner le
+          décès. Jeu de révision : il ne remplace pas les protocoles officiels.
         </p>
+        <p className="mt-2 text-xs font-semibold text-mp-blue">
+          {liste.length} patient{liste.length > 1 ? "s" : ""} disponible{liste.length > 1 ? "s" : ""}
+        </p>
+      </div>
+
+      <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+        {FILTRES.map((f) => (
+          <button
+            key={f.id}
+            type="button"
+            onClick={() => setFiltre(f.id)}
+            className={`min-h-[40px] shrink-0 rounded-full px-4 text-xs font-bold ${
+              filtre === f.id ? "bg-mp-blue text-white" : "mp-card text-mp-grey"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
 
       {chargement ? (
         <p className="mp-card mt-3 flex items-center gap-2 p-4 text-sm text-mp-grey">
           <Loader2 size={16} className="animate-spin" /> Chargement...
         </p>
+      ) : visibles.length === 0 ? (
+        <p className="mp-card mt-3 p-4 text-sm text-mp-grey">Aucun patient dans cette catégorie pour le moment.</p>
       ) : (
         <div className="mt-3 space-y-3">
-          {liste.map((c) => (
+          {visibles.map((c) => (
             <button
               key={c.id}
               type="button"
@@ -289,19 +347,25 @@ export default function ParcoursPatient() {
               onClick={() => void demarrer(c.id)}
               className="mp-card block min-h-[44px] w-full p-4 text-left"
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-3 text-sm font-bold">
-                  <Icone nom={c.icone} taille={48} />
-                  {c.titre}
-                </span>
-                <span className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-bold ${(GRAVITE[c.gravite] ?? GRAVITE.MODERE).classe}`}>
-                  {(GRAVITE[c.gravite] ?? GRAVITE.MODERE).label}
-                </span>
+              <div className="flex items-start gap-3">
+                <Portrait avatar={avatarSur(c.avatar)} taille={64} />
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="text-sm font-bold">{c.titre}</span>
+                    <Icone nom={c.icone} taille={34} />
+                  </div>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${(GRAVITE[c.gravite] ?? GRAVITE.MODERE).classe}`}>
+                      {(GRAVITE[c.gravite] ?? GRAVITE.MODERE).label}
+                    </span>
+                    <BarresGravite gravite={c.gravite} />
+                  </div>
+                  <p className="mt-1 text-xs text-mp-grey">
+                    {c.patient} · {c.nbEtapes} étapes · {c.duree}
+                  </p>
+                  <p className="mt-1 text-xs">{c.resume}</p>
+                </div>
               </div>
-              <p className="mt-1 text-xs text-mp-grey">
-                {c.patient} · {c.nbEtapes} étapes · {c.duree}
-              </p>
-              <p className="mt-2 text-xs">{c.resume}</p>
             </button>
           ))}
         </div>
