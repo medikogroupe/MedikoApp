@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import type { ReactNode } from "react";
 import { LogoIcon } from "@/components/Logo";
 import Cloche from "@/components/Cloche";
+import BoutonSession from "@/components/BoutonSession";
 
 export default function AppHeader({
   title,
@@ -37,6 +38,7 @@ export default function AppHeader({
           {subtitle ? <p className="truncate text-xs text-white/75">{subtitle}</p> : null}
         </div>
         <Cloche />
+        <BoutonSession />
         {action}
       </div>
     </header>
