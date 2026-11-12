@@ -1,0 +1,209 @@
+[
+  {
+    "id": "avc-ischemique-hypertension",
+    "titre": "Paralysie brutale du bras et de la jambe",
+    "gravite": "CRITIQUE",
+    "avatar": "homme",
+    "icone": "cerveau",
+    "patient": "Papa Kouassi, 62 ans",
+    "duree": "72 heures de suivi",
+    "resume": "Un homme hypertendu s'effondre avec la bouche déviée et un bras paralysé. Chaque minute compte pour son cerveau.",
+    "finBonne": "Papa Kouassi survit à son AVC et garde peu de séquelles grâce à une prise en charge rapide. Il reprend progressivement ses activités avec la rééducation et un traitement bien suivi.",
+    "finMoyenne": "Papa Kouassi survit mais garde des séquelles importantes (faiblesse du bras et de la jambe, troubles de la parole), à cause de retards ou de choix inadaptés. Relisez les corrections.",
+    "finMauvaise": "Papa Kouassi est décédé. Dans l'AVC, chaque minute compte : le repérage rapide, l'heure de début, l'imagerie et la prévention des complications changent le pronostic. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Papa Kouassi, 62 ans, hypertendu connu mais non traité, est amené par ses fils. Il y a une heure et demie, il a brusquement perdu la force du bras et de la jambe droits, et il parle de façon confuse. Sa bouche est déviée. Il est conscient.",
+        "choix": [
+          { "texte": "Reconnaître un AVC probable, noter l'heure exacte du début des signes, contrôler la glycémie capillaire et les constantes, et organiser un transfert urgent vers une structure avec scanner.", "effet": 5, "retour": "Une faiblesse brutale d'un côté, une bouche déviée et un trouble de la parole évoquent un AVC. L'heure de début conditionne les traitements possibles, et la glycémie élimine une hypoglycémie qui peut imiter un AVC." },
+          { "texte": "Penser à une simple fatigue et le renvoyer se reposer à la maison.", "effet": -20, "retour": "Un déficit brutal est une urgence neurologique. Le renvoyer chez lui fait perdre un temps précieux, pendant lequel le cerveau continue de souffrir." },
+          { "texte": "Lui donner à boire et à manger pour reprendre des forces avant le transfert.", "effet": -20, "retour": "Après un AVC, la déglutition est souvent perturbée : boire ou manger expose à une fausse route et à une pneumonie. Le patient reste à jeun jusqu'à l'évaluation." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Premiers soins",
+        "situation": "La glycémie capillaire est normale. Tension à 190/110, pouls irrégulier à 88 par minute, saturation à 96 %. Le patient reste conscient.",
+        "choix": [
+          { "texte": "Le laisser à jeun, tête légèrement surélevée, poser une voie veineuse avec du sérum salé, surveiller son état neurologique et obtenir une imagerie cérébrale en urgence, sans faire baisser brutalement la tension.", "effet": 5, "retour": "Dans les premières heures d'un AVC ischémique, on tolère une tension élevée pour garder l'irrigation du cerveau. On sécurise les fonctions vitales et on fait l'imagerie pour distinguer un AVC par obstruction d'un AVC hémorragique." },
+          { "texte": "Faire baisser rapidement la tension avec un antihypertenseur puissant.", "effet": -20, "retour": "Une baisse brutale de la tension peut aggraver la souffrance du cerveau mal irrigué. En phase aiguë, on ne corrige la tension que dans des situations précises." },
+          { "texte": "Donner tout de suite de l'aspirine avant toute imagerie.", "effet": -20, "retour": "Tant que l'on n'a pas exclu un saignement cérébral par l'imagerie, l'aspirine peut aggraver une hémorragie. L'imagerie vient avant." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Imagerie et traitement",
+        "situation": "Le scanner, réalisé 5 heures après le début des signes, montre un AVC ischémique sans saignement. La thrombolyse n'est pas indiquée à ce délai.",
+        "choix": [
+          { "texte": "Débuter un antiagrégant (aspirine) selon le protocole, puisque le saignement est exclu, et assurer les mesures générales : position, hydratation, surveillance neurologique, glycémie et température.", "effet": 5, "retour": "Après exclusion d'un saignement, un antiagrégant précoce réduit le risque de récidive. Les mesures générales (glycémie, température, hydratation) protègent le cerveau." },
+          { "texte": "Donner un anticoagulant à forte dose en urgence.", "effet": -20, "retour": "Un anticoagulant à forte dose en phase aiguë augmente le risque de transformation hémorragique de l'AVC. Ce n'est pas le traitement de première intention." },
+          { "texte": "Ne rien donner et attendre l'évolution.", "effet": -10, "retour": "L'absence de traitement antithrombotique précoce augmente le risque de récidive. Les mesures médicamenteuses et la surveillance sont nécessaires." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Complications",
+        "situation": "Le lendemain, Papa Kouassi est éveillé mais n'arrive pas à avaler correctement. Il tousse en buvant. Il reste couché sur le dos, sans bouger.",
+        "choix": [
+          { "texte": "Évaluer sa déglutition avant toute alimentation, poser une sonde nasogastrique si nécessaire, le changer de position régulièrement, prévenir les escarres et la phlébite, et débuter une mobilisation précoce.", "effet": 5, "retour": "Les complications (pneumonie d'inhalation, escarres, phlébite) sont une cause fréquente de décès après un AVC. Les prévenir fait partie du traitement." },
+          { "texte": "Lui donner à boire normalement, puisqu'il est éveillé.", "effet": -20, "retour": "Toux en buvant = trouble de la déglutition. Le risque de fausse route et de pneumonie est élevé." },
+          { "texte": "Le laisser alité immobile pendant plusieurs semaines pour qu'il se repose.", "effet": -10, "retour": "L'immobilité prolongée entraîne escarres, phlébites et perte musculaire. Une mobilisation précoce et progressive est recommandée." }
+        ]
+      },
+      {
+        "moment": "Jour 3 · Prévention d'une récidive",
+        "situation": "L'état neurologique s'est stabilisé. L'hypertension n'était pas traitée depuis des années. Papa Kouassi fume et a une glycémie un peu élevée.",
+        "choix": [
+          { "texte": "Débuter la prévention secondaire : traitement antihypertenseur au long cours (introduit progressivement), antiagrégant, statine, recherche du diabète, aide à l'arrêt du tabac et éducation du patient et de sa famille.", "effet": 5, "retour": "Après un AVC, contrôler la tension, le diabète, le cholestérol et le tabac réduit fortement le risque de récidive. L'éducation de la famille favorise l'observance." },
+          { "texte": "Arrêter tous les médicaments à la sortie : il va mieux.", "effet": -10, "retour": "L'amélioration ne signifie pas guérison de la cause : sans traitement de fond, le risque de nouvel AVC reste élevé." },
+          { "texte": "Lui conseiller de remplacer ses médicaments par des tisanes.", "effet": -20, "retour": "Les tisanes ne remplacent pas un traitement antihypertenseur et antiagrégant. Cela expose à une récidive grave." }
+        ]
+      },
+      {
+        "moment": "Jour 3 · Rééducation et famille",
+        "situation": "Papa Kouassi peut sortir de l'unité de soins. Son bras droit reste faible et il parle lentement. Sa famille ne sait pas comment l'aider.",
+        "choix": [
+          { "texte": "Organiser une rééducation précoce (kinésithérapie, orthophonie), apprendre à la famille les bons gestes et les signes d'alerte, et prévoir un suivi régulier.", "effet": 5, "retour": "La rééducation précoce et l'implication de la famille améliorent la récupération. Savoir reconnaître un nouvel AVC permet d'agir vite." },
+          { "texte": "Dire à la famille qu'il n'y a plus rien à faire et qu'il faut attendre.", "effet": -10, "retour": "La rééducation peut améliorer nettement la récupération. Décourager la famille prive le patient de ses meilleures chances." },
+          { "texte": "Le renvoyer chez lui sans rééducation ni suivi.", "effet": -10, "retour": "Sans rééducation ni suivi, les séquelles s'installent et le risque de récidive augmente." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "tuberculose-pulmonaire-adulte",
+    "titre": "Toux depuis un mois et sueurs nocturnes",
+    "gravite": "GRAVE",
+    "avatar": "homme",
+    "icone": "microbe",
+    "patient": "Ibrahim, 35 ans",
+    "duree": "6 mois de traitement",
+    "resume": "Un jeune père tousse depuis quatre semaines, maigrit et crache du sang. Dépistez, traitez et protégez son entourage.",
+    "finBonne": "Ibrahim termine son traitement et guérit de sa tuberculose. Le diagnostic rapide, un traitement suivi sans interruption et le dépistage de l'entourage ont stoppé la chaîne de transmission.",
+    "finMoyenne": "Ibrahim finit par guérir, mais des retards, des interruptions ou des oublis ont compliqué son traitement et exposé son entourage. Relisez les corrections.",
+    "finMauvaise": "Ibrahim est décédé. Une tuberculose non traitée ou mal traitée est mortelle et contagieuse : le diagnostic précoce et un traitement complet sont indispensables. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Ibrahim, 35 ans, consulte pour une toux depuis quatre semaines, de la fièvre le soir, des sueurs nocturnes et une perte de 8 kg. Il a craché du sang une fois. Sa femme et ses deux enfants vivent avec lui.",
+        "choix": [
+          { "texte": "Évoquer une tuberculose : lui donner un masque, l'isoler des autres patients dans une zone bien aérée, et demander un examen des crachats (test moléculaire de type Xpert ou microscopie).", "effet": 5, "retour": "Une toux de plus de deux semaines avec amaigrissement, sueurs nocturnes et crachats de sang fait suspecter la tuberculose. Le masque et la ventilation protègent les autres patients et les soignants." },
+          { "texte": "Prescrire un antibiotique banal et le renvoyer à la maison sans examen des crachats.", "effet": -20, "retour": "Un antibiotique banal ne traite pas la tuberculose. Sans examen des crachats, le diagnostic est manqué et la maladie se transmet." },
+          { "texte": "Attendre une radiographie avant de faire un prélèvement de crachats.", "effet": -10, "retour": "L'examen des crachats confirme la maladie et ne doit pas attendre. La radiographie complète le diagnostic mais ne le remplace pas." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Résultat",
+        "situation": "Le test des crachats est positif pour la tuberculose, sans résistance à la rifampicine. Ibrahim n'a jamais été dépisté pour le VIH.",
+        "choix": [
+          { "texte": "Confirmer la tuberculose pulmonaire, proposer le dépistage du VIH avec conseil et consentement, déclarer le cas au programme national et débuter le traitement standard associant plusieurs antituberculeux selon le protocole.", "effet": 5, "retour": "La tuberculose se traite par une association de médicaments. Le dépistage du VIH est systématique car les deux maladies sont liées. Le cas doit être déclaré pour suivre le traitement et dépister l'entourage." },
+          { "texte": "Débuter un seul antituberculeux, plus facile à supporter.", "effet": -20, "retour": "Un seul médicament favorise l'apparition de bacilles résistants. Le traitement associe toujours plusieurs médicaments." },
+          { "texte": "Débuter le traitement sans déclarer le cas ni proposer de dépistage du VIH.", "effet": -10, "retour": "Sans déclaration, le suivi et le dépistage de l'entourage sont impossibles. Ne pas proposer le test du VIH prive le patient d'une prise en charge complète." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Conseils",
+        "situation": "Ibrahim est d'accord pour débuter le traitement. Il vous demande combien de temps il devra prendre ses médicaments et si ses enfants risquent d'être malades.",
+        "choix": [
+          { "texte": "Expliquer que le traitement dure environ six mois et ne doit jamais être interrompu, organiser un soutien pour la prise régulière, prévenir des effets (urines orange) et dépister sa famille.", "effet": 5, "retour": "L'interruption du traitement est la première cause d'échec et de résistance. Le dépistage des proches, surtout des enfants, permet de les protéger ou de les traiter tôt." },
+          { "texte": "Lui dire qu'il pourra arrêter dès qu'il se sentira mieux.", "effet": -20, "retour": "Les symptômes disparaissent bien avant la guérison. Arrêter trop tôt provoque une rechute, souvent avec des bacilles résistants." },
+          { "texte": "Ne pas parler de la famille pour ne pas l'inquiéter.", "effet": -10, "retour": "Les personnes vivant avec un malade contagieux sont les plus exposées : leur dépistage est une étape essentielle." }
+        ]
+      },
+      {
+        "moment": "Mois 1 · Effets indésirables",
+        "situation": "Un mois plus tard, Ibrahim a des nausées, des vomissements et un jaunissement des yeux. Il craint que ses médicaments soient dangereux.",
+        "choix": [
+          { "texte": "Arrêter temporairement les médicaments, faire un bilan hépatique et reprendre le traitement avec un médecin selon le protocole, plutôt que de laisser le patient le décider seul.", "effet": 5, "retour": "Certains antituberculeux peuvent atteindre le foie. Un ictère impose l'arrêt temporaire et un bilan, puis une reprise encadrée et adaptée." },
+          { "texte": "Lui dire que c'est normal et continuer sans rien vérifier.", "effet": -20, "retour": "Un jaunissement des yeux est un signe d'atteinte du foie : il ne faut pas l'ignorer." },
+          { "texte": "Arrêter définitivement tout traitement antituberculeux.", "effet": -20, "retour": "Arrêter définitivement fait perdre le bénéfice du traitement et laisse la maladie évoluer. L'arrêt doit être temporaire et encadré." }
+        ]
+      },
+      {
+        "moment": "Mois 2 · Contrôle",
+        "situation": "Ibrahim a repris du poids et ne tousse presque plus. C'est la fin de la phase intensive. Un contrôle des crachats est prévu.",
+        "choix": [
+          { "texte": "Contrôler les crachats à la fin de la phase intensive, passer à la phase d'entretien si le résultat est négatif et poursuivre le suivi du poids et de la prise des médicaments.", "effet": 5, "retour": "Le contrôle des crachats permet de vérifier l'efficacité du traitement. En cas de résultat négatif, on passe à la phase d'entretien jusqu'à la fin du traitement." },
+          { "texte": "Arrêter le traitement : il va beaucoup mieux.", "effet": -20, "retour": "L'amélioration clinique ne signifie pas que tous les bacilles sont éliminés. Il faut aller jusqu'au bout de la cure." },
+          { "texte": "Ne plus faire aucun contrôle pour ne pas le déranger.", "effet": -10, "retour": "Le suivi est indispensable pour détecter un échec ou des effets indésirables et pour soutenir la prise régulière des médicaments." }
+        ]
+      },
+      {
+        "moment": "Mois 6 · Fin du traitement",
+        "situation": "Ibrahim a pris tous ses médicaments. Son voisinage a appris sa maladie et certains l'évitent. Il se sent honteux.",
+        "choix": [
+          { "texte": "Constater la fin du traitement et la guérison, vérifier que ses proches ont été dépistés, l'aider à lutter contre la stigmatisation par l'information et le soutien nutritionnel.", "effet": 5, "retour": "La tuberculose se guérit. La stigmatisation retarde le dépistage et pousse certains malades à abandonner. L'information de la communauté et le soutien nutritionnel font partie de la prise en charge." },
+          { "texte": "Lui conseiller de cacher sa maladie à sa famille et à ses voisins.", "effet": -20, "retour": "Cacher la maladie empêche le dépistage des proches. L'information, au contraire, protège la communauté." },
+          { "texte": "Mettre fin au suivi sans aucun conseil de sortie.", "effet": -10, "retour": "Après la guérison, quelques conseils (signes de rechute, hygiène de vie, dépistage des proches) font partie du suivi." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "ist-infection-pelvienne",
+    "titre": "Pertes jaunâtres, douleurs du bas-ventre et fièvre",
+    "gravite": "GRAVE",
+    "avatar": "femme",
+    "icone": "pilule",
+    "patient": "Fatou, 22 ans",
+    "duree": "7 jours de suivi",
+    "resume": "Une jeune femme consulte, gênée, pour des douleurs pelviennes et de la fièvre. Une infection sexuellement transmissible peut menacer sa fertilité.",
+    "finBonne": "Fatou guérit sans séquelle. Un accueil respectueux, un traitement adapté, le dépistage et la prise en charge de ses partenaires ont protégé sa santé et celle de son entourage.",
+    "finMoyenne": "Fatou guérit mais l'infection a traîné, avec un risque de séquelles pour sa fertilité, à cause de retards ou d'oublis. Relisez les corrections.",
+    "finMauvaise": "Fatou est décédée d'une complication grave de l'infection, non reconnue à temps. Les infections du bas-ventre peuvent être mortelles si on tarde à les traiter. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Fatou, 22 ans, est très gênée. Depuis une semaine, elle a des pertes vaginales jaunâtres, des douleurs du bas-ventre et de la fièvre à 38,5 °C. Elle a plusieurs partenaires et n'utilise pas toujours de préservatif.",
+        "choix": [
+          { "texte": "L'accueillir sans jugement, garantir la confidentialité, faire un interrogatoire complet, un examen avec un test de grossesse, et rechercher des signes de gravité.", "effet": 5, "retour": "Un accueil respectueux et confidentiel encourage les patientes à consulter tôt et à dire la vérité. L'examen et le test de grossesse orientent le traitement et recherchent une urgence." },
+          { "texte": "La sermonner sur son comportement avant de l'examiner.", "effet": -20, "retour": "Le jugement fait fuir les patientes, retarde les soins et favorise les complications. Le rôle du soignant est de soigner et de prévenir." },
+          { "texte": "Prescrire un antibiotique sans examen ni test de grossesse.", "effet": -10, "retour": "Sans examen, on peut manquer une complication grave ou une grossesse. Le traitement doit être adapté à la situation." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Diagnostic et traitement",
+        "situation": "L'examen révèle un écoulement du col et une douleur vive à la mobilisation du col utérin. Le test de grossesse est négatif. Il s'agit d'une probable infection du haut appareil génital.",
+        "choix": [
+          { "texte": "Traiter selon l'approche syndromique du protocole national, avec une association d'antibiotiques couvrant les germes les plus fréquents, et hospitaliser en cas de signes de gravité.", "effet": 5, "retour": "Dans l'infection pelvienne, plusieurs germes sont possibles. Sans examen de laboratoire immédiat, on traite le syndrome avec une association couvrant les agents fréquents, sans retard." },
+          { "texte": "Prescrire un seul antibiotique ciblant un seul germe.", "effet": -20, "retour": "Un seul antibiotique laisse des germes non traités, avec un risque de complications et de stérilité." },
+          { "texte": "Donner un antalgique et la laisser rentrer sans traitement.", "effet": -20, "retour": "Un antalgique soulage mais ne traite pas l'infection. Non traitée, elle peut provoquer abcès, stérilité ou grossesse extra-utérine." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Dépistage",
+        "situation": "Fatou est soulagée de l'accueil reçu. Vous pensez qu'elle pourrait avoir d'autres infections transmises sexuellement.",
+        "choix": [
+          { "texte": "Lui proposer, avec conseil et consentement, le dépistage du VIH, de la syphilis et de l'hépatite B.", "effet": 5, "retour": "Les infections sexuellement transmissibles sont souvent associées entre elles. Le dépistage proposé avec conseil, et sur consentement, permet un traitement précoce." },
+          { "texte": "Ne rien proposer, puisqu'elle n'a pas d'autres symptômes.", "effet": -20, "retour": "De nombreuses infections (VIH, syphilis, hépatite B) sont longtemps sans symptôme. Un dépistage proposé à cette occasion peut sauver des vies." },
+          { "texte": "Faire les tests sans lui en parler, pour gagner du temps.", "effet": -20, "retour": "Un test de dépistage, en particulier celui du VIH, exige l'information et le consentement de la patiente." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Partenaires",
+        "situation": "Fatou vous dit qu'elle a trois partenaires, dont un régulier. Elle redoute leur réaction.",
+        "choix": [
+          { "texte": "Expliquer l'importance de traiter les partenaires en même temps, proposer une aide pour les informer, leur offrir un traitement dans le respect de la confidentialité et recommander l'abstinence ou le préservatif pendant le traitement.", "effet": 5, "retour": "Sans traitement des partenaires, la réinfection est fréquente. La notification des partenaires est une mesure centrale de lutte contre les infections sexuellement transmissibles." },
+          { "texte": "Ne pas traiter les partenaires : seule la patiente est malade.", "effet": -20, "retour": "Les partenaires peuvent être porteurs sans symptômes et la réinfecter ou en contaminer d'autres." },
+          { "texte": "Lui demander de les informer elle-même, sans proposer d'aide ni de traitement.", "effet": -10, "retour": "Sans aide ni traitement, peu de partenaires seront réellement pris en charge. L'accompagnement est nécessaire." }
+        ]
+      },
+      {
+        "moment": "Jour 3 · Réévaluation",
+        "situation": "Trois jours après le début du traitement, la fièvre persiste et les douleurs sont plus fortes. Fatou est pâle.",
+        "choix": [
+          { "texte": "Réévaluer à 72 heures et, en l'absence d'amélioration, rechercher une complication (abcès, grossesse extra-utérine) et orienter vers un niveau de soins supérieur.", "effet": 5, "retour": "Une fièvre qui persiste malgré le traitement impose de chercher une complication. Un abcès ou une grossesse extra-utérine nécessite une prise en charge spécialisée et urgente." },
+          { "texte": "Changer d'antibiotique sans la réexaminer ni faire d'imagerie.", "effet": -10, "retour": "Un changement de traitement sans nouvel examen peut retarder le diagnostic d'une complication." },
+          { "texte": "Ignorer la persistance de la fièvre et attendre que cela passe.", "effet": -20, "retour": "Une infection pelvienne qui ne s'améliore pas peut se compliquer gravement. Il faut réagir sans attendre." }
+        ]
+      },
+      {
+        "moment": "Jour 7 · Prévention",
+        "situation": "Fatou est guérie. Elle vous demande comment éviter une nouvelle infection.",
+        "choix": [
+          { "texte": "Lui conseiller d'utiliser systématiquement le préservatif, de se faire dépister régulièrement, de compléter ses vaccinations (hépatite B, HPV) et de consulter vite en cas de symptômes.", "effet": 5, "retour": "Le préservatif, le dépistage régulier et la vaccination sont les piliers de la prévention des infections sexuellement transmissibles." },
+          { "texte": "Lui dire que le préservatif n'est plus nécessaire maintenant qu'elle est guérie.", "effet": -20, "retour": "Guérir d'une infection ne protège pas d'une nouvelle contamination. Le préservatif reste essentiel." },
+          { "texte": "La laisser partir sans aucun conseil de prévention.", "effet": -10, "retour": "Sans conseil, le risque de récidive reste élevé. La consultation est l'occasion de prévenir." }
+        ]
+      }
+    ]
+  }
+]

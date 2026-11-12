@@ -1,0 +1,140 @@
+[
+  {
+    "id": "acidocetose-diabetique-jeune",
+    "titre": "Grande soif, vomissements et respiration profonde",
+    "gravite": "GRAVE",
+    "avatar": "homme",
+    "icone": "seringue",
+    "patient": "Kouamé, 19 ans",
+    "duree": "5 jours de suivi",
+    "resume": "Un étudiant amaigri, très assoiffé, arrive somnolent avec une haleine fruitée. Un diabète découvert au pire moment.",
+    "finBonne": "Kouamé sort stabilisé, sous insuline, avec un vrai plan de suivi. Un diagnostic rapide, une réhydratation et une insulinothérapie bien conduites lui ont sauvé la vie.",
+    "finMoyenne": "Kouamé survit, mais sa prise en charge a été marquée par des déséquilibres et des retards. Relisez les corrections : l'acidocétose se traite avec méthode.",
+    "finMauvaise": "Kouamé est décédé. L'acidocétose diabétique est une urgence mortelle : il faut réhydrater, donner l'insuline à bon escient et surveiller le potassium et la glycémie. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Kouamé, 19 ans, est amené par ses amis. Depuis trois semaines, il boit beaucoup, urine énormément et maigrit. Depuis hier, il vomit et a mal au ventre. Il est somnolent, sa respiration est profonde et rapide, et son haleine sent le fruit.",
+        "choix": [
+          { "texte": "Mesurer immédiatement la glycémie capillaire, rechercher des corps cétoniques dans les urines, prendre les constantes et poser une voie veineuse.", "effet": 5, "retour": "Une soif intense, une polyurie, un amaigrissement et une respiration profonde avec haleine fruitée évoquent une acidocétose diabétique. La glycémie et les corps cétoniques confirment le diagnostic rapidement." },
+          { "texte": "Penser à une gastro-entérite et donner un antiémétique.", "effet": -20, "retour": "Les vomissements et douleurs du ventre peuvent être des signes d'acidocétose. Passer à côté du diagnostic expose à un coma." },
+          { "texte": "Lui donner à manger et des boissons sucrées pour le revigorer.", "effet": -20, "retour": "Donner du sucre à un patient dont la glycémie est déjà très élevée aggrave son état." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Premier traitement",
+        "situation": "La glycémie est à 4,2 g/L, les urines contiennent beaucoup de corps cétoniques. Le patient est déshydraté, le pouls est rapide et la tension basse.",
+        "choix": [
+          { "texte": "Débuter la réhydratation avec du sérum salé isotonique, puis l'insuline à faible dose en perfusion continue selon le protocole, avec surveillance de la glycémie et du potassium.", "effet": 5, "retour": "La priorité est de remplacer le volume perdu. L'insuline à faible dose, introduite après le début du remplissage, corrige progressivement l'acidocétose. Le potassium se surveille de près." },
+          { "texte": "Injecter une forte dose d'insuline rapide immédiatement, avant toute réhydratation et sans vérifier le potassium.", "effet": -30, "retour": "L'insuline fait entrer le potassium dans les cellules : sans vérification du potassium ni réhydratation, elle peut provoquer une chute dangereuse du potassium et des troubles du rythme cardiaque." },
+          { "texte": "Se contenter de faire boire de l'eau.", "effet": -20, "retour": "Chez un patient somnolent et déshydraté, la voie orale est insuffisante et dangereuse. La réhydratation se fait par voie veineuse." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Surveillance",
+        "situation": "Kouamé est perfusé et reçoit de l'insuline. Il est plus éveillé. Les résultats du laboratoire montrent un potassium bas.",
+        "choix": [
+          { "texte": "Corriger le potassium selon le résultat, surveiller la glycémie toutes les heures, la conscience et la diurèse, et adapter les apports.", "effet": 5, "retour": "Le potassium baisse avec l'insuline et la réhydratation : il faut le corriger et le surveiller. La glycémie et la diurèse guident la conduite du traitement." },
+          { "texte": "Ne pas s'occuper du potassium, car la glycémie baisse bien.", "effet": -20, "retour": "Un potassium bas non corrigé peut provoquer une paralysie des muscles et des arythmies graves." },
+          { "texte": "Surveiller la glycémie une seule fois par jour.", "effet": -10, "retour": "Dans l'acidocétose, la surveillance est rapprochée (glycémie toutes les heures) pour éviter l'hypoglycémie ou une correction insuffisante." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Relais et cause",
+        "situation": "Le lendemain, les corps cétoniques ont disparu, la glycémie est à 2 g/L et Kouamé mange normalement. Il avait aussi une infection urinaire.",
+        "choix": [
+          { "texte": "Passer à l'insuline sous la peau en chevauchant avec la perfusion avant de l'arrêter, traiter l'infection et rechercher les autres facteurs déclenchants.", "effet": 5, "retour": "Le relais se fait quand l'acidocétose est résolue : on débute l'insuline sous-cutanée avant d'arrêter la perfusion. Une infection est un déclencheur fréquent qu'il faut traiter." },
+          { "texte": "Arrêter brutalement l'insuline puisque la glycémie est normale.", "effet": -20, "retour": "Arrêter l'insuline sans relais expose à une rechute rapide de l'acidocétose." },
+          { "texte": "Ne pas chercher de cause : ça n'a pas d'importance.", "effet": -10, "retour": "Une cause déclenchante non traitée (infection, arrêt de traitement) expose à une rechute." }
+        ]
+      },
+      {
+        "moment": "Jour 3 · Éducation",
+        "situation": "Kouamé comprend qu'il a un diabète de type 1 et qu'il devra prendre de l'insuline toute sa vie. Il est inquiet et se demande comment conserver son insuline à la maison.",
+        "choix": [
+          { "texte": "Lui apprendre à s'injecter l'insuline, à surveiller sa glycémie, à reconnaître et traiter une hypoglycémie, à adapter son alimentation et à conserver l'insuline au frais.", "effet": 5, "retour": "L'éducation thérapeutique est la base du suivi : injection, surveillance, reconnaissance de l'hypoglycémie et conservation de l'insuline permettent de vivre normalement avec le diabète." },
+          { "texte": "Lui donner une ordonnance sans explication.", "effet": -10, "retour": "Sans éducation, les erreurs d'injection, les hypoglycémies et les arrêts de traitement sont fréquents." },
+          { "texte": "Lui dire qu'il pourra arrêter l'insuline quand sa glycémie sera normale.", "effet": -20, "retour": "Dans le diabète de type 1, l'insuline est indispensable à vie. L'arrêter provoque une nouvelle acidocétose." }
+        ]
+      },
+      {
+        "moment": "Jour 5 · Suivi au long cours",
+        "situation": "Kouamé quitte l'hôpital. Il craint de ne pas avoir les moyens d'acheter l'insuline et les bandelettes. Sa famille veut l'aider à sa façon.",
+        "choix": [
+          { "texte": "Organiser un suivi régulier, dépister à temps les complications (yeux, reins, pieds), l'aider à garantir l'accès à l'insuline et aux bandelettes, et impliquer sa famille dans son traitement.", "effet": 5, "retour": "Le suivi régulier, le dépistage des complications et l'accès continu au traitement sont essentiels. L'implication de la famille favorise l'observance." },
+          { "texte": "Ne prévoir aucun suivi : il saura se débrouiller.", "effet": -10, "retour": "Sans suivi, les complications et les ruptures de traitement ne sont pas détectées à temps." },
+          { "texte": "Lui conseiller de remplacer l'insuline par des remèdes traditionnels.", "effet": -20, "retour": "Aucun remède traditionnel ne remplace l'insuline dans le diabète de type 1. L'arrêter peut être mortel." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hepatite-b-aigue-severe",
+    "titre": "Jaunisse, fatigue et urines foncées",
+    "gravite": "GRAVE",
+    "avatar": "femme",
+    "icone": "biohazard",
+    "patient": "Akissi, 26 ans",
+    "duree": "10 jours de suivi",
+    "resume": "Une jeune femme a les yeux jaunes depuis cinq jours. Une hépatite virale peut dégénérer en quelques jours : à vous de repérer le danger.",
+    "finBonne": "Akissi guérit de son hépatite. Le diagnostic précis, la détection précoce des signes de gravité et la prévention dans l'entourage ont évité le pire.",
+    "finMoyenne": "Akissi s'en sort, mais sa convalescence est difficile à cause de retards ou de conseils inadaptés. Relisez les corrections.",
+    "finMauvaise": "Akissi est décédée d'une insuffisance hépatique aiguë. Une hépatite sévère peut tuer en quelques jours si l'on ne reconnaît pas les signes de gravité. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Akissi, 26 ans, consulte pour une jaunisse depuis cinq jours, des urines foncées, des nausées et une grande fatigue. Elle a eu de la fièvre au début. Elle est lucide et marche seule. Elle a été scarifiée récemment chez un guérisseur et n'a jamais été vaccinée contre l'hépatite B.",
+        "choix": [
+          { "texte": "L'interroger sur les expositions (injections ou scarifications, rapports sexuels, transfusion, aliments), rechercher des signes de gravité (confusion, somnolence, saignements) et demander un bilan hépatique et les sérologies des hépatites.", "effet": 5, "retour": "Devant un ictère, on cherche la cause et on évalue la gravité. Un bilan hépatique et la recherche des virus orientent le diagnostic et le suivi." },
+          { "texte": "Conclure à un paludisme et donner un traitement antipaludique sans test.", "effet": -20, "retour": "Un ictère n'est pas toujours dû au paludisme. Traiter sans confirmation retarde le vrai diagnostic." },
+          { "texte": "Prescrire des décoctions pour « nettoyer le foie ».", "effet": -10, "retour": "Certaines décoctions sont toxiques pour le foie. Elles peuvent aggraver l'atteinte hépatique." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Résultats",
+        "situation": "Les transaminases sont très élevées, la bilirubine aussi. L'antigène HBs et les IgM anti-HBc sont positifs : hépatite B aiguë. Le taux de prothrombine est à 60 %.",
+        "choix": [
+          { "texte": "Conclure à une hépatite B aiguë, mettre en place un traitement symptomatique et une surveillance, éviter l'alcool et les médicaments inutiles ou toxiques pour le foie, et vérifier le taux de prothrombine.", "effet": 5, "retour": "Dans l'hépatite B aiguë, le traitement est surtout symptomatique. On évite tout ce qui peut agresser le foie et on surveille la coagulation, qui reflète la gravité." },
+          { "texte": "Donner un antibiotique pour « désinfecter le foie ».", "effet": -20, "retour": "Les antibiotiques n'agissent pas contre un virus et certains peuvent être toxiques pour le foie." },
+          { "texte": "Donner des corticoïdes pour faire baisser l'inflammation.", "effet": -20, "retour": "Les corticoïdes ne sont pas indiqués dans l'hépatite virale aiguë : ils peuvent favoriser l'évolution du virus." }
+        ]
+      },
+      {
+        "moment": "Jour 4 · Signes de gravité",
+        "situation": "Akissi revient. Elle est confuse et très somnolente. Ses gencives saignent. Le taux de prothrombine est tombé à 30 %.",
+        "choix": [
+          { "texte": "Reconnaître une insuffisance hépatique aiguë grave et l'hospitaliser en urgence en soins intensifs ou la transférer vers un centre de référence.", "effet": 5, "retour": "La confusion, les saignements et la chute du taux de prothrombine signent une hépatite fulminante : une urgence vitale qui nécessite des soins intensifs spécialisés." },
+          { "texte": "La renvoyer à la maison avec du repos et des tisanes.", "effet": -30, "fatal": true, "retour": "Renvoyer une patiente confuse et qui saigne est une erreur mortelle. L'insuffisance hépatique aiguë peut tuer en quelques heures." },
+          { "texte": "Attendre quelques jours pour voir comment évolue son état.", "effet": -20, "retour": "Dans l'insuffisance hépatique aiguë, chaque heure compte. Attendre aggrave les risques d'hémorragie et de coma." }
+        ]
+      },
+      {
+        "moment": "Jour 4 · Prise en charge",
+        "situation": "Akissi est hospitalisée. Elle est agitée par moments et sa glycémie est basse.",
+        "choix": [
+          { "texte": "Surveiller de près la conscience, la glycémie et la coagulation, corriger l'hypoglycémie, éviter les sédatifs et les médicaments toxiques pour le foie, et organiser un transfert vers un centre spécialisé.", "effet": 5, "retour": "Les complications (hypoglycémie, hémorragie, encéphalopathie) font la gravité de l'hépatite fulminante. Les sédatifs peuvent masquer ou aggraver la confusion et sont à éviter." },
+          { "texte": "Lui donner un sédatif pour la calmer.", "effet": -20, "retour": "Un sédatif peut aggraver la confusion et masquer l'aggravation de l'encéphalopathie." },
+          { "texte": "Ne la surveiller qu'une fois par jour.", "effet": -10, "retour": "Dans cette situation, l'état peut changer en quelques heures. La surveillance doit être rapprochée." }
+        ]
+      },
+      {
+        "moment": "Jour 7 · Entourage",
+        "situation": "Akissi va mieux. Sa famille s'inquiète : sa mère veut séparer ses couverts et ne plus manger avec elle.",
+        "choix": [
+          { "texte": "Expliquer que l'hépatite B se transmet par le sang, les rapports sexuels et de la mère à l'enfant, et non par les repas partagés, puis proposer le dépistage et la vaccination de l'entourage et des partenaires.", "effet": 5, "retour": "Connaître les modes de transmission évite la stigmatisation. La vaccination et le dépistage des proches sont les mesures de prévention les plus efficaces." },
+          { "texte": "Conseiller d'isoler la patiente et de ne plus partager les repas, car la maladie se transmettrait par les couverts.", "effet": -10, "retour": "L'hépatite B ne se transmet pas par les couverts. Cette mesure stigmatise la patiente sans protéger la famille." },
+          { "texte": "Ne rien dire à l'entourage.", "effet": -20, "retour": "Sans information ni vaccination, les proches restent exposés. La prévention fait partie du traitement." }
+        ]
+      },
+      {
+        "moment": "Jour 10 · Suivi",
+        "situation": "Akissi va bien. Elle est inquiète pour son avenir et pour une future grossesse.",
+        "choix": [
+          { "texte": "Organiser un contrôle de l'antigène HBs à 6 mois pour confirmer la guérison, et lui expliquer l'importance de la vaccination des nouveau-nés dès la naissance lors de ses futures grossesses.", "effet": 5, "retour": "Chez certains patients, le virus persiste : le contrôle à 6 mois permet de le vérifier. La vaccination dès la naissance protège les enfants de la transmission mère-enfant." },
+          { "texte": "Lui dire qu'elle est guérie à vie sans aucun contrôle.", "effet": -10, "retour": "Le suivi est indispensable pour confirmer la disparition du virus et dépister une forme chronique." },
+          { "texte": "Lui conseiller de ne jamais avoir d'enfant.", "effet": -20, "retour": "Une femme peut avoir des enfants en toute sécurité si la vaccination à la naissance et le suivi sont bien organisés." }
+        ]
+      }
+    ]
+  }
+]

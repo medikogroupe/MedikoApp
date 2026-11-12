@@ -1,0 +1,278 @@
+[
+  {
+    "id": "pneumonie-enfant-hypoxemie",
+    "titre": "Toux et respiration rapide chez une petite fille",
+    "gravite": "MODERE",
+    "avatar": "enfant",
+    "icone": "poumons",
+    "patient": "Awa, 3 ans",
+    "duree": "5 jours de suivi",
+    "resume": "Une petite fille respire vite et tousse depuis 4 jours. Évitez qu'une pneumonie banale ne devienne mortelle.",
+    "finBonne": "Awa a repris des forces et sort guérie. Le repérage de l'hypoxémie, l'oxygène et un bon antibiotique ont fait la différence.",
+    "finMoyenne": "Awa s'en sort, mais son hospitalisation s'est compliquée à cause de retards ou de décisions inadaptées. Relisez les corrections pour mieux repérer les signes de gravité.",
+    "finMauvaise": "Awa n'a pas survécu. La pneumonie est l'une des premières causes de décès de l'enfant de moins de 5 ans : mesurer la saturation et donner de l'oxygène sauvent des vies. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Une mère amène Awa, 3 ans. Toux depuis 4 jours, fièvre, et elle respire vite. Elle est éveillée et accepte de boire. La salle d'attente est calme.",
+        "choix": [
+          { "texte": "L'examiner sans attendre : compter la fréquence respiratoire pendant une minute entière, chercher un tirage sous-costal et mesurer la saturation en oxygène.", "effet": 5, "retour": "Chez l'enfant qui tousse, on compte la respiration sur une minute entière et on cherche un tirage. La saturation (oxymètre) détecte l'hypoxémie, que l'œil ne voit pas toujours." },
+          { "texte": "Prescrire un sirop contre la toux et la renvoyer à la maison.", "effet": -20, "retour": "Un sirop ne traite pas une pneumonie. Une respiration rapide chez un enfant qui tousse doit toujours faire évoquer une pneumonie et déclencher un examen." },
+          { "texte": "Demander d'abord une radiographie avant tout examen.", "effet": -10, "retour": "La radiographie n'est pas nécessaire pour décider de la prise en charge initiale. Le diagnostic est avant tout clinique, et l'attente retarde le traitement." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Évaluation",
+        "situation": "Résultat : 52 respirations par minute, tirage sous-costal net, saturation à 88 % à l'air ambiant. Awa reste éveillée et boit, sans convulsion.",
+        "choix": [
+          { "texte": "Conclure à une pneumonie sévère avec hypoxémie : hospitaliser et débuter l'oxygène.", "effet": 5, "retour": "Une saturation inférieure à 90 % signe une hypoxémie : c'est un critère de gravité. L'enfant doit être hospitalisé et recevoir de l'oxygène." },
+          { "texte": "Conclure à une pneumonie simple : traitement à la maison avec un antibiotique par la bouche.", "effet": -30, "retour": "Avec une saturation à 88 %, un traitement à domicile est dangereux : l'hypoxémie non corrigée est la principale cause de décès dans la pneumonie de l'enfant." },
+          { "texte": "Faire boire beaucoup d'eau, donner un antipyrétique et la laisser rentrer.", "effet": -20, "retour": "Ces gestes sont utiles en complément, mais ils ne remplacent ni l'oxygène ni l'antibiotique, et le retour à domicile est inadapté." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Traitement",
+        "situation": "Awa est installée en hospitalisation. L'oxymètre affiche toujours 88 %. Elle ne vomit pas, mais elle est fatiguée.",
+        "choix": [
+          { "texte": "Débuter l'oxygène, puis un antibiotique adapté au protocole national, d'abord par voie injectable, à la dose calculée selon son poids.", "effet": 5, "retour": "L'oxygène corrige l'hypoxémie. L'antibiotique de première intention, injectable au début pour une pneumonie sévère, doit être donné sans retard, à la dose adaptée au poids." },
+          { "texte": "Donner uniquement un antibiotique par la bouche, sans oxygène.", "effet": -20, "retour": "L'antibiotique oral seul ne corrige pas le manque d'oxygène. Awa risque de s'aggraver rapidement." },
+          { "texte": "Lui donner des corticoïdes et un sirop contre la toux.", "effet": -20, "retour": "Les corticoïdes et les antitussifs n'ont pas de place dans la pneumonie de l'enfant : ils n'améliorent pas l'évolution." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Surveillance",
+        "situation": "Le lendemain, Awa a 39 °C et mange très peu. Sa saturation sous oxygène est à 95 %. Vous devez organiser la surveillance.",
+        "choix": [
+          { "texte": "Surveiller régulièrement la respiration, la saturation et l'hydratation, poursuivre l'alimentation ou l'allaitement et soulager la fièvre si elle est mal tolérée.", "effet": 5, "retour": "La surveillance régulière permet de voir tout de suite une aggravation. L'alimentation et l'hydratation font partie du traitement, et l'antipyrétique soulage l'enfant." },
+          { "texte": "Arrêter l'oxygène dès qu'elle paraît mieux, sans mesurer la saturation.", "effet": -20, "retour": "Sevrer l'oxygène sans mesure est dangereux : on teste l'arrêt en contrôlant la saturation à l'air ambiant." },
+          { "texte": "La mettre à jeun pour éviter les vomissements.", "effet": -10, "retour": "Le jeûne affaiblit l'enfant. On continue l'alimentation ou l'allaitement, en petites quantités et plus souvent si nécessaire." }
+        ]
+      },
+      {
+        "moment": "Jour 2 · Amélioration",
+        "situation": "Awa est plus éveillée, elle joue un peu et mange. La respiration est moins rapide. Elle a reçu au moins deux jours de traitement.",
+        "choix": [
+          { "texte": "Tester l'arrêt de l'oxygène en contrôlant la saturation à l'air ambiant, puis passer à l'antibiotique par la bouche selon le protocole.", "effet": 5, "retour": "Si la saturation reste correcte à l'air ambiant, on peut arrêter l'oxygène. Une fois l'amélioration nette et l'enfant capable d'avaler, on passe à l'antibiotique oral pour terminer la cure." },
+          { "texte": "Maintenir l'oxygène par précaution jusqu'à la sortie.", "effet": -10, "retour": "L'oxygène a un coût et peut manquer pour d'autres enfants : on l'arrête dès que la saturation est correcte." },
+          { "texte": "Arrêter tous les médicaments puisqu'elle va mieux.", "effet": -20, "retour": "Une cure incomplète expose à la rechute. L'antibiotique doit être poursuivi pour la durée prévue." }
+        ]
+      },
+      {
+        "moment": "Jour 5 · Sortie et prévention",
+        "situation": "Awa peut rentrer. Sa mère cuisine au feu de bois à l'intérieur et n'est pas sûre des vaccins de sa fille.",
+        "choix": [
+          { "texte": "Expliquer les signes d'alerte (respiration rapide, tirage, refus de boire, somnolence), vérifier le carnet de vaccination (pneumocoque, Hib, rougeole), conseiller d'éloigner la fumée de cuisine et planifier un contrôle.", "effet": 5, "retour": "Les vaccins contre le pneumocoque, l'Hib et la rougeole préviennent beaucoup de pneumonies. La fumée de cuisine abîme les poumons des enfants, et la famille doit savoir revenir à temps." },
+          { "texte": "La laisser sortir sans conseil : la mère a déjà été informée à l'arrivée.", "effet": -10, "retour": "Les conseils de sortie (signes d'alerte, vaccins, fumée) sont indispensables pour éviter une rechute ou une nouvelle pneumonie." },
+          { "texte": "Dire de revenir seulement si Awa a une convulsion.", "effet": -10, "retour": "Il faut revenir dès les premiers signes de danger (respiration rapide, refus de boire, somnolence), pas attendre une convulsion." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "cholera-deshydratation-severe",
+    "titre": "Diarrhée aqueuse brutale en pleine épidémie",
+    "gravite": "GRAVE",
+    "avatar": "homme",
+    "icone": "goutte",
+    "patient": "Moussa, 28 ans",
+    "duree": "4 jours de suivi",
+    "resume": "Un jeune homme arrive épuisé après une diarrhée « eau de riz ». L'épidémie est dans son quartier : chaque heure compte.",
+    "finBonne": "Moussa quitte le centre guéri. Une réhydratation rapide, l'isolement, la déclaration du cas et la prévention autour de lui ont protégé le patient et son quartier.",
+    "finMoyenne": "Moussa survit mais reste très affaibli, et le suivi a été compliqué par des retards ou des oublis. Relisez les corrections : la réhydratation et la déclaration ne peuvent pas attendre.",
+    "finMauvaise": "Moussa n'a pas survécu. Le choléra tue par déshydratation en quelques heures : seule une réhydratation immédiate sauve le patient. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil et isolement",
+        "situation": "Moussa, 28 ans, arrive à pied, soutenu par un voisin. Diarrhée très abondante, aqueuse, d'aspect « eau de riz », depuis 12 heures, avec vomissements et crampes. Plusieurs cas semblables ont été signalés dans son quartier. Il a les yeux enfoncés, une soif intense et un pouls faible.",
+        "choix": [
+          { "texte": "Le placer à l'écart (zone d'isolement), appliquer les précautions d'hygiène (lavage des mains, gants, désinfection des selles et vomissures) et évaluer son degré de déshydratation sans attendre.", "effet": 5, "retour": "Le choléra se transmet par les selles et les vomissures. On isole, on protège les soignants et on évalue tout de suite la déshydratation, qui fait la gravité." },
+          { "texte": "Le laisser dans la salle commune en attendant son tour.", "effet": -20, "retour": "Un cas suspect de choléra doit être isolé immédiatement pour éviter la contamination des autres patients et des soignants." },
+          { "texte": "Lui donner un antidiarrhéique pour arrêter les selles.", "effet": -20, "retour": "Les antidiarrhéiques sont inutiles et dangereux dans le choléra. Le danger vient de la perte d'eau et de sels, qu'il faut remplacer." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Réhydratation",
+        "situation": "L'examen montre une déshydratation sévère : pli cutané qui se défait très lentement, pouls filant, tension basse, patient très faible. Il peut à peine boire.",
+        "choix": [
+          { "texte": "Débuter immédiatement une réhydratation par voie intraveineuse, rapide, avec une solution adaptée (type Ringer lactate), puis réévaluer régulièrement.", "effet": 5, "retour": "Une déshydratation sévère impose une réhydratation intraveineuse rapide, sans délai, avec réévaluation fréquente." },
+          { "texte": "Lui donner uniquement des SRO à boire, à petites gorgées.", "effet": -20, "retour": "Dans la déshydratation sévère avec choc, la voie orale seule est trop lente. On commence par voie intraveineuse, puis on passe aux SRO dès qu'il peut boire." },
+          { "texte": "Attendre le résultat de la culture de selles avant de le réhydrater.", "effet": -30, "fatal": true, "retour": "Attendre la confirmation du laboratoire est une erreur mortelle : la réhydratation se commence sur la clinique, sans attendre. Moussa décède faute de remplissage." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Santé publique",
+        "situation": "Moussa est perfusé. Il y a déjà eu d'autres cas dans le même quartier cette semaine. Le laboratoire est à plusieurs heures.",
+        "choix": [
+          { "texte": "Déclarer immédiatement le cas suspect au système de surveillance et faire prélever des selles pour confirmation, sans retarder les soins.", "effet": 5, "retour": "Le choléra est une maladie à déclaration immédiate : alerter permet d'organiser la riposte (eau, assainissement, recherche des cas). Le prélèvement confirme, sans retarder le traitement." },
+          { "texte": "Ne rien déclarer : ce n'est qu'un cas de plus.", "effet": -20, "retour": "Ne pas déclarer retarde la riposte et laisse l'épidémie s'étendre. Chaque cas suspect doit être signalé." },
+          { "texte": "Attendre la confirmation du laboratoire avant de déclarer.", "effet": -10, "retour": "On déclare dès le cas suspect, sans attendre la confirmation : le délai coûte des vies." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Relais",
+        "situation": "Après plusieurs heures de perfusion, Moussa est éveillé, le pouls est mieux perçu et il peut boire. Les selles restent abondantes.",
+        "choix": [
+          { "texte": "Passer aux SRO pour compenser les pertes (volume adapté aux selles), poursuivre la surveillance et donner un antibiotique selon le protocole national.", "effet": 5, "retour": "Dès que le patient peut boire, les SRO prennent le relais. On compense les pertes au fur et à mesure, et un antibiotique adapté raccourcit la maladie et la durée d'excrétion." },
+          { "texte": "Arrêter la réhydratation puisqu'il va mieux.", "effet": -20, "retour": "Les pertes continuent : si on arrête de compenser, la déshydratation revient rapidement." },
+          { "texte": "Ne donner qu'un antibiotique, sans compenser les pertes.", "effet": -30, "retour": "L'antibiotique ne remplace jamais la réhydratation : c'est elle qui sauve la vie." }
+        ]
+      },
+      {
+        "moment": "Jour 2 · Surveillance",
+        "situation": "Moussa est toujours en observation. Il a encore des crampes et une diarrhée plus modérée. Il urine moins que prévu.",
+        "choix": [
+          { "texte": "Surveiller les pertes, la diurèse et l'état d'hydratation, et adapter les apports (SRO, perfusion si nécessaire) selon ce qu'il perd.", "effet": 5, "retour": "On ajuste les apports aux pertes réelles. Une diurèse faible traduit une réhydratation encore insuffisante." },
+          { "texte": "Réduire fortement les apports pour « reposer l'intestin ».", "effet": -20, "retour": "Restreindre les apports aggrave la déshydratation. Le traitement consiste à remplacer ce qui est perdu." },
+          { "texte": "Le faire sortir tout de suite malgré la diarrhée encore abondante.", "effet": -20, "retour": "Un patient qui perd encore beaucoup d'eau doit rester en observation jusqu'à ce que les pertes diminuent." }
+        ]
+      },
+      {
+        "moment": "Jour 4 · Sortie et prévention",
+        "situation": "Moussa va mieux et peut rentrer. Il vit dans un quartier où l'eau potable manque, et plusieurs proches ont la diarrhée.",
+        "choix": [
+          { "texte": "Lui expliquer le lavage des mains au savon, le traitement de l'eau de boisson, la désinfection des selles et vomissures, le recours rapide aux SRO pour l'entourage et la vaccination si elle est organisée.", "effet": 5, "retour": "La prévention protège l'entourage : mains, eau potable, assainissement, SRO précoces pour les proches et vaccin oral lors des campagnes." },
+          { "texte": "Le laisser rentrer sans conseil.", "effet": -10, "retour": "Sans prévention, le cycle de contamination continue dans la famille et le quartier." },
+          { "texte": "Lui conseiller de ne pas parler de sa maladie pour éviter la panique.", "effet": -20, "retour": "Cacher la maladie freine la riposte et expose les voisins. L'information et la sensibilisation sont essentielles." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "hemorragie-post-partum",
+    "titre": "Saignement abondant après un accouchement",
+    "gravite": "CRITIQUE",
+    "avatar": "femme",
+    "icone": "sang",
+    "patient": "Adjoua, 29 ans",
+    "duree": "48 heures de suivi",
+    "resume": "Une jeune mère saigne abondamment après la naissance de son bébé. Vous avez quelques minutes pour agir.",
+    "finBonne": "Adjoua est stabilisée et sort avec son bébé après quelques jours. Des gestes rapides, un utérotonique, un remplissage et un transfert organisé lui ont sauvé la vie.",
+    "finMoyenne": "Adjoua survit, mais elle est très anémiée et sa récupération est longue, à cause de retards ou de gestes inadaptés. Relisez les corrections pour gagner du temps la prochaine fois.",
+    "finMauvaise": "Adjoua est décédée. L'hémorragie du post-partum est une cause majeure de mort maternelle : sans gestes immédiats, une femme peut mourir en moins de deux heures. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Première minute",
+        "situation": "Dans un centre de santé, Adjoua, 29 ans, vient d'accoucher par voie basse il y a 20 minutes. Le placenta est sorti. Elle saigne abondamment, le sang coule en continu. Elle est pâle, son pouls est rapide et elle se plaint de vertiges. Vous êtes avec une sage-femme.",
+        "choix": [
+          { "texte": "Appeler immédiatement de l'aide, poser deux voies veineuses, mesurer les constantes et masser l'utérus.", "effet": 5, "retour": "L'hémorragie du post-partum est une urgence vitale. On alerte l'équipe, on sécurise les voies veineuses, on mesure pouls et tension, et on masse l'utérus." },
+          { "texte": "Attendre quelques minutes pour voir si le saignement diminue.", "effet": -30, "fatal": true, "retour": "Attendre est une erreur mortelle : une femme peut perdre plusieurs litres de sang en peu de temps. L'hémorragie du post-partum se traite immédiatement." },
+          { "texte": "La transférer tout de suite, sans geste préalable.", "effet": -20, "retour": "Un transfert sans réanimation ni gestes de contrôle expose à un décès en route. On stabilise et on traite tout en organisant le transfert." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Cause principale",
+        "situation": "L'examen montre un utérus mou et mal contracté, au-dessus du nombril. Le saignement persiste.",
+        "choix": [
+          { "texte": "Masser l'utérus en continu et administrer un utérotonique de première intention (ocytocine) selon le protocole.", "effet": 5, "retour": "Dans la majorité des cas, la cause est l'atonie utérine. Le massage et l'ocytocine font contracter l'utérus et arrêtent le saignement." },
+          { "texte": "Donner un antalgique et surveiller.", "effet": -20, "retour": "Un antalgique ne traite pas la cause. Il faut faire contracter l'utérus." },
+          { "texte": "Poser seulement une poche de glace sur le ventre.", "effet": -20, "retour": "La glace n'arrête pas une hémorragie utérine. Seuls le massage et les utérotoniques sont efficaces." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Remplissage",
+        "situation": "Après le massage, le saignement reste abondant. Le pouls est à 130 par minute et la tension baisse. Adjoua est de plus en plus pâle.",
+        "choix": [
+          { "texte": "Remplir rapidement avec des cristalloïdes sur deux voies, demander du sang compatible et donner de l'acide tranexamique selon le protocole, le plus tôt possible.", "effet": 5, "retour": "Le remplissage compense la perte de volume. L'acide tranexamique, donné précocement (dans les trois heures), réduit la mortalité. Le sang doit être demandé sans attendre." },
+          { "texte": "Ne poser qu'une voie lente et attendre le médecin.", "effet": -20, "retour": "Dans l'hémorragie, on a besoin de deux voies et d'un remplissage rapide. Attendre aggrave le choc." },
+          { "texte": "Lui faire boire une grande quantité de boisson chaude.", "effet": -20, "retour": "Chez une femme en état de choc, la voie orale est insuffisante et dangereuse. Le remplissage se fait par voie veineuse." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Chercher une autre cause",
+        "situation": "Malgré l'utérotonique, le saignement continue. L'utérus est maintenant assez ferme.",
+        "choix": [
+          { "texte": "Examiner soigneusement le col et le vagin à la recherche d'une déchirure, vérifier que le placenta est complet, évacuer les caillots et réparer les lésions.", "effet": 5, "retour": "Quand l'utérus est ferme et que l'on saigne encore, il faut penser à un traumatisme (déchirure) ou à une rétention de débris. La recherche systématique est indispensable." },
+          { "texte": "Poursuivre le massage seul sans chercher d'autre cause.", "effet": -20, "retour": "Un utérus ferme qui saigne a une autre cause : traumatisme ou rétention. Sans la chercher, l'hémorragie continue." },
+          { "texte": "Attendre l'arrivée du médecin sans rien faire.", "effet": -10, "retour": "Pendant l'attente, chaque geste compte. On continue le traitement et l'examen." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Choc",
+        "situation": "Deux heures après l'accouchement, Adjoua devient confuse. La tension est très basse, le pouls filant. Le saignement a diminué mais n'est pas arrêté. L'hôpital de référence est à 40 minutes.",
+        "choix": [
+          { "texte": "Poursuivre la réanimation (remplissage, sang), mettre en place un tamponnement utérin (ballon) ou une compression en attendant, et organiser un transfert médicalisé avec la patiente stabilisée, accompagnée d'un soignant.", "effet": 5, "retour": "En cas de choc ou d'hémorragie persistante, on associe réanimation et mesures de contrôle (tamponnement par ballon, compression) avant un transfert organisé et médicalisé." },
+          { "texte": "La transférer immédiatement, sans réanimation, par le moyen disponible.", "effet": -30, "fatal": true, "retour": "Un transfert non médicalisé d'une patiente en choc est souvent mortel. Elle s'aggrave pendant le trajet." },
+          { "texte": "Attendre le lendemain pour décider.", "effet": -30, "fatal": true, "retour": "Attendre le lendemain est une erreur mortelle. Chaque minute aggrave le choc." }
+        ]
+      },
+      {
+        "moment": "Jour 2 · Suivi et prévention",
+        "situation": "Adjoua a été prise en charge avec succès et transférée en maternité. Elle est stable, mais très anémiée. Sa famille attend des explications.",
+        "choix": [
+          { "texte": "Surveiller de près ses constantes, sa diurèse et son saignement, transfuser si nécessaire, traiter l'anémie, informer honnêtement la famille et prévoir des conseils pour les futurs accouchements en structure équipée.", "effet": 5, "retour": "Le suivi rapproché évite une rechute. L'anémie doit être traitée. L'information de la famille et le suivi des grossesses suivantes (accouchement assisté) font partie des soins." },
+          { "texte": "La renvoyer à la maison le jour même.", "effet": -10, "retour": "Après une hémorragie sévère, la surveillance en structure reste nécessaire (anémie, récidive, infection)." },
+          { "texte": "Ne pas informer la famille pour éviter les questions.", "effet": -20, "retour": "L'information honnête de la famille est un droit et une obligation. Elle permet aussi d'organiser un suivi." }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "paludisme-simple-adulte",
+    "titre": "Fièvre et frissons chez une commerçante",
+    "gravite": "LEGER",
+    "avatar": "femme",
+    "icone": "thermometre",
+    "patient": "Mariam, 32 ans",
+    "duree": "3 jours de suivi",
+    "resume": "Une commerçante a de la fièvre depuis deux jours. Un cas simple, à condition de ne pas bâcler le diagnostic ni les conseils.",
+    "finBonne": "Mariam guérit sans complication. Le diagnostic confirmé, le bon traitement bien expliqué et la prévention ont évité la rechute et un nouvel épisode.",
+    "finMoyenne": "Mariam finit par guérir, mais à cause d'un traitement mal choisi ou mal expliqué, la maladie a traîné ou récidivé. Relisez les corrections.",
+    "finMauvaise": "Mariam n'a pas survécu : un paludisme simple mal pris en charge peut devenir grave en quelques jours. Relisez les corrections et recommencez.",
+    "etapes": [
+      {
+        "moment": "Jour 0 · Accueil",
+        "situation": "Mariam, 32 ans, consulte pour de la fièvre depuis deux jours, avec frissons, maux de tête et courbatures. Elle mange et boit, marche seule et n'a ni vomissements, ni convulsions, ni difficulté à respirer.",
+        "choix": [
+          { "texte": "L'interroger et l'examiner, rechercher des signes de gravité (conscience, respiration, pâleur, urines foncées, vomissements) et mesurer la température.", "effet": 5, "retour": "Avant de traiter, on cherche toujours les signes de gravité : ils changent complètement la prise en charge." },
+          { "texte": "Lui donner un antibiotique sans autre examen.", "effet": -20, "retour": "Une fièvre en zone d'endémie palustre doit d'abord faire chercher le paludisme. Un antibiotique seul ne le traite pas." },
+          { "texte": "La rassurer et lui dire de revenir si la fièvre continue, sans l'examiner.", "effet": -10, "retour": "Sans examen, on peut manquer un signe de gravité." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Confirmer le diagnostic",
+        "situation": "Aucun signe de gravité. Vous êtes dans une zone où le paludisme est fréquent.",
+        "choix": [
+          { "texte": "Faire un test de diagnostic rapide (TDR) ou une goutte épaisse avant de traiter.", "effet": 5, "retour": "Le traitement antipaludique repose sur la confirmation du parasite. Le TDR est rapide : ici, il est positif." },
+          { "texte": "Traiter directement sans test, comme tout le monde dans le quartier.", "effet": -10, "retour": "Traiter sans confirmation conduit à des traitements inutiles et à manquer d'autres maladies. On confirme dès que le test est disponible." },
+          { "texte": "Attendre trois jours pour voir comment la fièvre évolue.", "effet": -20, "retour": "Attendre fait courir le risque d'un paludisme grave." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Traitement",
+        "situation": "Le TDR est positif. Aucun signe de gravité. Mariam peut avaler les comprimés.",
+        "choix": [
+          { "texte": "Prescrire une association à base d'artémisinine (CTA) par la bouche, selon le protocole national, à la dose adaptée à son poids.", "effet": 5, "retour": "Le paludisme simple se traite par une CTA orale, en cure complète. C'est le traitement recommandé." },
+          { "texte": "Prescrire de la chloroquine seule, comme autrefois.", "effet": -20, "retour": "La chloroquine seule n'est plus efficace dans beaucoup de régions en raison des résistances." },
+          { "texte": "L'hospitaliser et lui donner de l'artésunate injectable d'emblée.", "effet": -10, "retour": "L'artésunate injectable est réservé au paludisme grave. Pour un paludisme simple, la voie orale suffit et évite une hospitalisation inutile." }
+        ]
+      },
+      {
+        "moment": "Jour 0 · Conseils de prise",
+        "situation": "Mariam vous demande comment prendre ses comprimés. Elle dit qu'elle arrêtera dès que la fièvre sera partie.",
+        "choix": [
+          { "texte": "Expliquer que la cure doit être terminée, à prendre avec un repas, à répéter la dose si elle vomit dans la demi-heure, et conseiller du paracétamol pour la fièvre et de bien boire.", "effet": 5, "retour": "Une cure complète évite la rechute. Les vomissements précoces peuvent faire perdre la dose. Le paracétamol soulage la fièvre et les douleurs." },
+          { "texte": "Lui dire d'arrêter dès que la fièvre disparaît.", "effet": -20, "retour": "Arrêter trop tôt expose à la rechute et à la résistance." },
+          { "texte": "Lui donner l'ordonnance sans explication.", "effet": -10, "retour": "Sans explication, les erreurs de prise sont fréquentes." }
+        ]
+      },
+      {
+        "moment": "Jour 1 · Prévention",
+        "situation": "Mariam dort sous une moustiquaire déchirée, et de l'eau stagne dans des seaux devant sa maison.",
+        "choix": [
+          { "texte": "Lui conseiller de dormir sous une moustiquaire imprégnée en bon état, de vider ou couvrir les récipients d'eau stagnante et de consulter vite en cas de fièvre dans la famille.", "effet": 5, "retour": "La moustiquaire imprégnée et la suppression des gîtes larvaires réduisent fortement les piqûres de moustiques." },
+          { "texte": "Ne rien dire : la prévention n'est pas le problème du jour.", "effet": -10, "retour": "Sans prévention, le risque de nouvel épisode reste élevé." },
+          { "texte": "Lui conseiller de brûler des produits fumigènes dans la chambre fermée.", "effet": -10, "retour": "Les fumées dans une pièce fermée sont nocives. Les moyens efficaces sont les moustiquaires imprégnées et la lutte contre les gîtes." }
+        ]
+      },
+      {
+        "moment": "Jour 3 · Contrôle",
+        "situation": "Trois jours plus tard, Mariam revient. La fièvre est tombée, mais elle se sent encore fatiguée.",
+        "choix": [
+          { "texte": "L'examiner, vérifier qu'elle a bien terminé le traitement et lui dire de revenir tout de suite en cas de fièvre persistante ou de signe de gravité.", "effet": 5, "retour": "Un contrôle confirme la guérison. Une fièvre qui persiste après le traitement impose de rechercher un échec thérapeutique ou une autre maladie." },
+          { "texte": "Lui dire de doubler les doses toute seule si la fièvre revient.", "effet": -20, "retour": "Doubler les doses seule est dangereux et inefficace : une fièvre qui revient impose un nouvel examen." },
+          { "texte": "Changer pour un antibiotique sans la réexaminer.", "effet": -10, "retour": "Un changement de traitement se décide après un nouvel examen, pas à l'aveugle." }
+        ]
+      }
+    ]
+  }
+]

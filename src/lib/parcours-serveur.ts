@@ -2,6 +2,12 @@ import { asc, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { jeuCas } from "@/db/schema";
 import { CAS, type Cas, type Etape, type Gravite } from "@/lib/parcours-cas";
+import lot1 from "@/data/cas-lot-1.json";
+import lot2a from "@/data/cas-lot-2a.json";
+import lot2b from "@/data/cas-lot-2b.json";
+
+/** Cas livres avec le code : ajoutes en brouillon quand ils manquent, jamais ecrases. */
+const CAS_LIVRES: unknown[] = [...(lot1 as unknown[]), ...(lot2a as unknown[]), ...(lot2b as unknown[])];
 
 const GRAVITES = ["LEGER", "MODERE", "GRAVE", "CRITIQUE"];
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -60,8 +66,18 @@ export function assurerCasParDefaut(): Promise<void> {
   if (!initialise) {
     initialise = (async () => {
       const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(jeuCas);
-      if (n > 0) return;
-      for (let i = 0; i < CAS.length; i++) await enregistrerCas(CAS[i], "ACTIF");
+      const existants = new Set((await db.select({ slug: jeuCas.slug }).from(jeuCas)).map((r) => r.slug));
+      if (n === 0) {
+        for (let i = 0; i < CAS.length; i++) {
+          await enregistrerCas(CAS[i], "ACTIF");
+          existants.add(CAS[i].id);
+        }
+      }
+      for (const brut of CAS_LIVRES) {
+        const r = validerCas(brut);
+        if ("cas" in r && !existants.has(r.cas.id)) await enregistrerCas(r.cas, "BROUILLON");
+      }
+
     })().catch((e) => {
       initialise = null;
       throw e;
