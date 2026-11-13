@@ -4,7 +4,7 @@ import { db } from "@/db";
 import { jeuCas } from "@/db/schema";
 import { isAdmin } from "@/lib/auth";
 import type { Cas } from "@/lib/parcours-cas";
-import { assurerCasParDefaut, enregistrerCas, validerCas, versCas } from "@/lib/parcours-serveur";
+import { assurerCasParDefaut, enregistrerCas, formatDe, nbEtapesDe, validerCas } from "@/lib/parcours-serveur";
 import { messageDetaille } from "@/lib/schema-securite";
 
 export const dynamic = "force-dynamic";
@@ -26,7 +26,8 @@ export async function GET() {
         patient: r.patient,
         icone: r.icone,
         statut: r.statut,
-        nbEtapes: versCas(r).etapes.length,
+        nbEtapes: nbEtapesDe(r),
+        format: formatDe(r),
       })),
     });
   } catch (e) {
@@ -51,7 +52,7 @@ export async function POST(request: Request) {
       }
       const statut = String(b?.statut ?? "");
       if (statut !== "ACTIF" && statut !== "BROUILLON") return NextResponse.json({ error: "Statut invalide." }, { status: 400 });
-      if (statut === "ACTIF" && versCas(r).etapes.length === 0) {
+      if (statut === "ACTIF" && nbEtapesDe(r) === 0) {
         return NextResponse.json({ error: "Ce cas n'a aucune étape : impossible de l'activer." }, { status: 400 });
       }
       await db.update(jeuCas).set({ statut }).where(eq(jeuCas.id, id));

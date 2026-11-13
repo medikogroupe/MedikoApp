@@ -5,9 +5,13 @@ import { CAS, type Cas, type Etape, type Gravite } from "@/lib/parcours-cas";
 import lot1 from "@/data/cas-lot-1.json";
 import lot2a from "@/data/cas-lot-2a.json";
 import lot2b from "@/data/cas-lot-2b.json";
+import casV2Pneumonie from "@/data/cas-v2-pneumonie.json";
+import { enregistrerCasV2 } from "@/lib/consultation-serveur";
+import { validerCasV2 } from "@/lib/consultation";
 
 /** Cas livres avec le code : ajoutes en brouillon quand ils manquent, jamais ecrases. */
 const CAS_LIVRES: unknown[] = [...(lot1 as unknown[]), ...(lot2a as unknown[]), ...(lot2b as unknown[])];
+const CAS_V2: unknown[] = [...(casV2Pneumonie as unknown[])];
 
 const GRAVITES = ["LEGER", "MODERE", "GRAVE", "CRITIQUE"];
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
@@ -77,6 +81,10 @@ export function assurerCasParDefaut(): Promise<void> {
         const r = validerCas(brut);
         if ("cas" in r && !existants.has(r.cas.id)) await enregistrerCas(r.cas, "BROUILLON");
       }
+      for (const brut2 of CAS_V2) {
+        const r2 = validerCasV2(brut2);
+        if ("cas" in r2 && !existants.has(r2.cas.id)) await enregistrerCasV2(r2.cas, "BROUILLON");
+      }
 
     })().catch((e) => {
       initialise = null;
@@ -84,6 +92,18 @@ export function assurerCasParDefaut(): Promise<void> {
     });
   }
   return initialise;
+}
+
+export function formatDe(r: Ligne): number {
+  return (r.contenu as Record<string, unknown> | null)?.format === 2 ? 2 : 1;
+}
+
+export function nbEtapesDe(r: Ligne): number {
+  if (formatDe(r) === 2) {
+    const b = (r.contenu as { besoins?: unknown }).besoins;
+    return Array.isArray(b) ? b.length : 0;
+  }
+  return versCas(r).etapes.length;
 }
 
 export async function listerCasActifs() {
@@ -98,16 +118,17 @@ export async function listerCasActifs() {
       patient: c.patient,
       icone: c.icone,
       resume: c.resume,
-      nbEtapes: c.etapes.length,
+      nbEtapes: nbEtapesDe(r),
       avatar: c.avatar ?? "homme",
+      format: formatDe(r),
     };
   });
 }
 
-export async function trouverCas(slug: string): Promise<{ cas: Cas; statut: string } | null> {
+export async function trouverCas(slug: string): Promise<{ cas: Cas; statut: string; format: number } | null> {
   if (!SLUG.test(slug)) return null;
   const [r] = await db.select().from(jeuCas).where(eq(jeuCas.slug, slug)).limit(1);
-  return r ? { cas: versCas(r), statut: r.statut } : null;
+  return r ? { cas: versCas(r), statut: r.statut, format: formatDe(r) } : null;
 }
 
 /** Controle un cas importe (JSON). Retourne le cas nettoye ou un message d'erreur lisible. */

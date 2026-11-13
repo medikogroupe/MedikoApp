@@ -3,7 +3,7 @@
 import { Visage, type Avatar } from "@/components/jeux/Portrait";
 
 /** Chambre d'hopital illustree : patient alite, perfusion et moniteur (constantes indicatives liees a l'etat). */
-export default function SceneHopital({ avatar, sante, mort = false }: { avatar: Avatar; sante: number; mort?: boolean }) {
+export default function SceneHopital({ avatar, sante, mort = false, masquerMoniteur = false }: { avatar: Avatar; sante: number; mort?: boolean; masquerMoniteur?: boolean }) {
   const echelle = avatar === "bebe" ? 0.55 : avatar === "enfant" ? 0.65 : 0.75;
   const demi = 40 * echelle;
   const tx = 110 - demi;
@@ -48,6 +48,7 @@ export default function SceneHopital({ avatar, sante, mort = false }: { avatar: 
         />
       )}
       <text x="278" y="102" fontSize="7" fill="#7f8ea3">constantes indicatives</text>
+      {masquerMoniteur ? <rect x="262" y="8" width="130" height="106" rx="10" fill="#e6eff7" /> : null}
 
       <rect x="234" y="58" width="4" height="136" fill="#9aa8b5" />
       <rect x="222" y="190" width="28" height="5" rx="2" fill="#9aa8b5" />

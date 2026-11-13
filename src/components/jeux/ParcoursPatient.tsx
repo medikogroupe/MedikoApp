@@ -15,6 +15,7 @@ type CasInfo = {
   icone: string;
   resume: string;
   nbEtapes: number;
+  format?: number;
 };
 type Vue = {
   cas: { id: string; titre: string; gravite: string; patient: string; icone: string; avatar: string };
@@ -183,6 +184,11 @@ export default function ParcoursPatient() {
     setErreur("");
     try {
       const d = await appel<{ token: string; vue: Vue }>({ action: "start", cas: id });
+      const lien = (d as unknown as { redirige?: string }).redirige;
+      if (lien) {
+        window.location.assign(lien);
+        return;
+      }
       setToken(d.token);
       setVue(d.vue);
       setRetour(null);
@@ -344,7 +350,7 @@ export default function ParcoursPatient() {
               key={c.id}
               type="button"
               disabled={occupe}
-              onClick={() => void demarrer(c.id)}
+              onClick={() => (c.format === 2 ? window.location.assign("/jeux/consultation?cas=" + c.id) : void demarrer(c.id))}
               className="mp-card block min-h-[44px] w-full p-4 text-left"
             >
               <div className="flex items-start gap-3">
@@ -361,7 +367,7 @@ export default function ParcoursPatient() {
                     <BarresGravite gravite={c.gravite} />
                   </div>
                   <p className="mt-1 text-xs text-mp-grey">
-                    {c.patient} · {c.nbEtapes} étapes · {c.duree}
+                    {c.patient} · {c.format === 2 ? "Simulation de suivi" : c.nbEtapes + " étapes"} · {c.duree}
                   </p>
                   <p className="mt-1 text-xs">{c.resume}</p>
                 </div>

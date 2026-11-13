@@ -20,6 +20,7 @@ export async function POST(request: Request) {
       if (trouve.statut !== "ACTIF" && !(await isAdmin())) {
         return NextResponse.json({ error: "Ce patient n'est pas encore disponible." }, { status: 403 });
       }
+      if (trouve.format === 2) return NextResponse.json({ redirige: "/jeux/consultation?cas=" + trouve.cas.id });
       if (trouve.cas.etapes.length === 0) return NextResponse.json({ error: "Ce patient n'a aucune étape." }, { status: 400 });
       const e = nouvellePartie(trouve.cas);
       return NextResponse.json({ token: signer(e), vue: vue(e, trouve.cas) });

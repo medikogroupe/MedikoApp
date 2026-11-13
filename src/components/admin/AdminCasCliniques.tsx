@@ -13,6 +13,7 @@ type Ligne = {
   icone: string;
   statut: "ACTIF" | "BROUILLON";
   nbEtapes: number;
+  format?: number;
 };
 
 const etapeModele = (n: number) => ({
@@ -167,7 +168,7 @@ export default function AdminCasCliniques() {
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <Link
-                    href={`/jeux/parcours?cas=${l.slug}`}
+                    href={l.format === 2 ? `/jeux/consultation?cas=${l.slug}` : `/jeux/parcours?cas=${l.slug}`}
                     target="_blank"
                     className="flex min-h-[44px] items-center gap-1 rounded-lg bg-mp-bg px-3 text-xs font-bold text-mp-blue"
                   >
