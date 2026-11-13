@@ -1,0 +1,80 @@
+[
+  {
+    "format": 2,
+    "id": "pneumonie-enfant-suivi",
+    "titre": "Toux et fièvre chez une petite fille : le suivi",
+    "gravite": "MODERE",
+    "avatar": "enfant",
+    "icone": "poumons",
+    "patient": "Awa, 3 ans",
+    "duree": "suivi de plusieurs jours",
+    "resume": "Une petite fille tousse et respire vite. Interrogez, examinez, prescrivez avec prudence, puis organisez le suivi.",
+    "accueil": "Une mère amène Awa, 3 ans, dans votre centre de santé. Elle tousse depuis plusieurs jours, a de la fièvre et respire vite. Vous disposez de 6 actions pour cette consultation : interroger, examiner ou demander des examens. Choisissez-les avec soin, vous ne pourrez pas tout faire.",
+    "facteurs": ["enfant", "allergie-penicilline"],
+    "santeDepart": 62,
+    "pointsAction": 6,
+    "maxJours": 30,
+    "suiviMin": 2,
+    "constantes": [
+      { "nom": "Fréquence respiratoire", "unite": "/min", "a100": 26, "a0": 72, "normal": [20, 34] },
+      { "nom": "Saturation en oxygène", "unite": "%", "a100": 98, "a0": 70, "normal": [94, 100] },
+      { "nom": "Température", "unite": "°C", "a100": 36.8, "a0": 40.8, "normal": [36, 37.5], "decimales": 1 },
+      { "nom": "Pouls", "unite": "/min", "a100": 105, "a0": 175, "normal": [80, 130] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Awa est éveillée, elle joue un peu et boit normalement. Sa respiration est calme." },
+      { "min": 70, "texte": "Awa est fatiguée mais réactive. Elle tousse encore, respire un peu vite et boit correctement." },
+      { "min": 45, "texte": "Awa est abattue et respire vite, avec un creusement sous les côtes. Elle boit peu." },
+      { "min": 20, "texte": "Awa est très somnolente, elle geint et respire avec difficulté. Elle refuse de boire." },
+      { "min": 0, "texte": "Awa est inconsciente, ses lèvres sont bleutées." }
+    ],
+    "infos": [
+      { "id": "depuis", "question": "Depuis quand est-elle malade, et comment ça a commencé ?", "reponse": "Toux depuis 4 jours, fièvre depuis 3 jours. Elle respire de plus en plus vite depuis hier." },
+      { "id": "boire", "question": "Boit-elle et mange-t-elle ?", "reponse": "Elle boit très peu depuis hier et refuse la bouillie.", "cle": true, "revision": "Chez l'enfant, le refus de boire fait partie des signes de danger : il faut toujours le rechercher." },
+      { "id": "convulsion", "question": "A-t-elle eu des convulsions ou perdu connaissance ?", "reponse": "Non, aucune convulsion." },
+      { "id": "antibio", "question": "A-t-elle déjà pris des antibiotiques ? Comment les a-t-elle supportés ?", "reponse": "Oui, de l'amoxicilline il y a un an pour une otite. Elle a eu des plaques rouges qui démangent sur tout le corps quelques heures plus tard. Le médecin avait dit de ne plus lui en donner.", "revele": "allergie-penicilline", "cle": true, "revision": "Avant tout antibiotique, on recherche une allergie médicamenteuse, surtout aux pénicillines. Une prescription habituelle devient dangereuse chez un patient allergique." },
+      { "id": "vaccins", "question": "Son carnet de vaccination est-il à jour ?", "reponse": "Elle n'a pas reçu le vaccin contre le pneumocoque. Les autres vaccins sont à jour." },
+      { "id": "fumee", "question": "Comment cuisinez-vous à la maison ?", "reponse": "Au feu de bois, dans la pièce où dort Awa." },
+      { "id": "contage", "question": "Y a-t-il quelqu'un qui tousse dans la famille ?", "reponse": "Le grand-père tousse depuis des mois." },
+      { "id": "poids", "question": "Quel est son poids ?", "reponse": "14 kg, pesée au centre." },
+      { "id": "voyage", "question": "Avez-vous voyagé récemment ?", "reponse": "Non, la famille n'a pas quitté le quartier." },
+      { "id": "maison", "question": "Avez-vous déjà donné des médicaments à la maison ?", "reponse": "Un sirop contre la toux acheté au marché, et du paracétamol." },
+      { "id": "urines", "question": "Fait-elle des urines normalement ?", "reponse": "Oui, mais un peu moins qu'avant." },
+      { "id": "digestion", "question": "A-t-elle la diarrhée ou des vomissements ?", "reponse": "Non, ni diarrhée ni vomissements." }
+    ],
+    "examensCliniques": [
+      { "id": "const", "libelle": "Prendre les constantes (respiration, pouls, température)", "constantes": ["Fréquence respiratoire", "Pouls", "Température"], "cle": true, "revision": "Chez un enfant qui tousse, on compte la fréquence respiratoire sur une minute entière : une respiration rapide évoque une pneumonie." },
+      { "id": "spo2", "libelle": "Mesurer la saturation en oxygène", "constantes": ["Saturation en oxygène"], "cle": true, "revision": "Mesurer la saturation en oxygène chez tout enfant qui respire vite : une valeur inférieure à 90 % impose l'oxygène et l'hospitalisation." },
+      { "id": "thorax", "libelle": "Observer et ausculter le thorax", "resultat": "Creusement net sous les côtes. À l'écoute, des crépitants à la base droite.", "cle": true, "revision": "L'examen du thorax (tirage, crépitants) oriente vers une pneumonie et vers sa gravité." },
+      { "id": "danger", "libelle": "Rechercher les signes de danger (conscience, convulsions, boisson)", "resultat": "Éveillée mais abattue, elle boit très peu. Pas de convulsion." },
+      { "id": "gorge", "libelle": "Examiner la gorge et les oreilles", "resultat": "Gorge un peu rouge. Les tympans sont normaux." },
+      { "id": "ventre", "libelle": "Palper l'abdomen", "resultat": "Abdomen souple et indolore. Foie et rate normaux." },
+      { "id": "peau", "libelle": "Examiner la peau et le pli cutané", "resultat": "Pas d'éruption. Le pli cutané se défait rapidement." }
+    ],
+    "examens": [
+      { "id": "tdr", "libelle": "Test de diagnostic rapide du paludisme", "resultat": "Négatif." },
+      { "id": "glyc", "libelle": "Glycémie capillaire", "resultat": "0,9 g/L, normale." },
+      { "id": "nfs", "libelle": "Numération formule sanguine", "resultat": "Globules blancs élevés. Hémoglobine correcte.", "delai": 1 },
+      { "id": "rx", "libelle": "Radiographie du thorax", "resultat": "Opacité dense du lobe inférieur droit : pneumonie.", "delai": 1 },
+      { "id": "urine", "libelle": "Examen des urines", "resultat": "Normal.", "delai": 1 }
+    ],
+    "diagnostics": [
+      { "id": "pneumo-grave", "libelle": "Pneumonie sévère avec hypoxémie", "correct": true },
+      { "id": "pneumo-simple", "libelle": "Pneumonie simple, sans signe de gravité", "revision": "Une saturation inférieure à 90 % ou un refus de boire classe la pneumonie comme sévère : traitement à l'hôpital, pas à domicile." },
+      { "id": "bronchiolite", "libelle": "Bronchiolite virale", "revision": "La bronchiolite touche surtout le nourrisson, avec des sifflements : ici, fièvre élevée, crépitants localisés et opacité à la radiographie évoquent une pneumonie." },
+      { "id": "asthme", "libelle": "Crise d'asthme", "revision": "L'asthme donne des sifflements sans fièvre ni opacité radiologique." },
+      { "id": "palu", "libelle": "Paludisme grave", "revision": "Un test de diagnostic rapide négatif écarte le paludisme : il faut le demander avant de traiter." },
+      { "id": "rhino", "libelle": "Rhinopharyngite banale", "revision": "Une rhinopharyngite ne donne pas de respiration rapide ni de tirage." }
+    ],
+    "besoins": [
+      { "id": "o2", "libelle": "Oxygénothérapie", "tags": ["oxygene"], "jours": 2, "perte": 8, "gain": 5 },
+      { "id": "abxinj", "libelle": "Antibiotique injectable adapté", "tags": ["antibiotique-injectable"], "jours": 2, "perte": 7, "gain": 4 },
+      { "id": "abx", "libelle": "Cure complète d'antibiotique", "tags": ["antibiotique"], "jours": 5, "perte": 3, "gain": 3 },
+      { "id": "surv", "libelle": "Hospitalisation et surveillance", "tags": ["surveillance"], "jours": 3, "perte": 4, "gain": 3 },
+      { "id": "fievre", "libelle": "Contrôle de la fièvre", "tags": ["antipyretique"], "jours": 2, "perte": 1, "gain": 1 }
+    ],
+    "finBonne": "Awa guérit sans complication. L'allergie a été recherchée, la gravité reconnue, le bon traitement prescrit et le suivi bien organisé : une petite fille sauvée.",
+    "finMoyenne": "Awa survit, mais son traitement a été incomplet ou mal suivi et elle garde des séquelles respiratoires. Relisez la fiche de révision pour mieux conduire le prochain suivi.",
+    "finMauvaise": "Awa n'a pas survécu. Dans la pneumonie sévère de l'enfant, une erreur de prescription ou un retard de prise en charge peut être fatal. Relisez la fiche de révision et recommencez."
+  }
+]
