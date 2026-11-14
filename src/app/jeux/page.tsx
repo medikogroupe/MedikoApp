@@ -356,6 +356,16 @@ export default function JeuxPage() {
         </span>
       </Link>
 
+      <Link href="/jeux/mes-patients" className="mp-card mb-4 flex items-center gap-3 p-4">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-mp-bg">
+          <img src="/jeux/icones/hopital.png" alt="" width={34} height={34} className="object-contain" draggable={false} />
+        </span>
+        <span className="flex-1">
+          <span className="block text-sm font-bold">Mes patients</span>
+          <span className="block text-xs text-mp-grey">Reprenez vos suivis enregistrés, de consultation en consultation.</span>
+        </span>
+      </Link>
+
       <div className="flex gap-2">
         {onglets.map((o) => {
           const Icon = o.icon;

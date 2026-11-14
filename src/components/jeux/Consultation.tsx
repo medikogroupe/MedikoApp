@@ -19,7 +19,7 @@ import SceneHopital from "@/components/jeux/SceneHopital";
 import { avatarSur } from "@/components/jeux/Portrait";
 import type { Bilan, Message, Vue } from "@/lib/consultation";
 
-type Reponse = { token: string; vue: Vue; messages: Message[]; bilan: Bilan | null };
+type Reponse = { token: string; vue: Vue; messages: Message[]; bilan: Bilan | null; suivi?: string };
 type Onglet = "interroger" | "examiner" | "examens" | "diagnostic" | "ordonnance" | "rendez-vous";
 
 const ONGLETS: { id: Onglet; label: string; icone: typeof Search }[] = [
@@ -44,8 +44,8 @@ const GENRE: Record<Message["genre"], string> = {
   alerte: "border-red-500 bg-red-50",
 };
 
-async function appel(corps: Record<string, unknown>): Promise<Reponse> {
-  const res = await fetch("/api/jeux/consultation", {
+async function appel(corps: Record<string, unknown>, url = "/api/jeux/consultation"): Promise<Reponse> {
+  const res = await fetch(url, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(corps),
@@ -76,12 +76,23 @@ export default function Consultation() {
   const [selection, setSelection] = useState<Record<string, number>>({});
   const [rdv, setRdv] = useState(0);
   const fin = useRef<HTMLDivElement>(null);
+  const [suivi, setSuivi] = useState("");
+  const [persiste, setPersiste] = useState(false);
 
-  async function demarrer(cas: string) {
+  async function demarrer(cas: string, recommencer = false) {
     setOccupe(true);
     setErreur("");
     try {
-      const d = await appel({ action: "start", cas });
+      let connecte = false;
+      try {
+        const sess = (await (await fetch("/api/auth/session", { cache: "no-store" })).json()) as { connecte?: boolean };
+        connecte = Boolean(sess.connecte);
+      } catch {
+        connecte = false;
+      }
+      const d = connecte ? await appel({ action: "start", cas, recommencer }, "/api/jeux/suivi") : await appel({ action: "start", cas });
+      setPersiste(connecte);
+      setSuivi(d.suivi ?? "");
       setToken(d.token);
       setVue(d.vue);
       setJournal(d.messages);
@@ -112,7 +123,7 @@ export default function Consultation() {
     setOccupe(true);
     setErreur("");
     try {
-      const d = await appel({ ...corps, token });
+      const d = persiste ? await appel({ ...corps, suivi }, "/api/jeux/suivi") : await appel({ ...corps, token });
       const passage = corps.action === "rdv" && !d.bilan;
       setToken(d.token);
       setVue(d.vue);
@@ -214,6 +225,7 @@ export default function Consultation() {
           </span>
         </div>
         <p className="mt-2 text-sm">{vue.narratif}</p>
+        {persiste ? <p className="mt-1 text-[11px] text-mp-grey">Suivi enregistré : vous pouvez fermer et reprendre plus tard.</p> : null}
         <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-mp-grey">
           <Clock size={14} className="text-mp-blue" /> Temps de consultation
           <span className="flex gap-1" aria-label={`${vue.pa} actions restantes sur ${vue.paMax}`}>
@@ -307,7 +319,7 @@ export default function Consultation() {
           ) : null}
 
           <div className="mt-4 flex flex-wrap gap-3">
-            <button type="button" className="mp-btn-yellow" disabled={occupe} onClick={() => void demarrer(slug)}>
+            <button type="button" className="mp-btn-yellow" disabled={occupe} onClick={() => void demarrer(slug, true)}>
               <RotateCcw size={16} /> Rejouer ce patient
             </button>
             <Link href="/jeux/parcours" className="mp-btn-ghost inline-flex items-center justify-center">

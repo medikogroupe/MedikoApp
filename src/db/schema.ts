@@ -285,3 +285,18 @@ export const jeuCas = pgTable("jeu_cas", {
   ordre: integer("ordre").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
+
+/** Suivis de simulation enregistres par etudiant (reprise possible d'une session a l'autre). */
+export const jeuSuivis = pgTable("jeu_suivis", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").notNull(),
+  casSlug: text("cas_slug").notNull(),
+  etat: jsonb("etat").$type<Record<string, unknown>>().notNull(),
+  statut: text("statut").notNull().default("EN_COURS"),
+  issue: text("issue"),
+  jour: integer("jour").notNull().default(0),
+  consultations: integer("consultations").notNull().default(1),
+  bilan: jsonb("bilan").$type<Record<string, unknown> | null>(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
