@@ -4,7 +4,7 @@ import { CATALOGUE, FACTEURS, traitement } from "@/lib/consultation-catalogue";
 /* Description d'un cas de simulation (format 2) */
 
 export type Info = { id: string; question: string; reponse: string; cle?: boolean; revele?: string; revision?: string };
-export type ExamenClinique = { id: string; libelle: string; resultat?: string; constantes?: string[]; cle?: boolean; revision?: string };
+export type ExamenClinique = { id: string; libelle: string; resultat?: string; constantes?: string[]; cle?: boolean; revele?: string; revision?: string };
 export type Examen = { id: string; libelle: string; resultat: string; delai?: number; cle?: boolean; revision?: string };
 export type Diagnostic = { id: string; libelle: string; correct?: boolean; revision?: string };
 /** Un besoin du patient : tant qu'il n'est pas couvert, l'etat se degrade ; couvert assez de jours, il est resolu. */
@@ -485,6 +485,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
       depenser(n);
       n.ec.push(ex.id);
       if (!n.e.includes(ex.id)) n.e.push(ex.id);
+      if (ex.revele && !n.k.includes(ex.revele)) n.k.push(ex.revele);
       const lignes = [...mesurer(cas, ex.constantes ?? [], n.s)];
       if (ex.resultat) lignes.push(ex.resultat);
       messages.push({ genre: "info", texte: `${ex.libelle} : ${lignes.join(" · ")}` });
@@ -531,7 +532,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
         const interdits = tr.contre.filter((f) => cas.facteurs.includes(f));
         if (interdits.length > 0) {
           const f = interdits[0] as string;
-          const cache = cas.infos.some((x) => x.revele === f);
+          const cache = cas.infos.some((x) => x.revele === f) || cas.examensCliniques.some((x) => x.revele === f);
           const connu = !cache || n.k.includes(f);
           n.s = Math.max(0, n.s - (tr.penalite ?? 20));
           n.f.push(`ci:${tr.id}:${f}:${connu ? 1 : 0}`);

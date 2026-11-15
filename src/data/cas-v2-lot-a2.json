@@ -1,0 +1,161 @@
+[
+  {
+    "format": 2,
+    "id": "accouchement-primipare",
+    "titre": "Une première naissance au centre de santé",
+    "gravite": "MODERE",
+    "avatar": "enceinte",
+    "icone": "bebe",
+    "patient": "Rokia, 24 ans",
+    "duree": "accouchement et suites de couches",
+    "resume": "Une primipare arrive en plein travail. Accompagnez la naissance sans gestes inutiles, puis protégez la mère et le bébé.",
+    "accueil": "Rokia, 24 ans, première grossesse, arrive au centre de santé avec des contractions fortes toutes les 3 minutes. Le travail est avancé. Vous disposez de 6 actions : interroger, examiner ou demander des examens. Vous prescrirez ensuite les gestes et les soins de l'accouchement, puis le prochain rendez-vous.",
+    "facteurs": ["travail-physiologique", "nne-vigoureux"],
+    "santeDepart": 80,
+    "pointsAction": 6,
+    "maxJours": 14,
+    "suiviMin": 2,
+    "constantes": [
+      { "nom": "Pouls", "unite": "/min", "a100": 80, "a0": 140, "normal": [60, 100] },
+      { "nom": "Pression artérielle systolique", "unite": "mmHg", "a100": 115, "a0": 170, "normal": [100, 139] },
+      { "nom": "Température", "unite": "°C", "a100": 36.8, "a0": 39.5, "normal": [36, 37.5], "decimales": 1 },
+      { "nom": "Rythme cardiaque du bébé", "unite": "/min", "a100": 140, "a0": 80, "normal": [110, 160] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Rokia est calme et son bébé va bien. Elle se repose, le saignement est normal et l'utérus est ferme." },
+      { "min": 60, "texte": "Rokia est active, fatiguée, les contractions sont rapprochées. Le travail progresse." },
+      { "min": 35, "texte": "Rokia saigne plus que la normale et elle est pâle. Le bébé est mou et crie peu." },
+      { "min": 10, "texte": "Rokia et son bébé sont en danger : saignement abondant, bébé qui ne crie pas." },
+      { "min": 0, "texte": "Rokia est inconsciente et son bébé ne réagit plus." }
+    ],
+    "infos": [
+      { "id": "debut", "question": "Depuis quand a-t-elle des contractions ? Les eaux sont-elles rompues ?", "reponse": "Contractions depuis ce matin, de plus en plus fortes. Les eaux se sont rompues il y a 3 heures, liquide clair." },
+      { "id": "cpn", "question": "A-t-elle fait des consultations prénatales ?", "reponse": "Quatre consultations. Tension normale à chaque fois, aucun problème signalé." },
+      { "id": "groupe", "question": "Quel est son groupe sanguin ?", "reponse": "Sa carte indique : groupe A, rhésus négatif.", "cle": true, "revision": "Le groupe et le rhésus se demandent dès l'admission : une mère de rhésus négatif d'un bébé de rhésus positif reçoit des immunoglobulines anti-D dans les 72 heures." },
+      { "id": "vih", "question": "Connaît-elle son statut VIH ?", "reponse": "Test négatif au 3e mois de grossesse, noté dans son carnet." },
+      { "id": "cesarienne", "question": "A-t-elle déjà eu une césarienne ou une opération de l'utérus ?", "reponse": "Non, c'est sa première grossesse." },
+      { "id": "mouvements", "question": "Le bébé bouge-t-il ?", "reponse": "Oui, il bouge normalement." },
+      { "id": "saignement", "question": "A-t-elle perdu du sang ?", "reponse": "Seulement un peu de glaires rosées." },
+      { "id": "signes", "question": "A-t-elle des maux de tête, des troubles de la vue ou des gonflements ?", "reponse": "Non, aucun de ces signes." },
+      { "id": "terme", "question": "À combien de semaines est-elle ?", "reponse": "Environ 39 semaines." },
+      { "id": "accompagnant", "question": "Y a-t-il quelqu'un pour l'accompagner ?", "reponse": "Sa mère est présente." },
+      { "id": "repas", "question": "A-t-elle mangé ou bu ?", "reponse": "Elle a bu de l'eau et mangé un peu de bouillie." }
+    ],
+    "examensCliniques": [
+      { "id": "const", "libelle": "Prendre les constantes de la mère (pouls, tension, température)", "constantes": ["Pouls", "Pression artérielle systolique", "Température"], "cle": true, "revision": "À l'admission, on prend toujours la tension, le pouls et la température : une tension élevée évoque une pré-éclampsie." },
+      { "id": "bcf", "libelle": "Écouter les bruits du cœur du bébé", "constantes": ["Rythme cardiaque du bébé"], "cle": true, "revision": "Les bruits du cœur du fœtus se surveillent à intervalles réguliers pendant le travail : une anomalie impose d'agir vite." },
+      { "id": "palpation", "libelle": "Palper le ventre (hauteur utérine, position du bébé)", "resultat": "Bébé en présentation de la tête, engagée. Hauteur utérine normale. Contractions fortes toutes les 3 minutes.", "cle": true, "revision": "La palpation précise la présentation (tête, siège) : c'est la base de la décision d'accoucher sur place ou de transférer." },
+      { "id": "tv", "libelle": "Faire un toucher vaginal (dilatation, col)", "resultat": "Col effacé, dilatation à 8 cm, tête engagée, poche des eaux rompue, liquide clair.", "cle": true, "revision": "Le toucher vaginal, fait avec asepsie, précise la dilatation et la progression ; il se répète à intervalles réguliers, pas à chaque contraction." },
+      { "id": "oedemes", "libelle": "Chercher des œdèmes et tester les réflexes", "resultat": "Pas d'œdème, réflexes normaux." },
+      { "id": "urines", "libelle": "Faire uriner et chercher de l'albumine dans les urines", "resultat": "Pas d'albumine dans les urines." },
+      { "id": "bassin", "libelle": "Évaluer le bassin", "resultat": "Bassin normal, dimensions suffisantes." }
+    ],
+    "examens": [
+      { "id": "grmere", "libelle": "Groupe sanguin et rhésus de la mère", "resultat": "Groupe A, rhésus négatif." },
+      { "id": "hb", "libelle": "Hémoglobine", "resultat": "Hémoglobine à 11,5 g/dL." },
+      { "id": "tdr", "libelle": "Test de diagnostic rapide du paludisme", "resultat": "Négatif." },
+      { "id": "vih", "libelle": "Test rapide VIH", "resultat": "Négatif." },
+      { "id": "grnne", "libelle": "Groupe sanguin et rhésus du nouveau-né", "resultat": "Nouveau-né de groupe A, rhésus positif.", "delai": 1 }
+    ],
+    "diagnostics": [
+      { "id": "normal", "libelle": "Travail normal en phase active, bassin normal", "correct": true },
+      { "id": "faux", "libelle": "Faux travail", "revision": "Des contractions fortes toutes les 3 minutes avec une dilatation à 8 cm ne sont pas un faux travail." },
+      { "id": "dystocie", "libelle": "Dystocie : travail qui n'avance pas", "revision": "La dilatation de 8 cm avec une tête engagée montre un travail qui progresse bien." },
+      { "id": "preeclampsie", "libelle": "Pré-éclampsie sévère", "revision": "Une tension normale, sans albumine ni signes neurologiques, écarte la pré-éclampsie." },
+      { "id": "cordon", "libelle": "Procidence du cordon", "revision": "Le toucher vaginal ne retrouve pas de cordon dans la filière : ce diagnostic est écarté." },
+      { "id": "rupture", "libelle": "Menace de rupture utérine", "revision": "Une primipare sans cicatrice utérine avec un travail normal n'est pas à risque de rupture utérine." }
+    ],
+    "besoins": [
+      { "id": "asepsie", "libelle": "Accouchement propre (asepsie)", "tags": ["asepsie"], "jours": 1, "perte": 6, "gain": 3 },
+      { "id": "partogramme", "libelle": "Surveillance du travail (partogramme)", "tags": ["partogramme"], "jours": 1, "perte": 6, "gain": 3 },
+      { "id": "utero", "libelle": "Prévention de l'hémorragie (utérotonique après la naissance)", "tags": ["uterotonique"], "jours": 1, "perte": 15, "gain": 5 },
+      { "id": "cordon", "libelle": "Clampage tardif du cordon", "tags": ["cordon"], "jours": 1, "perte": 3, "gain": 2 },
+      { "id": "peau", "libelle": "Peau à peau et allaitement dans la première heure", "tags": ["peau-a-peau"], "jours": 1, "perte": 4, "gain": 3 },
+      { "id": "vitk", "libelle": "Vitamine K1 du nouveau-né", "tags": ["vitamineK"], "jours": 1, "perte": 3, "gain": 2 },
+      { "id": "vaccins", "libelle": "Vaccins de naissance", "tags": ["vaccins-naissance"], "jours": 1, "perte": 3, "gain": 2 },
+      { "id": "antid", "libelle": "Immunoglobuline anti-D (mère de rhésus négatif)", "tags": ["antiD"], "jours": 1, "perte": 5, "gain": 3 },
+      { "id": "surv", "libelle": "Surveillance en maternité", "tags": ["surveillance"], "jours": 2, "perte": 5, "gain": 3 }
+    ],
+    "finBonne": "Rokia accouche d'un bébé en bonne santé, sans hémorragie. Un accouchement propre, accompagné sans gestes inutiles, la prévention de l'hémorragie et les soins immédiats du nouveau-né ont protégé la mère et l'enfant.",
+    "finMoyenne": "Rokia et son bébé s'en sortent, mais des oublis (prévention de l'hémorragie, soins du nouveau-né, anti-D) ou des gestes inutiles ont compliqué les suites. Relisez la fiche de révision.",
+    "finMauvaise": "Rokia est décédée d'une hémorragie après l'accouchement, ou son bébé n'a pas survécu à des gestes inadaptés. La prévention de l'hémorragie et l'accompagnement physiologique sont des gestes vitaux. Relisez la fiche de révision et recommencez."
+  },
+  {
+    "format": 2,
+    "id": "soins-toilette-patient-alite",
+    "titre": "Soins et toilette d'une patiente alitée",
+    "gravite": "MODERE",
+    "avatar": "femme",
+    "icone": "hopital",
+    "patient": "Mamie Tanoh, 78 ans",
+    "duree": "30 jours de soins",
+    "resume": "Une patiente âgée, alitée depuis 10 jours après une fracture du col du fémur, a la peau fragile. Les soins quotidiens décident de la suite : prévenez l'escarre.",
+    "accueil": "Mamie Tanoh, 78 ans, est alitée depuis 10 jours après l'opération d'une fracture du col du fémur. Elle est consciente mais fatiguée, et mange peu. Vous êtes l'infirmier ou l'infirmière responsable de ses soins de base. Vous disposez de 6 actions pour cette première visite : observer, interroger, examiner. Puis vous organisez les soins de la semaine.",
+    "facteurs": ["risque-escarre", "escarre-debut", "peau-fragile"],
+    "santeDepart": 68,
+    "pointsAction": 6,
+    "maxJours": 60,
+    "suiviMin": 3,
+    "constantes": [
+      { "nom": "Température", "unite": "°C", "a100": 36.8, "a0": 39, "normal": [36, 37.5], "decimales": 1 },
+      { "nom": "Pouls", "unite": "/min", "a100": 76, "a0": 120, "normal": [60, 100] },
+      { "nom": "Score de Braden (risque d'escarre)", "unite": "/23", "a100": 23, "a0": 6, "normal": [19, 23] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Mamie Tanoh est propre, confortable et elle sourit. Sa peau est intacte." },
+      { "min": 60, "texte": "Mamie Tanoh est fatiguée mais calme. Une rougeur persiste au bas du dos." },
+      { "min": 35, "texte": "Mamie Tanoh se plaint d'une douleur au sacrum. Une plaie superficielle est apparue." },
+      { "min": 15, "texte": "Mamie Tanoh a une plaie profonde au sacrum, de la fièvre, et refuse de manger." },
+      { "min": 0, "texte": "Mamie Tanoh est inconsciente, la plaie est infectée." }
+    ],
+    "infos": [
+      { "id": "position", "question": "Comment est-elle installée dans le lit ? Qui la change de position ?", "reponse": "Elle reste surtout allongée sur le dos. Sa famille la tourne une fois par jour quand elle vient.", "cle": true, "revision": "La position et la fréquence des changements d'appui sont au cœur de la prévention des escarres : on les demande toujours." },
+      { "id": "alimentation", "question": "Que mange-t-elle ? Boit-elle ?", "reponse": "Elle mange quelques cuillerées de bouillie et boit peu.", "cle": true, "revision": "Une dénutrition et une déshydratation fragilisent la peau : l'alimentation fait partie de la prévention." },
+      { "id": "incontinence", "question": "Est-elle incontinente ? Porte-t-elle une couche ?", "reponse": "Elle porte une couche, souvent humide, changée deux fois par jour." },
+      { "id": "douleur", "question": "A-t-elle mal ? Où ?", "reponse": "Elle a mal à la hanche opérée et au bas du dos quand on la bouge." },
+      { "id": "mobilite", "question": "Peut-elle bouger seule ou s'asseoir ?", "reponse": "Elle ne bouge pas seule. Le kinésithérapeute n'est pas encore passé." },
+      { "id": "matelas", "question": "Sur quoi est-elle couchée ?", "reponse": "Un matelas de mousse fin et usé, sans protection." },
+      { "id": "famille", "question": "Qui l'aide au quotidien ?", "reponse": "Sa fille, une fois par jour, et une voisine." },
+      { "id": "maladies", "question": "A-t-elle une maladie connue (diabète, hypertension) ?", "reponse": "Hypertension traitée. Pas de diabète." },
+      { "id": "hygiene", "question": "Comment se fait sa toilette ?", "reponse": "Une toilette rapide du visage et des mains, tous les deux jours." },
+      { "id": "dents", "question": "Porte-t-elle une prothèse dentaire ? Les soins de bouche sont-ils faits ?", "reponse": "Elle a une prothèse, enlevée la nuit. La bouche est rarement nettoyée." }
+    ],
+    "examensCliniques": [
+      { "id": "peau", "libelle": "Examiner la peau du sacrum, des talons et des hanches", "resultat": "Rougeur du sacrum qui ne disparaît pas quand on appuie dessus (escarre de stade 1). Les talons sont rouges. Pas de plaie ouverte.", "revele": "escarre-debut", "cle": true, "revision": "Une rougeur qui ne blanchit pas à la pression est une escarre débutante : on examine chaque jour les zones d'appui (sacrum, talons, hanches)." },
+      { "id": "const", "libelle": "Prendre les constantes (température, pouls)", "constantes": ["Température", "Pouls"] },
+      { "id": "braden", "libelle": "Évaluer le risque d'escarre (score de Braden)", "constantes": ["Score de Braden (risque d'escarre)"], "cle": true, "revision": "L'échelle de Braden mesure le risque d'escarre : elle guide l'intensité de la prévention." },
+      { "id": "bouche", "libelle": "Examiner la bouche", "resultat": "Langue sèche et dépôt blanchâtre : bouche sale et déshydratée." },
+      { "id": "poumons", "libelle": "Écouter les poumons", "resultat": "Léger encombrement à la base, sans fièvre." },
+      { "id": "hydratation", "libelle": "Évaluer l'hydratation", "resultat": "Peau sèche, urines foncées : déshydratation modérée." },
+      { "id": "mollets", "libelle": "Examiner les mollets (phlébite)", "resultat": "Pas de douleur ni de gonflement." },
+      { "id": "douleurmobilisation", "libelle": "Évaluer la douleur à la mobilisation", "resultat": "Douleur modérée à la hanche quand on la tourne, qui la fait refuser d'être bougée." }
+    ],
+    "examens": [
+      { "id": "glyc", "libelle": "Glycémie capillaire", "resultat": "1,0 g/L, normale." },
+      { "id": "urine", "libelle": "Bandelette urinaire", "resultat": "Normale." },
+      { "id": "nfs", "libelle": "Numération formule sanguine", "resultat": "Anémie modérée : hémoglobine à 10 g/dL.", "delai": 1 },
+      { "id": "albumine", "libelle": "Albumine sanguine", "resultat": "Albumine basse : dénutrition.", "delai": 1 }
+    ],
+    "diagnostics": [
+      { "id": "escarre", "libelle": "Escarre débutante (stade 1) avec risque élevé d'aggravation", "correct": true },
+      { "id": "irritation", "libelle": "Simple irritation par la couche", "revision": "Une rougeur qui ne disparaît pas à la pression est une escarre débutante, pas une irritation banale." },
+      { "id": "diabetique", "libelle": "Plaie du diabétique", "revision": "La patiente n'est pas diabétique : la rougeur vient de la pression prolongée." },
+      { "id": "eczema", "libelle": "Eczéma", "revision": "L'eczéma démange et touche les plis : ici la rougeur est située sur les zones d'appui." },
+      { "id": "allergie", "libelle": "Réaction allergique au savon", "revision": "La rougeur est localisée aux zones d'appui, pas diffuse : ce n'est pas une allergie." },
+      { "id": "normale", "libelle": "Peau normale, simple fatigue", "revision": "Une peau rouge qui ne blanchit pas à la pression n'est jamais normale chez un patient alité." }
+    ],
+    "besoins": [
+      { "id": "position", "libelle": "Changements de position toutes les 2 heures", "tags": ["position"], "jours": 7, "perte": 3, "gain": 3 },
+      { "id": "peau", "libelle": "Protection des zones d'appui", "tags": ["protection-peau"], "jours": 7, "perte": 3, "gain": 3 },
+      { "id": "toilette", "libelle": "Toilette complète au lit et soins de la peau", "tags": ["toilette"], "jours": 3, "perte": 2, "gain": 2 },
+      { "id": "aliment", "libelle": "Aide à l'alimentation et à l'hydratation", "tags": ["alimentation"], "jours": 5, "perte": 2, "gain": 3 },
+      { "id": "bouche", "libelle": "Soins de bouche", "tags": ["soins-bouche"], "jours": 3, "perte": 1, "gain": 1 },
+      { "id": "mains", "libelle": "Hygiène des mains avant et après chaque soin", "tags": ["hygiene-mains"], "jours": 7, "perte": 2, "gain": 2 },
+      { "id": "mobil", "libelle": "Mobilisation précoce (kinésithérapie)", "tags": ["mobilisation-precoce"], "jours": 7, "perte": 2, "gain": 2 },
+      { "id": "douleur", "libelle": "Antalgie avant les soins", "tags": ["antalgique", "antipyretique"], "jours": 5, "perte": 1, "gain": 1 }
+    ],
+    "finBonne": "Mamie Tanoh retrouve une peau intacte et reprend des forces. Les changements de position, la protection des appuis, l'alimentation et la toilette ont évité l'escarre.",
+    "finMoyenne": "Mamie Tanoh n'a pas d'escarre grave, mais sa peau reste fragile et sa récupération est lente à cause de soins irréguliers. Relisez la fiche de révision.",
+    "finMauvaise": "Mamie Tanoh a développé une escarre profonde et infectée, puis une complication fatale. La prévention des escarres est un soin à part entière. Relisez la fiche de révision et recommencez."
+  }
+]
