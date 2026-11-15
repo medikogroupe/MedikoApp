@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import AppHeader from "@/components/AppHeader";
 import BottomNav from "@/components/BottomNav";
 import Footer from "@/components/Footer";
+import GardeService from "@/components/GardeService";
 
 export default function PageShell({
   title,
@@ -21,7 +22,9 @@ export default function PageShell({
   return (
     <div className="flex min-h-dvh flex-col bg-mp-bg">
       <AppHeader title={title} subtitle={subtitle} back={back} action={action} />
-      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-4">{children}</main>
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-4">
+        <GardeService>{children}</GardeService>
+      </main>
       <Footer />
       {nav ? <BottomNav /> : null}
     </div>

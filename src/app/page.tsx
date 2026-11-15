@@ -88,6 +88,7 @@ export default async function HomePage() {
           <Link href="/pharmacies" className="mp-btn-ghost flex-1">
             Pharmacies de garde
           </Link>
+          <Link href="/decouvrir" className="mp-btn-ghost flex-1">Essayer un mini-QCM</Link>
           <Link href="/contact" className="mp-btn-ghost flex-1">
             Contacter le support
           </Link>

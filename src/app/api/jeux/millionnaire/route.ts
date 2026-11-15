@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import { abandonner, lire, nouvellePartie, repondre, signer, utiliserJoker, vue } from "@/lib/millionnaire";
 
 export const dynamic = "force-dynamic";
 
 /** Une seule route pour toute la partie : start, answer, joker, quit. */
 export async function POST(request: Request) {
+  if (!(await getCurrentUser())) return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
   const corps = await request.json().catch(() => ({}));
   const action = String(corps.action ?? "");
   try {
