@@ -1,3 +1,5 @@
+import { EXTRA, FACTEURS_EXTRA } from "@/lib/consultation-catalogue-extra";
+
 export type Traitement = {
   id: string;
   nom: string;
@@ -9,12 +11,16 @@ export type Traitement = {
   contre: string[];
   /** Deux traitements de la meme famille prescrits ensemble font doublon. */
   famille?: string;
+  /** Geste ou prise unique : pas de duree a choisir (compte pour un jour). */
+  ponctuel?: boolean;
+  /** Degats a la sante si le traitement est contre-indique (20 par defaut). */
+  penalite?: number;
   /** Rappel pedagogique affiche a l'etudiant en cas d'erreur. */
   revision: string;
 };
 
 /** Libelles des facteurs du patient (allergies, terrain...). */
-export const FACTEURS: Record<string, string> = {
+const FACTEURS_BASE: Record<string, string> = {
   enfant: "âge inférieur à 12 ans",
   "allergie-penicilline": "allergie à la pénicilline",
   "insuffisance-renale": "insuffisance rénale",
@@ -23,7 +29,7 @@ export const FACTEURS: Record<string, string> = {
 };
 
 /** Catalogue sans doses : les doses seront ajoutees apres validation par un medecin ou un pharmacien. */
-export const CATALOGUE: Traitement[] = [
+const BASE: Traitement[] = [
   {
     id: "oxygene",
     nom: "Oxygénothérapie",
@@ -56,7 +62,7 @@ export const CATALOGUE: Traitement[] = [
     nom: "Perfusion de sérum salé",
     type: "SOIN",
     forme: "Voie intraveineuse",
-    tags: ["hydratation", "hydratation-iv"],
+    tags: ["hydratation", "hydratation-iv", "remplissage"],
     contre: [],
     revision: "La réhydratation par voie veineuse est réservée aux déshydratations sévères ou à l'impossibilité de boire.",
   },
@@ -168,6 +174,9 @@ export const CATALOGUE: Traitement[] = [
     revision: "L'artésunate injectable est réservé au paludisme grave confirmé.",
   },
 ];
+
+export const FACTEURS: Record<string, string> = { ...FACTEURS_BASE, ...FACTEURS_EXTRA };
+export const CATALOGUE: Traitement[] = [...BASE, ...EXTRA];
 
 export function traitement(id: string): Traitement | undefined {
   return CATALOGUE.find((t) => t.id === id);

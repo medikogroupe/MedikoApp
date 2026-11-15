@@ -1,0 +1,169 @@
+[
+  {
+    "format": 2,
+    "id": "accident-route-polytraumatise",
+    "titre": "Motard renversé : le polytraumatisé",
+    "gravite": "CRITIQUE",
+    "avatar": "homme",
+    "icone": "ambulance",
+    "patient": "Adama, 24 ans",
+    "duree": "premières heures et suivi",
+    "resume": "Un motard sans casque arrive après un accident de la route, pâle et en sueur. Chaque minute compte : sauvez-le sans l'aggraver.",
+    "accueil": "Adama, 24 ans, est amené aux urgences 30 minutes après avoir été renversé par un camion alors qu'il roulait à moto. Il est pâle, couvert de sueurs et saigne abondamment de la cuisse gauche. Vous disposez de 6 actions pour cette prise en charge initiale : interroger les accompagnants, examiner ou demander des examens. Priorisez, vous ne pourrez pas tout faire.",
+    "facteurs": ["traumatisme-rachis", "polytraumatisme", "hemorragie-active"],
+    "santeDepart": 50,
+    "pointsAction": 6,
+    "maxJours": 30,
+    "suiviMin": 2,
+    "constantes": [
+      { "nom": "Pouls", "unite": "/min", "a100": 80, "a0": 160, "normal": [60, 100] },
+      { "nom": "Pression artérielle systolique", "unite": "mmHg", "a100": 120, "a0": 50, "normal": [100, 140] },
+      { "nom": "Fréquence respiratoire", "unite": "/min", "a100": 16, "a0": 40, "normal": [12, 20] },
+      { "nom": "Saturation en oxygène", "unite": "%", "a100": 98, "a0": 80, "normal": [94, 100] },
+      { "nom": "Score de Glasgow", "unite": "/15", "a100": 15, "a0": 6, "normal": [14, 15] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Adama est conscient et stabilisé. Il est fatigué, perfusé, et se plaint de sa jambe opérée." },
+      { "min": 70, "texte": "Adama est pâle mais répond clairement. Il a très mal à la cuisse." },
+      { "min": 45, "texte": "Adama est pâle, en sueur, agité et confus par moments. Il saigne de la cuisse gauche." },
+      { "min": 25, "texte": "Adama est très pâle, glacé, somnolent, sa respiration est rapide. Les saignements ne s'arrêtent pas." },
+      { "min": 0, "texte": "Adama est inconscient, glacé, son pouls est à peine perceptible." }
+    ],
+    "infos": [
+      { "id": "mecanisme", "question": "Que s'est-il passé exactement ?", "reponse": "Un camion l'a renversé à moto, à grande vitesse. Il n'avait pas de casque et a été projeté de plusieurs mètres.", "cle": true, "revision": "Le mécanisme (vitesse, projection, absence de casque) fait craindre un traumatisme grave du crâne, du rachis et des organes : on le recherche toujours." },
+      { "id": "cou", "question": "A-t-il mal au cou ? Fourmille-t-il dans les bras ou les jambes ?", "reponse": "Il se plaint de douleurs du cou et de fourmillements dans la jambe droite.", "revele": "traumatisme-rachis", "cle": true, "revision": "Toute douleur du cou chez un traumatisé impose d'immobiliser le rachis avant de le déplacer." },
+      { "id": "connaissance", "question": "A-t-il perdu connaissance ?", "reponse": "Oui, environ 5 minutes sur la route, puis il s'est réveillé confus." },
+      { "id": "transport", "question": "Comment a-t-il été relevé et amené ?", "reponse": "Des passants l'ont relevé, assis dans une voiture et conduit à l'hôpital." },
+      { "id": "allergies", "question": "A-t-il des allergies ou prend-il des médicaments ?", "reponse": "Aucune allergie connue, aucun traitement." },
+      { "id": "vat", "question": "Est-il vacciné contre le tétanos ?", "reponse": "Personne ne sait : il n'a pas de carnet de vaccination.", "cle": true, "revision": "Toute plaie souillée impose de vérifier la protection antitétanique ; en cas de doute, on vaccine." },
+      { "id": "repas", "question": "Quand a-t-il mangé pour la dernière fois ?", "reponse": "Il a pris un repas il y a deux heures." },
+      { "id": "antecedents", "question": "A-t-il une maladie connue (cœur, saignements) ?", "reponse": "Aucune maladie connue. Il est en bonne santé habituelle." },
+      { "id": "alcool", "question": "Avait-il bu de l'alcool ?", "reponse": "Selon un témoin, probablement un peu." },
+      { "id": "famille", "question": "Quelqu'un de sa famille est-il présent ?", "reponse": "Son frère est là et accepte tous les soins nécessaires." },
+      { "id": "poids", "question": "Quel est son poids ?", "reponse": "Environ 70 kg." },
+      { "id": "metier", "question": "Quel est son métier ?", "reponse": "Il est conducteur de moto-taxi." }
+    ],
+    "examensCliniques": [
+      { "id": "const", "libelle": "Prendre les constantes (pouls, tension, respiration)", "constantes": ["Pouls", "Pression artérielle systolique", "Fréquence respiratoire"], "cle": true, "revision": "Dans un traumatisme grave, on mesure d'emblée pouls, tension et respiration : un pouls rapide avec une tension basse signe un choc hémorragique." },
+      { "id": "spo2", "libelle": "Mesurer la saturation en oxygène", "constantes": ["Saturation en oxygène"], "cle": true, "revision": "La saturation guide l'oxygénothérapie : un polytraumatisé reçoit de l'oxygène." },
+      { "id": "glasgow", "libelle": "Évaluer la conscience (score de Glasgow) et les pupilles", "constantes": ["Score de Glasgow"], "resultat": "Pupilles égales et réactives." },
+      { "id": "voies", "libelle": "Libérer et contrôler les voies aériennes", "resultat": "Un peu de sang dans la bouche, que vous aspirez. La respiration est rapide, le thorax se soulève des deux côtés." },
+      { "id": "cuisse", "libelle": "Examiner la cuisse gauche", "resultat": "Fracture ouverte du fémur : plaie profonde, sang rouge qui coule en jet, os visible. La jambe est déformée.", "cle": true, "revision": "On cherche et on contrôle d'abord les hémorragies visibles : une plaie de cuisse qui saigne en jet engage le pronostic vital en quelques minutes." },
+      { "id": "abdomen", "libelle": "Palper l'abdomen", "resultat": "Ventre dur et douloureux, surtout à gauche, avec défense sous les côtes gauches.", "cle": true, "revision": "Un ventre douloureux après un choc violent fait craindre un saignement interne (rate, foie) : on l'explore toujours." },
+      { "id": "thorax", "libelle": "Examiner le thorax", "resultat": "Quelques côtes fracturées à gauche, sans détresse majeure. Le murmure vésiculaire est présent des deux côtés." },
+      { "id": "bassin", "libelle": "Appuyer doucement sur le bassin", "resultat": "Bassin stable et indolore." },
+      { "id": "tete", "libelle": "Examiner la tête et le cou", "resultat": "Plaie du cuir chevelu, douleur à la palpation des vertèbres cervicales. Pas d'écoulement par les oreilles." }
+    ],
+    "examens": [
+      { "id": "fast", "libelle": "Échographie abdominale rapide (FAST)", "resultat": "Liquide libre autour de la rate et dans le bassin : hémopéritoine.", "cle": true, "revision": "L'échographie rapide au lit du patient détecte en quelques minutes un saignement interne chez un traumatisé instable." },
+      { "id": "groupe", "libelle": "Groupe sanguin et recherche d'agglutinines", "resultat": "Groupe O positif, sang compatible disponible." },
+      { "id": "hb", "libelle": "Hémoglobine", "resultat": "Hémoglobine à 7,8 g/dL." },
+      { "id": "glyc", "libelle": "Glycémie capillaire", "resultat": "1,1 g/L, normale." },
+      { "id": "rxbassin", "libelle": "Radiographie du bassin", "resultat": "Pas de fracture du bassin." },
+      { "id": "rxfemur", "libelle": "Radiographie du fémur gauche", "resultat": "Fracture comminutive du fémur gauche, fracture ouverte." },
+      { "id": "scanner", "libelle": "Scanner cérébral et cervical", "resultat": "Pas d'hémorragie intracrânienne. Fracture d'une vertèbre cervicale, stable, sans compression de la moelle.", "delai": 1 },
+      { "id": "tdr", "libelle": "Test de diagnostic rapide du paludisme", "resultat": "Négatif." }
+    ],
+    "diagnostics": [
+      { "id": "poly", "libelle": "Polytraumatisme avec choc hémorragique", "correct": true },
+      { "id": "femur", "libelle": "Simple fracture ouverte de la cuisse", "revision": "La fracture de la cuisse n'explique pas à elle seule le choc : le ventre dur et le liquide libre à l'échographie révèlent un saignement interne associé." },
+      { "id": "cranien", "libelle": "Traumatisme crânien isolé", "revision": "Les signes de choc hémorragique (pouls rapide, tension basse, pâleur) viennent des saignements, pas du crâne seul." },
+      { "id": "syncope", "libelle": "Malaise vagal après la chute", "revision": "Un malaise ne provoque pas de saignement en jet ni de ventre dur : chez un polytraumatisé, on cherche d'abord ce qui menace la vie." },
+      { "id": "pneumo", "libelle": "Pneumothorax compressif isolé", "revision": "Le murmure vésiculaire est présent des deux côtés : un pneumothorax compressif n'est pas en cause." },
+      { "id": "alcool", "libelle": "Ivresse avec agitation", "revision": "Attribuer l'agitation à l'alcool est une erreur classique : chez un traumatisé, une agitation évoque d'abord un choc ou une atteinte cérébrale." }
+    ],
+    "besoins": [
+      { "id": "hemo", "libelle": "Contrôle de l'hémorragie de la cuisse", "tags": ["hemostase"], "jours": 1, "perte": 25, "gain": 5 },
+      { "id": "rachis", "libelle": "Immobilisation du rachis cervical", "tags": ["rachis"], "jours": 3, "perte": 6, "gain": 2 },
+      { "id": "o2", "libelle": "Oxygénothérapie", "tags": ["oxygene"], "jours": 1, "perte": 6, "gain": 4 },
+      { "id": "rempl", "libelle": "Remplissage vasculaire", "tags": ["remplissage"], "jours": 2, "perte": 12, "gain": 6 },
+      { "id": "sang", "libelle": "Transfusion de sang compatible", "tags": ["transfusion"], "jours": 1, "perte": 10, "gain": 6 },
+      { "id": "txa", "libelle": "Acide tranexamique précoce", "tags": ["antifibrinolytique"], "jours": 1, "perte": 3, "gain": 2 },
+      { "id": "douleur", "libelle": "Antalgie", "tags": ["antalgique", "antipyretique"], "jours": 3, "perte": 2, "gain": 1 },
+      { "id": "attelle", "libelle": "Immobilisation de la fracture", "tags": ["immobilisation"], "jours": 2, "perte": 4, "gain": 2 },
+      { "id": "abx", "libelle": "Antibiothérapie de la fracture ouverte", "tags": ["antibiotique"], "jours": 5, "perte": 3, "gain": 2 },
+      { "id": "vat", "libelle": "Prophylaxie antitétanique", "tags": ["tetanos"], "jours": 1, "perte": 2, "gain": 1 },
+      { "id": "chir", "libelle": "Chirurgie en urgence", "tags": ["chirurgie"], "jours": 1, "perte": 12, "gain": 8 },
+      { "id": "surv", "libelle": "Surveillance en soins intensifs", "tags": ["surveillance"], "jours": 3, "perte": 4, "gain": 3 }
+    ],
+    "finBonne": "Adama est opéré à temps, stabilisé, et sort après quelques jours avec sa fracture traitée. L'hémorragie contrôlée, le rachis protégé, le remplissage, le sang et la chirurgie lui ont sauvé la vie.",
+    "finMoyenne": "Adama survit, mais des retards ou des oublis lui laissent des séquelles : fracture mal consolidée, infection ou faiblesse de la jambe. Relisez la fiche de révision.",
+    "finMauvaise": "Adama est décédé d'un choc hémorragique. Chez un polytraumatisé, il faut arrêter l'hémorragie, protéger le rachis, remplir, transfuser et opérer sans attendre. Relisez la fiche de révision et recommencez."
+  },
+  {
+    "format": 2,
+    "id": "secourisme-brulure-enfant",
+    "titre": "Brûlure à l'eau bouillante chez un enfant",
+    "gravite": "GRAVE",
+    "avatar": "enfant",
+    "icone": "pansement",
+    "patient": "Yao, 5 ans",
+    "duree": "premiers secours et suivi",
+    "resume": "Un enfant s'est renversé une marmite d'eau bouillante sur le bras et la poitrine. Les gestes des premières minutes décident de la suite.",
+    "accueil": "La mère de Yao, 5 ans, arrive affolée au centre de santé. Il y a 20 minutes, il a renversé une marmite d'eau bouillante sur son bras gauche et sa poitrine. Il pleure, la peau est rouge avec des cloques. Vous disposez de 6 actions : interrogez, examinez, puis soignez. Attention à ce que la famille a déjà fait.",
+    "facteurs": ["enfant", "brulure"],
+    "santeDepart": 66,
+    "pointsAction": 6,
+    "maxJours": 21,
+    "suiviMin": 2,
+    "constantes": [
+      { "nom": "Pouls", "unite": "/min", "a100": 100, "a0": 170, "normal": [80, 130] },
+      { "nom": "Fréquence respiratoire", "unite": "/min", "a100": 22, "a0": 44, "normal": [18, 30] },
+      { "nom": "Température", "unite": "°C", "a100": 36.8, "a0": 39.8, "normal": [36, 37.5], "decimales": 1 }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Yao est calme, joue un peu et se laisse toucher. Ses brûlures sont propres et peu douloureuses." },
+      { "min": 65, "texte": "Yao a mal et pleure par moments, mais il est éveillé et boit." },
+      { "min": 40, "texte": "Yao est abattu, a de la fièvre, la brûlure suinte et le fait souffrir. Il boit peu." },
+      { "min": 20, "texte": "Yao est très somnolent, brûlant de fièvre. La plaie sent mauvais et il refuse de boire." },
+      { "min": 0, "texte": "Yao est inconscient, très pâle, son pouls est à peine perceptible." }
+    ],
+    "infos": [
+      { "id": "depuis", "question": "Que s'est-il passé exactement, et il y a combien de temps ?", "reponse": "Il y a 20 minutes, une marmite d'eau bouillante s'est renversée sur son bras gauche et sa poitrine. Il n'a pas respiré de fumée.", "cle": true, "revision": "Le mécanisme (liquide bouillant, flamme, électricité) et le délai orientent la gravité et la conduite à tenir." },
+      { "id": "fait", "question": "Qu'avez-vous déjà fait sur la brûlure ?", "reponse": "Sa grand-mère a retiré son t-shirt collé en tirant, puis a étalé du beurre et de la pâte dentifrice. Personne n'a mis d'eau.", "cle": true, "revision": "On demande toujours ce qui a été appliqué : les corps gras et les remèdes locaux sont à retirer et ne remplacent jamais le refroidissement à l'eau." },
+      { "id": "tetanos", "question": "Yao est-il vacciné contre le tétanos ?", "reponse": "Le carnet indique qu'il n'a pas eu de rappel depuis ses 18 mois.", "cle": true, "revision": "Toute brûlure ouverte impose de vérifier la protection antitétanique." },
+      { "id": "allergies", "question": "A-t-il des allergies ?", "reponse": "Aucune allergie connue." },
+      { "id": "boire", "question": "Boit-il ? A-t-il vomi ?", "reponse": "Il a bu un peu d'eau. Il n'a pas vomi." },
+      { "id": "poids", "question": "Quel est son poids ?", "reponse": "18 kg." },
+      { "id": "cuisine", "question": "Où cuisine-t-on, et comment la marmite était-elle posée ?", "reponse": "Au sol, dans la cour, sur trois pierres. Les enfants jouent à côté." },
+      { "id": "voix", "question": "A-t-il toussé ? Sa voix a-t-elle changé depuis l'accident ?", "reponse": "Non, sa voix est normale et il ne tousse pas." },
+      { "id": "urines", "question": "Fait-il pipi normalement ?", "reponse": "Oui, comme d'habitude." },
+      { "id": "maison", "question": "Combien d'enfants vivent dans la maison ?", "reponse": "Quatre enfants partagent la cour avec deux autres familles." }
+    ],
+    "examensCliniques": [
+      { "id": "const", "libelle": "Prendre les constantes (pouls, respiration, température)", "constantes": ["Pouls", "Fréquence respiratoire", "Température"], "cle": true, "revision": "On mesure toujours les constantes d'un enfant brûlé : un pouls rapide signale la douleur et le début d'une déshydratation." },
+      { "id": "surface", "libelle": "Estimer la surface brûlée (règle de la paume)", "resultat": "Environ 12 % de la surface du corps : tout le bras gauche et une partie du thorax.", "cle": true, "revision": "Chez l'enfant, une brûlure de plus de 10 % de la surface impose l'hospitalisation et une réhydratation : on l'estime toujours (la paume de l'enfant vaut environ 1 %)." },
+      { "id": "profondeur", "libelle": "Évaluer la profondeur de la brûlure", "resultat": "Brûlure du 2e degré : peau rouge avec cloques, très douloureuse, quelques zones plus profondes sur le thorax.", "cle": true, "revision": "La profondeur (1er, 2e, 3e degré) décide du pansement, de la douleur et du risque de cicatrices : on l'évalue toujours." },
+      { "id": "voies", "libelle": "Rechercher une brûlure du visage ou des voies respiratoires", "resultat": "Visage intact, pas de suie, voix normale, respiration calme." },
+      { "id": "plis", "libelle": "Examiner les mains, les plis et les articulations", "resultat": "Les doigts sont épargnés. La brûlure passe sur le pli du coude : surveiller la mobilité." },
+      { "id": "hydratation", "libelle": "Évaluer l'hydratation (pli cutané, soif, muqueuses)", "resultat": "Soif intense, muqueuses un peu sèches." },
+      { "id": "douleur", "libelle": "Évaluer la douleur", "resultat": "Douleur intense : Yao pleure dès qu'on s'approche de son bras." },
+      { "id": "dos", "libelle": "Examiner le dos et les fesses", "resultat": "Pas d'autre brûlure." }
+    ],
+    "examens": [
+      { "id": "glyc", "libelle": "Glycémie capillaire", "resultat": "0,8 g/L, normale." },
+      { "id": "rx", "libelle": "Radiographie du bras gauche", "resultat": "Aucune fracture." },
+      { "id": "nfs", "libelle": "Numération formule sanguine", "resultat": "Hémoglobine correcte, globules blancs un peu élevés.", "delai": 1 },
+      { "id": "iono", "libelle": "Ionogramme sanguin", "resultat": "Sodium et potassium dans les limites.", "delai": 1 }
+    ],
+    "diagnostics": [
+      { "id": "brulure12", "libelle": "Brûlure du 2e degré, environ 12 % de la surface", "correct": true },
+      { "id": "premier", "libelle": "Brûlure du 1er degré (simple rougeur)", "revision": "Des cloques signent au moins un 2e degré : une simple rougeur serait un 1er degré." },
+      { "id": "troisieme", "libelle": "Brûlure du 3e degré étendue", "revision": "Un 3e degré est blanc ou noirâtre et peu douloureux : ici la peau est rouge, avec des cloques et très douloureuse." },
+      { "id": "chimique", "libelle": "Brûlure chimique", "revision": "Le liquide était de l'eau bouillante : c'est une brûlure thermique." },
+      { "id": "domicile", "libelle": "Brûlure bénigne à soigner à domicile", "revision": "Plus de 10 % de la surface chez un enfant impose l'hospitalisation : ce n'est pas une brûlure bénigne." },
+      { "id": "dermatite", "libelle": "Dermatite infectieuse", "revision": "Il s'agit d'une brûlure récente, pas d'une infection de la peau." }
+    ],
+    "besoins": [
+      { "id": "froid", "libelle": "Refroidissement immédiat", "tags": ["refroidissement"], "jours": 1, "perte": 8, "gain": 4 },
+      { "id": "pansement", "libelle": "Pansement propre non adhérent", "tags": ["pansement-brulure"], "jours": 3, "perte": 4, "gain": 3 },
+      { "id": "douleur", "libelle": "Antalgie", "tags": ["antalgique", "antipyretique"], "jours": 3, "perte": 3, "gain": 2 },
+      { "id": "hydra", "libelle": "Réhydratation (brûlure de plus de 10 %)", "tags": ["hydratation"], "jours": 2, "perte": 6, "gain": 4 },
+      { "id": "vat", "libelle": "Prophylaxie antitétanique", "tags": ["tetanos"], "jours": 1, "perte": 2, "gain": 1 },
+      { "id": "surv", "libelle": "Hospitalisation et surveillance", "tags": ["surveillance"], "jours": 3, "perte": 5, "gain": 3 }
+    ],
+    "finBonne": "Yao guérit avec peu de cicatrices. Le refroidissement, le pansement, la réhydratation et l'hospitalisation ont évité l'infection et le choc.",
+    "finMoyenne": "Yao survit, mais ses brûlures cicatrisent mal (infection, cicatrices qui tirent) à cause de gestes inadaptés ou de retards. Relisez la fiche de révision.",
+    "finMauvaise": "Yao est décédé d'une complication de sa brûlure (déshydratation, choc ou infection). Chez l'enfant, la réhydratation et la surveillance sont vitales. Relisez la fiche de révision et recommencez."
+  }
+]

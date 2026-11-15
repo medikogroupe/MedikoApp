@@ -173,12 +173,12 @@ export default function Consultation() {
     setSelection((s) => {
       const copie = { ...s };
       if (id in copie) delete copie[id];
-      else copie[id] = 5;
+      else copie[id] = vue?.catalogue.find((x) => x.id === id)?.ponctuel ? 1 : 5;
       return copie;
     });
   }
 
-  function ligneTraitement(t: { id: string; nom: string; forme: string }, v: Vue) {
+  function ligneTraitement(t: { id: string; nom: string; forme: string; ponctuel?: boolean }, v: Vue) {
     const actif = t.id in selection;
     const enCours = v.ordonnance.some((o) => o.id === t.id);
     return (
@@ -194,7 +194,7 @@ export default function Consultation() {
             <span className="text-sm font-semibold">{t.nom}</span>
             <span className="text-[11px] text-mp-grey">{enCours ? "Déjà en cours" : t.forme}</span>
           </button>
-          {actif ? (
+          {actif && !t.ponctuel ? (
             <select
               className="mp-input !w-auto !py-1 text-xs"
               value={selection[t.id]}

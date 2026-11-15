@@ -247,7 +247,7 @@ export type Vue = {
   examens: LaboVue[];
   diagnostics: { id: string; libelle: string }[];
   diagnostic: string;
-  catalogue: { id: string; nom: string; type: string; forme: string }[];
+  catalogue: { id: string; nom: string; type: string; forme: string; ponctuel: boolean }[];
   ordonnance: { id: string; nom: string; forme: string; reste: number }[];
   connus: string[];
   rdv: number[];
@@ -330,7 +330,7 @@ export function vue(e: Etat, cas: CasV2): Vue {
     examens: labos,
     diagnostics: cas.diagnostics.map((x) => ({ id: x.id, libelle: x.libelle })),
     diagnostic: e.d,
-    catalogue: CATALOGUE.map((t) => ({ id: t.id, nom: t.nom, type: t.type, forme: t.forme })),
+    catalogue: CATALOGUE.map((t) => ({ id: t.id, nom: t.nom, type: t.type, forme: t.forme, ponctuel: Boolean(t.ponctuel) })),
     ordonnance: ordonnanceActive(e).map((o) => {
       const t = traitement(o.id);
       return { id: o.id, nom: t ? t.nom : o.id, forme: t ? t.forme : "", reste: o.debut + o.jours - e.j };
@@ -520,7 +520,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
       if (!Array.isArray(a.lignes) || a.lignes.length === 0 || a.lignes.length > 12) throw new Error("Choisissez entre 1 et 12 traitements.");
       for (const l of a.lignes) {
         const tr = traitement(String(l.id));
-        const jours = Math.round(Number(l.jours));
+        const jours = tr && tr.ponctuel ? 1 : Math.round(Number(l.jours));
         if (!tr) throw new Error("Traitement inconnu.");
         if (!DUREES.includes(jours)) throw new Error("Durée invalide.");
         const actif = n.p.some((o) => o.id === tr.id && o.debut <= n.j && n.j < o.debut + o.jours);
@@ -533,11 +533,11 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
           const f = interdits[0] as string;
           const cache = cas.infos.some((x) => x.revele === f);
           const connu = !cache || n.k.includes(f);
-          n.s = Math.max(0, n.s - 20);
+          n.s = Math.max(0, n.s - (tr.penalite ?? 20));
           n.f.push(`ci:${tr.id}:${f}:${connu ? 1 : 0}`);
           messages.push({
             genre: "alerte",
-            texte: `Réaction grave : ${tr.nom} est contre-indiqué (${FACTEURS[f] ?? f}). Le traitement est arrêté et l'état du patient s'est dégradé.`,
+            texte: (tr.penalite ?? 20) < 15 ? `Geste nocif : ${tr.nom} est contre-indiqué (${FACTEURS[f] ?? f}). Il aggrave la situation du patient.` : `Réaction grave : ${tr.nom} est contre-indiqué (${FACTEURS[f] ?? f}). Le traitement est arrêté et l'état du patient s'est dégradé.`,
           });
           continue;
         }
