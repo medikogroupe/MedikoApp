@@ -128,7 +128,11 @@ export default async function DashboardPage() {
       </section>
 
       <section className="mt-4 grid grid-cols-2 gap-3">
-        {MODULES.filter((m) => ["/qcm", "/edt", "/notes", "/cours-pdf"].includes(m.href)).map((m) => {
+        <Link href="/jeux/parcours" className="mp-card flex flex-col gap-2 p-4">
+          <img src="/jeux/icones/stetho.png" alt="" width={26} height={26} className="object-contain" draggable={false} />
+          <span className="text-sm font-semibold leading-tight">Simulation de patients</span>
+        </Link>
+        {MODULES.filter((m) => ["/qcm", "/cours-pdf", "/edt"].includes(m.href)).map((m) => {
           const Icon = m.icon;
           return (
             <Link key={m.href} href={m.href} className="mp-card flex flex-col gap-2 p-4">

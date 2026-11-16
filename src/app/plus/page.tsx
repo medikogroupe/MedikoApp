@@ -2,6 +2,7 @@ import Link from "next/link";
 import PageShell from "@/components/PageShell";
 
 const SERVICES: { href: string; titre: string; texte: string }[] = [
+  { href: "/notes", titre: "Notes", texte: "Vos notes personnelles." },
   { href: "/edt", titre: "Agenda", texte: "Emploi du temps et rappels." },
   { href: "/pharmacies", titre: "Santé", texte: "Pharmacies de garde et établissements." },
   { href: "/cours-pdf", titre: "Cours en PDF", texte: "Vos cours par domaine." },
