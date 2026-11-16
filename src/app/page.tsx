@@ -54,6 +54,12 @@ export default async function HomePage() {
             >
               Se connecter
             </Link>
+            <Link
+              href="/visiteur"
+              className="inline-flex w-full items-center justify-center rounded-[10px] px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white underline underline-offset-4 sm:w-auto"
+            >
+              Essayer un QCM sans compte
+            </Link>
           </div>
         </div>
       </section>

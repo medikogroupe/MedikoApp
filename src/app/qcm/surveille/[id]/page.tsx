@@ -12,7 +12,7 @@ export default async function QcmSurveillePage({ params }: { params: Promise<{ i
   await ensureSeed();
   const { id } = await params;
   const user = await getCurrentUser();
-  if (!user) redirect("/connexion");
+  if (!user) redirect(`/visiteur/session?id=${encodeURIComponent(id)}`);
 
   const [session] = UUID_RE.test(id)
     ? await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1)

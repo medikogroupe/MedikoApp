@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, ListChecks, Puzzle, User } from "lucide-react";
+import { Home, ListChecks, Puzzle, User , LayoutGrid } from "lucide-react";
 
 const ITEMS = [
   { href: "/dashboard", label: "Accueil", icon: Home },
   { href: "/qcm", label: "QCM", icon: ListChecks },
   { href: "/jeux", label: "Jeux", icon: Puzzle },
   { href: "/profil", label: "Profil", icon: User },
+  { href: "/plus", label: "Plus", icon: LayoutGrid },
 ];
 
 export default function BottomNav() {
