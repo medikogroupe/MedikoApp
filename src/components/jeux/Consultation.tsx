@@ -90,8 +90,16 @@ export default function Consultation() {
       } catch {
         connecte = false;
       }
-      const d = connecte ? await appel({ action: "start", cas, recommencer }, "/api/jeux/suivi") : await appel({ action: "start", cas });
-      setPersiste(connecte);
+      let persisteLocal = connecte;
+      let d: Reponse;
+      try {
+        d = connecte ? await appel({ action: "start", cas, recommencer }, "/api/jeux/suivi") : await appel({ action: "start", cas });
+      } catch (e1) {
+        if (!connecte) throw e1;
+        persisteLocal = false;
+        d = await appel({ action: "start", cas });
+      }
+      setPersiste(persisteLocal);
       setSuivi(d.suivi ?? "");
       setToken(d.token);
       setVue(d.vue);

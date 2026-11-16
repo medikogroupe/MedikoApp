@@ -2,13 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Home, ListChecks, MapPin, User } from "lucide-react";
+import { Home, ListChecks, Puzzle, User } from "lucide-react";
 
 const ITEMS = [
   { href: "/dashboard", label: "Accueil", icon: Home },
   { href: "/qcm", label: "QCM", icon: ListChecks },
-  { href: "/edt", label: "Agenda", icon: CalendarDays },
-  { href: "/pharmacies", label: "Santé", icon: MapPin },
+  { href: "/jeux", label: "Jeux", icon: Puzzle },
   { href: "/profil", label: "Profil", icon: User },
 ];
 

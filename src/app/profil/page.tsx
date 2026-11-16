@@ -4,6 +4,7 @@ import { and, desc, eq, sql } from "drizzle-orm";
 import { BookOpen, CreditCard, GraduationCap, MapPin, Target } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import LogoutButton from "@/components/LogoutButton";
+import CarteMesPatients from "@/components/profile/CarteMesPatients";
 import PhotoProfil from "@/components/profile/PhotoProfil";
 import { db } from "@/db";
 import { bibliothequePerso, carriere, qcmTentatives, resultatsQcm } from "@/db/schema";
@@ -152,6 +153,7 @@ export default async function ProfilPage() {
       </div>
 
       <div className="mt-4">
+        <CarteMesPatients />
         <LogoutButton />
       </div>
     </PageShell>
