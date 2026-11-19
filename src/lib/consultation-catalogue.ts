@@ -1,5 +1,6 @@
 import { EXTRA, FACTEURS_EXTRA } from "@/lib/consultation-catalogue-extra";
 import { EXTRA2, FACTEURS_EXTRA2 } from "@/lib/consultation-catalogue-extra2";
+import { EXTRA3, FACTEURS_EXTRA3 } from "@/lib/consultation-catalogue-extra3";
 
 export type Traitement = {
   id: string;
@@ -176,8 +177,8 @@ const BASE: Traitement[] = [
   },
 ];
 
-export const FACTEURS: Record<string, string> = { ...FACTEURS_BASE, ...FACTEURS_EXTRA, ...FACTEURS_EXTRA2 };
-export const CATALOGUE: Traitement[] = [...BASE, ...EXTRA, ...EXTRA2];
+export const FACTEURS: Record<string, string> = { ...FACTEURS_BASE, ...FACTEURS_EXTRA, ...FACTEURS_EXTRA2, ...FACTEURS_EXTRA3 };
+export const CATALOGUE: Traitement[] = [...BASE, ...EXTRA, ...EXTRA2, ...EXTRA3];
 
 export function traitement(id: string): Traitement | undefined {
   return CATALOGUE.find((t) => t.id === id);

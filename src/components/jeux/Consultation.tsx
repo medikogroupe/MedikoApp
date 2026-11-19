@@ -60,6 +60,9 @@ function libelleRdv(jours: number): string {
   if (jours === 7) return "Dans 1 semaine";
   if (jours === 14) return "Dans 2 semaines";
   if (jours === 30) return "Dans 1 mois";
+  if (jours === 90) return "Dans 3 mois";
+  if (jours === 180) return "Dans 6 mois";
+  if (jours === 365) return "Dans 1 an";
   return `Dans ${jours} jours`;
 }
 
@@ -211,7 +214,7 @@ export default function Consultation() {
             >
               {v.durees.map((d) => (
                 <option key={d} value={d}>
-                  {d} j
+                  {d >= 30 ? Math.round(d / 30) + " mois" : d + " j"}
                 </option>
               ))}
             </select>

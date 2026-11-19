@@ -5,7 +5,7 @@ import { CATALOGUE, FACTEURS, traitement } from "@/lib/consultation-catalogue";
 
 export type Info = { id: string; question: string; reponse: string; cle?: boolean; revele?: string; revision?: string };
 export type ExamenClinique = { id: string; libelle: string; resultat?: string; constantes?: string[]; cle?: boolean; revele?: string; revision?: string };
-export type Examen = { id: string; libelle: string; resultat: string; delai?: number; cle?: boolean; revision?: string };
+export type Examen = { id: string; libelle: string; resultat: string; delai?: number; cle?: boolean; revele?: string; revision?: string };
 export type Diagnostic = { id: string; libelle: string; correct?: boolean; revision?: string };
 /** Un besoin du patient : tant qu'il n'est pas couvert, l'etat se degrade ; couvert assez de jours, il est resolu. */
 export type Besoin = { id: string; libelle: string; tags: string[]; jours: number; depuis?: number; perte?: number; gain?: number };
@@ -29,6 +29,12 @@ export type CasV2 = {
   maxJours: number;
   /** Nombre minimal de consultations attendues avant la guerison (controle intermediaire). */
   suiviMin?: number;
+  /** Delais de rendez-vous propres au cas (suivis longs). */
+  rdv?: number[];
+  /** Durees de prescription propres au cas. */
+  durees?: number[];
+  /** Patient chronique : on juge l equilibre de la sante a la fin du suivi. */
+  chronique?: boolean;
   constantes: Constante[];
   etats: EtatNarratif[];
   infos: Info[];
@@ -336,8 +342,8 @@ export function vue(e: Etat, cas: CasV2): Vue {
       return { id: o.id, nom: t ? t.nom : o.id, forme: t ? t.forme : "", reste: o.debut + o.jours - e.j };
     }),
     connus: e.k.map((f) => FACTEURS[f] ?? f),
-    rdv: RDV_JOURS,
-    durees: DUREES,
+    rdv: cas.rdv ?? RDV_JOURS,
+    durees: cas.durees ?? DUREES,
     termine: Boolean(e.fin),
   };
 }
@@ -501,6 +507,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
       depenser(n);
       n.ec.push(ex.id);
       n.x.push([ex.id, n.j]);
+      if (ex.revele && (ex.delai ?? 0) === 0 && !n.k.includes(ex.revele)) n.k.push(ex.revele);
       const delai = ex.delai ?? 0;
       messages.push({
         genre: "info",
@@ -523,7 +530,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
         const tr = traitement(String(l.id));
         const jours = tr && tr.ponctuel ? 1 : Math.round(Number(l.jours));
         if (!tr) throw new Error("Traitement inconnu.");
-        if (!DUREES.includes(jours)) throw new Error("Durée invalide.");
+        if (!tr.ponctuel && !(cas.durees ?? DUREES).includes(jours)) throw new Error("Durée invalide.");
         const actif = n.p.some((o) => o.id === tr.id && o.debut <= n.j && n.j < o.debut + o.jours);
         if (actif) {
           messages.push({ genre: "info", texte: `${tr.nom} est déjà en cours.` });
@@ -532,7 +539,7 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
         const interdits = tr.contre.filter((f) => cas.facteurs.includes(f));
         if (interdits.length > 0) {
           const f = interdits[0] as string;
-          const cache = cas.infos.some((x) => x.revele === f) || cas.examensCliniques.some((x) => x.revele === f);
+          const cache = cas.infos.some((x) => x.revele === f) || cas.examensCliniques.some((x) => x.revele === f) || cas.examens.some((x) => x.revele === f);
           const connu = !cache || n.k.includes(f);
           n.s = Math.max(0, n.s - (tr.penalite ?? 20));
           n.f.push(`ci:${tr.id}:${f}:${connu ? 1 : 0}`);
@@ -580,11 +587,11 @@ export function agir(e: Etat, cas: CasV2, a: Action): Reponse {
 
     case "rdv": {
       const jours = Math.round(Number(a.jours));
-      if (!RDV_JOURS.includes(jours)) throw new Error("Délai de rendez-vous invalide.");
+      if (!(cas.rdv ?? RDV_JOURS).includes(jours)) throw new Error("Délai de rendez-vous invalide.");
       const res = avancer(n, cas, jours);
       if (res === "DECES") return conclure(n, cas, "DECES", messages);
       if (res === "GUERISON") return conclure(n, cas, "GUERISON", messages);
-      if (res === "FIN") return conclure(n, cas, "SEQUELLES", messages);
+      if (res === "FIN") return conclure(n, cas, cas.chronique && n.s >= 70 ? "GUERISON" : "SEQUELLES", messages);
       n.n += 1;
       n.ec = [];
       n.pa = res === "URGENCE" ? Math.max(3, cas.pointsAction - 2) : cas.pointsAction;

@@ -1,0 +1,80 @@
+[
+  {
+    "format": 2,
+    "id": "diabete-type2-suivi-vie",
+    "titre": "Diabète de type 2 : le suivi de toute une vie",
+    "gravite": "MODERE",
+    "avatar": "femme",
+    "icone": "seringue",
+    "patient": "Mme Konan, 52 ans",
+    "duree": "suivi de 10 ans",
+    "resume": "Une commerçante découvre un diabète. Accompagnez-la pendant dix ans, consultation après consultation, pour éviter les complications.",
+    "accueil": "Mme Konan, 52 ans, commerçante, consulte pour une grande soif, des urines fréquentes et une fatigue depuis deux mois. Une glycémie faite au marché était très élevée. Vous allez la suivre pendant des années : à chaque consultation, vous avez 6 actions, puis vous prescrivez et fixez le prochain rendez-vous (1 mois, 3 mois, 6 mois ou 1 an). Un suivi trop espacé ou un traitement interrompu aggrave la maladie.",
+    "facteurs": ["insuffisance-renale", "diabete"],
+    "santeDepart": 70,
+    "pointsAction": 6,
+    "maxJours": 3650,
+    "suiviMin": 8,
+    "chronique": true,
+    "rdv": [30, 90, 180, 365],
+    "durees": [30, 90, 180],
+    "constantes": [
+      { "nom": "Glycémie à jeun", "unite": "g/L", "a100": 1, "a0": 4, "normal": [0.7, 1.1], "decimales": 1 },
+      { "nom": "Hémoglobine glyquée (HbA1c)", "unite": "%", "a100": 5.5, "a0": 12, "normal": [4, 6.5], "decimales": 1 },
+      { "nom": "Pression artérielle systolique", "unite": "mmHg", "a100": 125, "a0": 180, "normal": [100, 139] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "Mme Konan va bien : elle a de l'énergie, suit son régime et sa glycémie est maîtrisée." },
+      { "min": 65, "texte": "Mme Konan a soif, urine souvent et se sent fatiguée. Sa glycémie reste élevée." },
+      { "min": 40, "texte": "Mme Konan a maigri, sa vue est trouble et les plaies de ses pieds cicatrisent mal." },
+      { "min": 20, "texte": "Mme Konan est somnolente, déshydratée, avec une haleine acétonique : c'est une urgence." },
+      { "min": 0, "texte": "Mme Konan est dans le coma." }
+    ],
+    "infos": [
+      { "id": "symptomes", "question": "Depuis quand a-t-elle soif et urine-t-elle beaucoup ?", "reponse": "Depuis deux mois. Elle se lève trois fois la nuit pour uriner et a perdu 4 kg." },
+      { "id": "antecedents", "question": "Quels sont ses antécédents ? Y a-t-il du diabète dans la famille ?", "reponse": "Sa mère était diabétique. Elle-même est en surpoids et a une tension élevée." },
+      { "id": "alimentation", "question": "Comment mange-t-elle ?", "reponse": "Beaucoup de riz, de pâte de manioc et de boissons sucrées. Peu de légumes.", "cle": true, "revision": "Le régime alimentaire est la base du traitement du diabète : on le recherche à chaque consultation." },
+      { "id": "activite", "question": "Fait-elle de l'activité physique ?", "reponse": "Très peu : elle reste assise au marché toute la journée." },
+      { "id": "tabac", "question": "Fume-t-elle ou boit-elle de l'alcool ?", "reponse": "Ni l'un ni l'autre." },
+      { "id": "pieds", "question": "A-t-elle des fourmillements ou des plaies aux pieds ?", "reponse": "Quelques fourmillements la nuit, pas de plaie." },
+      { "id": "vue", "question": "Sa vue a-t-elle baissé ?", "reponse": "Un peu floue le soir." },
+      { "id": "plantes", "question": "Prend-elle des médicaments ou des plantes ?", "reponse": "Des tisanes de plantes achetées au marché, sans grand effet." },
+      { "id": "reins", "question": "A-t-elle déjà eu une maladie des reins ou des urines troubles ?", "reponse": "Une infection urinaire il y a un an. Aucun bilan des reins n'a jamais été fait.", "cle": true, "revision": "Avant de prescrire un antidiabétique oral, on évalue la fonction rénale : la metformine est contre-indiquée en cas d'insuffisance rénale sévère." },
+      { "id": "aide", "question": "Qui l'aide à la maison ?", "reponse": "Sa fille aînée fait la cuisine." },
+      { "id": "budget", "question": "Peut-elle acheter ses médicaments chaque mois ?", "reponse": "Difficilement : le budget est serré." }
+    ],
+    "examensCliniques": [
+      { "id": "const", "libelle": "Prendre le poids, la taille et la tension", "constantes": ["Pression artérielle systolique"], "resultat": "Poids 82 kg, taille 1,60 m : indice de masse corporelle à 32 (obésité).", "cle": true, "revision": "Le poids, l'indice de masse corporelle et la tension se mesurent à chaque consultation d'un diabétique." },
+      { "id": "glycemie", "libelle": "Mesurer la glycémie capillaire", "constantes": ["Glycémie à jeun"] },
+      { "id": "pieds", "libelle": "Examiner les pieds (sensibilité, pouls, peau)", "resultat": "Sensibilité diminuée au gros orteil, pouls présents, peau sèche, pas de plaie.", "cle": true, "revision": "L'examen des pieds se fait à chaque consultation : la perte de sensibilité expose aux plaies et aux amputations." },
+      { "id": "fond", "libelle": "Regarder le fond d'œil", "resultat": "Début de rétinopathie diabétique (quelques microanévrismes)." },
+      { "id": "coeur", "libelle": "Écouter le cœur et les poumons", "resultat": "Examen normal." },
+      { "id": "abdomen", "libelle": "Examiner l'abdomen", "resultat": "Obésité abdominale, pas de masse." }
+    ],
+    "examens": [
+      { "id": "hba1c", "libelle": "Hémoglobine glyquée (HbA1c)", "resultat": "HbA1c à 9,8 %.", "cle": true, "revision": "L'HbA1c, mesurée tous les 3 mois, reflète l'équilibre du diabète sur les semaines passées." },
+      { "id": "creat", "libelle": "Créatinine et débit de filtration glomérulaire (DFG)", "resultat": "Créatinine élevée : DFG à 25 mL/min (insuffisance rénale sévère).", "revele": "insuffisance-renale", "cle": true, "revision": "La fonction rénale se mesure avant tout antidiabétique oral et se surveille ensuite chaque année." },
+      { "id": "urine", "libelle": "Bandelette urinaire (sucre, protéines, cétones)", "resultat": "Sucre +++, protéines +, pas de cétones." },
+      { "id": "lipides", "libelle": "Bilan lipidique", "resultat": "Cholestérol LDL élevé : 1,9 g/L.", "delai": 1 },
+      { "id": "ecg", "libelle": "Électrocardiogramme", "resultat": "Normal." }
+    ],
+    "diagnostics": [
+      { "id": "dt2", "libelle": "Diabète de type 2 avec insuffisance rénale sévère et début de complications", "correct": true },
+      { "id": "dt1", "libelle": "Diabète de type 1", "revision": "Le diabète de type 1 touche surtout le sujet jeune et mince, avec des cétones : ici, obésité, antécédents familiaux et absence de cétones évoquent un type 2." },
+      { "id": "gesta", "libelle": "Diabète gestationnel", "revision": "Le diabète gestationnel n'existe que pendant la grossesse : Mme Konan a 52 ans." },
+      { "id": "stress", "libelle": "Hyperglycémie passagère de stress", "revision": "Une HbA1c à 9,8 % montre une hyperglycémie installée depuis des semaines, pas un simple pic passager." },
+      { "id": "insipide", "libelle": "Diabète insipide", "revision": "Le diabète insipide ne donne pas de sucre dans les urines ni d'hyperglycémie." },
+      { "id": "obesite", "libelle": "Simple obésité sans diabète", "revision": "La glycémie et l'HbA1c élevées confirment un diabète, pas une simple obésité." }
+    ],
+    "besoins": [
+      { "id": "trait", "libelle": "Traitement antidiabétique adapté", "tags": ["antidiabetique"], "jours": 100000, "perte": 0.25, "gain": 0.15 },
+      { "id": "educ", "libelle": "Éducation thérapeutique et hygiène de vie", "tags": ["education"], "jours": 100000, "perte": 0.08, "gain": 0.06 },
+      { "id": "ctrl", "libelle": "Contrôle biologique régulier", "tags": ["controle-bio"], "jours": 100000, "perte": 0.06, "gain": 0.04 },
+      { "id": "depist", "libelle": "Dépistage des complications", "tags": ["depistage-complications"], "jours": 100000, "perte": 0.05, "gain": 0.03 },
+      { "id": "cv", "libelle": "Prévention cardiovasculaire", "tags": ["statine"], "jours": 100000, "perte": 0.05, "gain": 0.03 }
+    ],
+    "finBonne": "Dix ans plus tard, Mme Konan est en bonne santé : son diabète est équilibré, ses reins sont préservés et elle n'a aucune complication grave. Un suivi régulier, un traitement adapté à ses reins et l'éducation ont changé sa vie.",
+    "finMoyenne": "Après dix ans, Mme Konan est vivante mais fragilisée : complications aux yeux, aux pieds ou aux reins à cause d'un suivi irrégulier ou d'un traitement interrompu. Relisez la fiche de révision.",
+    "finMauvaise": "Mme Konan est décédée d'une complication de son diabète. Dans une maladie chronique, un traitement mal choisi ou un suivi trop espacé coûtent des années de vie. Relisez la fiche de révision et recommencez."
+  }
+]
