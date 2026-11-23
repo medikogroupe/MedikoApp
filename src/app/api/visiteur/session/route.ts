@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { qcmAdmin } from "@/db/schema";
 import { UUID_RE, melangerListe, noterTentative, questionPublique, type QuestionRow } from "@/lib/qcm";
-import { chargerQuestions, nettoyerReponses } from "@/lib/qcm-server";
+import { chargerQuestions, figerQuestionnaire, nettoyerReponses } from "@/lib/qcm-server";
 
 export const dynamic = "force-dynamic";
 
@@ -33,13 +33,18 @@ const sansImage = (q: QuestionRow) => !q.imageId && !(q.propositionsImages ?? []
 
 async function chargerSession(id: string) {
   if (!UUID_RE.test(id)) return { erreur: "Session invalide.", status: 400 };
-  const [session] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1);
+  let [session] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1);
   if (!session) return { erreur: "Session introuvable.", status: 404 };
   if (session.statut !== "ACTIF") return { erreur: "Cette session est clôturée.", status: 403 };
   if (session.dateLancement.getTime() > Date.now()) {
     return { erreur: `Cette session ouvre le ${session.dateLancement.toLocaleString("fr-FR")}.`, status: 403 };
   }
   // Une session réservée à des filières, ou ancienne (questions non figées), reste pour les inscrits.
+  if (session.filieres.length === 0 && session.questionIds.length === 0) {
+    await figerQuestionnaire(session.id);
+    const [rechargee] = await db.select().from(qcmAdmin).where(eq(qcmAdmin.id, id)).limit(1);
+    if (rechargee) session = rechargee;
+  }
   if (session.filieres.length > 0 || session.questionIds.length === 0) {
     return { erreur: "Cette session est réservée aux étudiants inscrits. Connecte-toi pour la passer.", status: 403 };
   }
