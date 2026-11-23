@@ -45,9 +45,7 @@ export default async function HomePage() {
             organisation, documents et annuaire santé de proximité.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/inscription" className="inline-flex w-full items-center justify-center rounded-[10px] border border-white/40 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white sm:w-auto">
-              Créer un compte
-            </Link>
+            <Link href="/inscription" className="inline-flex w-full items-center justify-center rounded-[10px] bg-[#16a34a] px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white sm:w-auto">Créer un compte</Link>
             <Link
               href="/connexion"
               className="inline-flex w-full items-center justify-center rounded-[10px] border border-white/40 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white sm:w-auto"
