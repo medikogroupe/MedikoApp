@@ -44,9 +44,7 @@ export default function GardeService({ children }: { children: ReactNode }) {
         <Link href="/connexion" className="mp-btn-yellow">Se connecter</Link>
         <Link href="/inscription" className="mp-btn-ghost">Créer un compte</Link>
       </div>
-      <Link href="/decouvrir" className="mt-3 inline-block text-xs font-semibold text-mp-blue">
-        Essayer un mini-QCM sans compte
-      </Link>
+      <Link href="/visiteur" className="mp-btn-ghost mt-3 w-full">Répondre aux questionnaires sans compte</Link>
     </section>
   );
 }

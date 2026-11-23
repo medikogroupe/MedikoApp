@@ -45,7 +45,7 @@ export default async function HomePage() {
             organisation, documents et annuaire santé de proximité.
           </p>
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Link href="/inscription" className="mp-btn-yellow sm:w-auto sm:px-8">
+            <Link href="/inscription" className="inline-flex w-full items-center justify-center rounded-[10px] border border-white/40 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white sm:w-auto">
               Créer un compte
             </Link>
             <Link
@@ -54,12 +54,7 @@ export default async function HomePage() {
             >
               Se connecter
             </Link>
-            <Link
-              href="/visiteur"
-              className="inline-flex w-full items-center justify-center rounded-[10px] px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white underline underline-offset-4 sm:w-auto"
-            >
-              Essayer un QCM sans compte
-            </Link>
+            <Link href="/visiteur" className="mp-btn-yellow sm:w-auto sm:px-8">Répondre aux questionnaires sans compte</Link>
           </div>
         </div>
       </section>
@@ -94,7 +89,7 @@ export default async function HomePage() {
           <Link href="/pharmacies" className="mp-btn-ghost flex-1">
             Pharmacies de garde
           </Link>
-          <Link href="/decouvrir" className="mp-btn-ghost flex-1">Essayer un mini-QCM</Link>
+          
           <Link href="/contact" className="mp-btn-ghost flex-1">
             Contacter le support
           </Link>
