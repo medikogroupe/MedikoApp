@@ -1,0 +1,83 @@
+[
+  {
+    "format": 2,
+    "id": "hypertension-suivi-vie",
+    "titre": "Hypertension artérielle : le suivi de toute une vie",
+    "gravite": "MODERE",
+    "avatar": "homme",
+    "icone": "coeur",
+    "patient": "M. Diallo, 58 ans",
+    "duree": "suivi de 10 ans",
+    "resume": "Un chauffeur découvre une tension très élevée lors d'un dépistage. Accompagnez-le dix ans pour éviter l'AVC, l'infarctus et l'insuffisance rénale.",
+    "accueil": "M. Diallo, 58 ans, chauffeur de taxi, vient après un dépistage organisé dans son quartier : sa tension était très élevée. Il se plaint de maux de tête le matin et de bourdonnements d'oreille. Vous allez le suivre pendant des années : à chaque consultation, vous avez 6 actions, puis vous prescrivez et fixez le prochain rendez-vous (1 mois, 3 mois, 6 mois ou 1 an). Un traitement arrêté ou un suivi trop espacé expose à l'AVC, à l'infarctus et à l'insuffisance rénale.",
+    "facteurs": ["hypertension", "goutte"],
+    "santeDepart": 62,
+    "pointsAction": 6,
+    "maxJours": 3650,
+    "suiviMin": 8,
+    "chronique": true,
+    "rdv": [30, 90, 180, 365],
+    "durees": [30, 90, 180],
+    "constantes": [
+      { "nom": "Pression artérielle systolique", "unite": "mmHg", "a100": 125, "a0": 296, "normal": [100, 139] },
+      { "nom": "Pression artérielle diastolique", "unite": "mmHg", "a100": 78, "a0": 162, "normal": [60, 89] },
+      { "nom": "Pouls", "unite": "/min", "a100": 72, "a0": 110, "normal": [60, 100] }
+    ],
+    "etats": [
+      { "min": 85, "texte": "M. Diallo se sent en forme. Sa tension est bien contrôlée et il suit son traitement." },
+      { "min": 60, "texte": "M. Diallo a des maux de tête le matin, des bourdonnements d'oreille et des vertiges. Sa tension reste élevée." },
+      { "min": 40, "texte": "M. Diallo est essoufflé à l'effort, a les chevilles gonflées et la vue trouble." },
+      { "min": 20, "texte": "M. Diallo a un côté du corps faible et la parole difficile : urgence (AVC ou insuffisance cardiaque)." },
+      { "min": 0, "texte": "M. Diallo est inconscient." }
+    ],
+    "infos": [
+      { "id": "symptomes", "question": "Quels symptômes a-t-il, et depuis quand ?", "reponse": "Des maux de tête le matin et des bourdonnements d'oreille depuis environ 3 mois." },
+      { "id": "tabac", "question": "Fume-t-il ou boit-il de l'alcool ?", "reponse": "Il fume une vingtaine de cigarettes par jour depuis 30 ans. Un peu de bière le week-end.", "cle": true, "revision": "Le tabac multiplie le risque d'AVC et d'infarctus chez l'hypertendu : on le recherche et on aide à l'arrêter à chaque consultation." },
+      { "id": "sel", "question": "Comment mange-t-il ? Aime-t-il les plats salés ?", "reponse": "Beaucoup de bouillons en cubes, de poisson fumé et de pain. Il sale beaucoup ses plats.", "cle": true, "revision": "Le sel (bouillons en cubes, poisson fumé, charcuterie) fait monter la tension : la réduction du sel est une base du traitement." },
+      { "id": "famille", "question": "Y a-t-il de l'hypertension ou des AVC dans la famille ?", "reponse": "Son père est mort d'un AVC à 62 ans, sa mère est hypertendue." },
+      { "id": "articulations", "question": "A-t-il des douleurs articulaires ? Prend-il des médicaments contre la douleur ?", "reponse": "Des crises très douloureuses du gros orteil, qui reviennent deux ou trois fois par an. Il achète du diclofénac au marché quand ça fait mal.", "revele": "goutte", "cle": true, "revision": "Les douleurs répétées du gros orteil évoquent la goutte : elle contre-indique les diurétiques thiazidiques, et les anti-inflammatoires achetés sans avis aggravent l'hypertension." },
+      { "id": "reins", "question": "A-t-il une maladie des reins ou du diabète connus ?", "reponse": "Aucune maladie connue, mais il n'a jamais fait de bilan." },
+      { "id": "activite", "question": "Fait-il de l'activité physique ?", "reponse": "Non : il reste assis dans son taxi dix heures par jour." },
+      { "id": "sommeil", "question": "Comment dort-il ? Ronfle-t-il ?", "reponse": "Il ronfle fort et se réveille fatigué." },
+      { "id": "stress", "question": "Est-il stressé ? A-t-il des soucis au travail ?", "reponse": "Oui, des dettes et de longues journées." },
+      { "id": "plantes", "question": "Prend-il des plantes ou des médicaments traditionnels ?", "reponse": "Une tisane pour la tension, mais il l'oublie souvent." },
+      { "id": "budget", "question": "Peut-il acheter ses médicaments chaque mois ?", "reponse": "Difficilement, il veut des traitements peu coûteux." }
+    ],
+    "examensCliniques": [
+      { "id": "tension", "libelle": "Prendre la tension (au repos, aux deux bras)", "constantes": ["Pression artérielle systolique", "Pression artérielle diastolique", "Pouls"], "cle": true, "revision": "Le diagnostic d'hypertension repose sur des mesures répétées au repos : on prend la tension à chaque consultation." },
+      { "id": "poids", "libelle": "Peser et mesurer le tour de taille", "resultat": "Poids 88 kg, taille 1,74 m : indice de masse corporelle à 29, tour de taille augmenté." },
+      { "id": "coeur", "libelle": "Écouter le cœur et les poumons", "resultat": "Souffle léger, pas de signes d'insuffisance cardiaque." },
+      { "id": "fond", "libelle": "Regarder le fond d'œil", "resultat": "Rétinopathie hypertensive (artères rétrécies, petits saignements)." },
+      { "id": "articulations", "libelle": "Examiner les articulations", "resultat": "Gros orteil droit gonflé et déformé, avec des dépôts blanchâtres (tophus).", "revele": "goutte" },
+      { "id": "neuro", "libelle": "Faire l'examen neurologique", "resultat": "Normal." },
+      { "id": "pouls", "libelle": "Chercher les pouls des jambes", "resultat": "Pouls présents des deux côtés." }
+    ],
+    "examens": [
+      { "id": "creat", "libelle": "Créatinine et débit de filtration glomérulaire (DFG)", "resultat": "DFG à 62 mL/min : fonction rénale légèrement diminuée.", "cle": true, "revision": "La fonction rénale se mesure au départ et se surveille : l'hypertension est une cause fréquente d'insuffisance rénale." },
+      { "id": "ecg", "libelle": "Électrocardiogramme", "resultat": "Hypertrophie du ventricule gauche.", "cle": true, "revision": "L'électrocardiogramme repère l'épaississement du cœur dû à l'hypertension." },
+      { "id": "urique", "libelle": "Acide urique", "resultat": "Acide urique élevé." },
+      { "id": "glycemie", "libelle": "Glycémie à jeun", "resultat": "0,95 g/L, normale." },
+      { "id": "lipides", "libelle": "Bilan lipidique", "resultat": "LDL-cholestérol élevé : 1,8 g/L.", "delai": 1 },
+      { "id": "urine", "libelle": "Bandelette urinaire", "resultat": "Protéines +, pas de sang." }
+    ],
+    "diagnostics": [
+      { "id": "hta", "libelle": "Hypertension artérielle sévère avec retentissement (rétine, cœur, reins), à risque cardiovasculaire élevé", "correct": true },
+      { "id": "blouse", "libelle": "Hypertension de la blouse blanche", "revision": "Une rétinopathie, une hypertrophie du cœur et des protéines dans les urines montrent une hypertension installée depuis longtemps, pas une simple réaction à la consultation." },
+      { "id": "pheo", "libelle": "Hypertension secondaire à un phéochromocytome", "revision": "Cette cause rare donne des crises de sueurs et de palpitations : rien ici ne la fait évoquer." },
+      { "id": "panique", "libelle": "Crise de panique", "revision": "Une crise de panique est brève et sans retentissement sur les yeux, le cœur ou les reins." },
+      { "id": "stress", "libelle": "Simple stress passager", "revision": "Le stress peut élever la tension, mais les atteintes d'organes montrent une hypertension chronique." },
+      { "id": "ic", "libelle": "Insuffisance cardiaque isolée", "revision": "Il n'y a pas de signe d'insuffisance cardiaque : le problème principal est l'hypertension." }
+    ],
+    "besoins": [
+      { "id": "trait", "libelle": "Traitement antihypertenseur adapté", "tags": ["antihypertenseur"], "jours": 100000, "perte": 0.3, "gain": 0.18 },
+      { "id": "educ", "libelle": "Éducation thérapeutique (sel, activité physique, observance)", "tags": ["education"], "jours": 100000, "perte": 0.08, "gain": 0.06 },
+      { "id": "ctrl", "libelle": "Contrôle régulier de la tension", "tags": ["controle-tension"], "jours": 100000, "perte": 0.06, "gain": 0.04 },
+      { "id": "bilan", "libelle": "Bilan du retentissement (cœur, reins, yeux)", "tags": ["bilan-hta"], "jours": 100000, "perte": 0.05, "gain": 0.03 },
+      { "id": "tabac", "libelle": "Aide à l'arrêt du tabac", "tags": ["sevrage-tabac"], "jours": 100000, "perte": 0.05, "gain": 0.03 },
+      { "id": "cv", "libelle": "Prévention cardiovasculaire (statine)", "tags": ["statine"], "jours": 100000, "perte": 0.05, "gain": 0.03 }
+    ],
+    "finBonne": "Dix ans plus tard, M. Diallo n'a eu ni AVC, ni infarctus, ni insuffisance rénale : sa tension est maîtrisée, il a arrêté de fumer et mange moins salé. Un traitement adapté à sa goutte et un suivi régulier lui ont évité le sort de son père.",
+    "finMoyenne": "Après dix ans, M. Diallo est vivant mais fragilisé : atteinte du cœur ou des reins à cause d'un traitement interrompu ou d'un suivi irrégulier. Relisez la fiche de révision.",
+    "finMauvaise": "M. Diallo est décédé d'un AVC ou d'une complication de son hypertension. Une hypertension mal traitée ou mal suivie est un tueur silencieux. Relisez la fiche de révision et recommencez."
+  }
+]

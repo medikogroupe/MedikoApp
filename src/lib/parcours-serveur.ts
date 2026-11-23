@@ -9,12 +9,13 @@ import casV2Pneumonie from "@/data/cas-v2-pneumonie.json";
 import casV2LotA1 from "@/data/cas-v2-lot-a1.json";
 import casV2LotA2 from "@/data/cas-v2-lot-a2.json";
 import casV2Diabete from "@/data/cas-v2-chronique-diabete.json";
+import casV2Hta from "@/data/cas-v2-chronique-hta.json";
 import { enregistrerCasV2 } from "@/lib/consultation-serveur";
 import { validerCasV2 } from "@/lib/consultation";
 
 /** Cas livres avec le code : ajoutes en brouillon quand ils manquent, jamais ecrases. */
 const CAS_LIVRES: unknown[] = [...(lot1 as unknown[]), ...(lot2a as unknown[]), ...(lot2b as unknown[])];
-const CAS_V2: unknown[] = [...(casV2Pneumonie as unknown[]), ...(casV2LotA1 as unknown[]), ...(casV2LotA2 as unknown[]), ...(casV2Diabete as unknown[])];
+const CAS_V2: unknown[] = [...(casV2Pneumonie as unknown[]), ...(casV2LotA1 as unknown[]), ...(casV2LotA2 as unknown[]), ...(casV2Diabete as unknown[]), ...(casV2Hta as unknown[])];
 
 const GRAVITES = ["LEGER", "MODERE", "GRAVE", "CRITIQUE"];
 const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
